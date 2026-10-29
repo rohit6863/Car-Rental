@@ -1,0 +1,125 @@
+/* 
+ * Car Rental Portal - Red Theme
+ * Cleaned version without testimonial styles
+ */
+
+:root {
+  --primary-color: #e74c3c;
+  --secondary-color: #c0392b;
+  --text-color: #333;
+  --light-text: #fff;
+  --dark-bg: #2c3e50;
+  --light-bg: #f8f8f8;
+  --border-color: #ddd;
+}
+
+/* Header Styles */
+.header {
+  background-color: var(--primary-color);
+  color: var(--light-text);
+}
+
+/* Navigation Styles */
+.navbar-default {
+  background-color: var(--primary-color);
+  border-color: var(--secondary-color);
+}
+
+.navbar-default .navbar-nav > li > a {
+  color: var(--light-text);
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+  color: var(--light-text);
+  background-color: var(--secondary-color);
+}
+
+/* Button Styles */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--secondary-color);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+/* Footer Styles */
+.footer {
+  background-color: var(--dark-bg);
+  color: var(--light-text);
+}
+
+/* Card Styles */
+.card {
+  border: 1px solid var(--border-color);
+}
+
+.card-header {
+  background-color: var(--primary-color);
+  color: var(--light-text);
+}
+
+/* Form Styles */
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+}
+
+/* Link Styles */
+a {
+  color: var(--primary-color);
+}
+
+a:hover,
+a:focus {
+  color: var(--secondary-color);
+  text-decoration: none;
+}
+
+/* Pagination Styles */
+.pagination > .active > a,
+.pagination > .active > span {
+  background-color: var(--primary-color);
+  border-color: var(--secondary-color);
+}
+
+/* Alert Styles */
+.alert-success {
+  background-color: var(--primary-color);
+  border-color: var(--secondary-color);
+  color: var(--light-text);
+}
+
+/* Badge Styles */
+.badge {
+  background-color: var(--primary-color);
+}
+
+/* Progress Bar Styles */
+.progress-bar {
+  background-color: var(--primary-color);
+}
+
+/* Table Styles */
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: rgba(231, 76, 60, 0.05);
+}
+
+/* Custom Styles */
+.highlight {
+  color: var(--primary-color);
+}
+
+.border-highlight {
+  border-color: var(--primary-color);
+}
+
+.bg-highlight {
+  background-color: var(--primary-color);
+  color: var(--light-text);
+} 

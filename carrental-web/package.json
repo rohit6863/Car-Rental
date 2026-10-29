@@ -1,0 +1,31 @@
+{
+  "name": "carrental-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "parity": "node test-parity.cjs",
+    "test:datepicker": "node test-datepicker.cjs"
+  },
+  "dependencies": {
+    "@fontsource/lato": "^5.3.0",
+    "axios": "^1.7.9",
+    "bootstrap": "^3.4.1",
+    "dompurify": "^3.2.3",
+    "flatpickr": "^4.6.13",
+    "jquery": "^3.7.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.7"
+  }
+}

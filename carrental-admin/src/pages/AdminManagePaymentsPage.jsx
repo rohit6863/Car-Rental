@@ -1,0 +1,193 @@
+import React, { useState, useEffect } from 'react';
+import client from '../api/client';
+
+export default function AdminManagePaymentsPage() {
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [msg, setMsg] = useState('');
+  const [actionInProgress, setActionInProgress] = useState(null);
+
+  const loadPayments = async () => {
+    try {
+      const res = await client.get('/api/admin/payments');
+      setPayments(res.data);
+    } catch (err) {
+      setError('Failed to load payments');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPayments();
+  }, []);
+
+  const handleConfirm = async (id) => {
+    if (!window.confirm('Do you want to confirm this payment?')) return;
+    setError('');
+    setMsg('');
+    setActionInProgress(id);
+    try {
+      const res = await client.patch(`/api/admin/payments/${id}/confirm`);
+      setMsg(res.data.message || 'Payment Confirmed Successfully');
+    } catch (err) {
+      const errorMsg =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        'Failed to confirm payment';
+      setError(errorMsg);
+    } finally {
+      await loadPayments();
+      setActionInProgress(null);
+      if (typeof window !== 'undefined' && window.scrollTo) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  };
+
+  const handleReject = async (id) => {
+    if (!window.confirm('Do you want to reject this payment?')) return;
+    setError('');
+    setMsg('');
+    setActionInProgress(id);
+    try {
+      const res = await client.patch(`/api/admin/payments/${id}/reject`);
+      setMsg(res.data.message || 'Payment Rejected Successfully');
+    } catch (err) {
+      const errorMsg =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        'Failed to reject payment';
+      setError(errorMsg);
+    } finally {
+      await loadPayments();
+      setActionInProgress(null);
+      if (typeof window !== 'undefined' && window.scrollTo) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  };
+
+  return (
+    <div className="row">
+      <div className="col-md-12">
+        <h2 className="page-title">Manage Payments</h2>
+
+        {error && (
+          <div className="errorWrap" style={{
+            padding: '10px',
+            margin: '0 0 20px 0',
+            background: '#fff',
+            borderLeft: '4px solid #dd3d36',
+            boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
+          }}>
+            <strong>ERROR</strong>: {error}
+          </div>
+        )}
+        {msg && (
+          <div className="succWrap" style={{
+            padding: '10px',
+            margin: '0 0 20px 0',
+            background: '#fff',
+            borderLeft: '4px solid #5cb85c',
+            boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
+          }}>
+            <strong>SUCCESS</strong>: {msg}
+          </div>
+        )}
+
+        <div className="panel panel-default">
+          <div className="panel-heading">Payment Details</div>
+          <div className="panel-body">
+            {loading ? (
+              <p>Loading payments...</p>
+            ) : (
+              <table id="zctb" className="display table table-striped table-bordered table-hover" cellSpacing="0" width="100%">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Booking ID</th>
+                    <th>User</th>
+                    <th>Vehicle</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Transaction ID</th>
+                    <th>Payment Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.length === 0 ? (
+                    <tr>
+                      <td colSpan="10" className="text-center">No payments found</td>
+                    </tr>
+                  ) : (
+                    payments.map((p, idx) => (
+                      <tr key={p.id}>
+                        <td>{idx + 1}</td>
+                        <td>{p.booking_id}</td>
+                        <td>{p.FullName}</td>
+                        <td>{p.VehiclesTitle}</td>
+                        <td>Rs. {p.amount}</td>
+                        <td>
+                          {p.payment_method}
+                          {p.payment_method === 'UPI' && p.notes && (
+                            <>
+                              <br />
+                              <small>{p.notes}</small>
+                            </>
+                          )}
+                        </td>
+                        <td>{p.transaction_id || '-'}</td>
+                        <td>{p.payment_date ? new Date(p.payment_date).toLocaleString() : ''}</td>
+                        <td>
+                          <span style={{ textTransform: 'capitalize' }}>
+                            {p.payment_status}
+                          </span>
+                        </td>
+                        <td>
+                          {actionInProgress === p.id ? (
+                            <span>Processing...</span>
+                          ) : p.payment_status === 'pending' ? (
+                            <>
+                              <a
+                                href="#confirm"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleConfirm(p.id);
+                                }}
+                              >
+                                Confirm
+                              </a>
+                              {' / '}
+                              <a
+                                href="#reject"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleReject(p.id);
+                                }}
+                                style={{ color: '#dd3d36' }}
+                              >
+                                Reject
+                              </a>
+                            </>
+                          ) : (
+                            <span style={{ textTransform: 'capitalize' }}>
+                              {p.payment_status}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

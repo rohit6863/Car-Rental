@@ -1,0 +1,1502 @@
+/* 
+ * Car Rental Portal - Minimalistic CSS
+ * Focused on fixing distorted GUI elements
+ */
+
+/* Base Styles */
+:root {
+  --primary-color: #c51514;
+  --secondary-color: #089901;
+  --text-color: #555555;
+  --heading-color: #111111;
+  --light-bg: #f5f5f5;
+  --border-color: #dcd9d9;
+  --light-gray: #f8f8f8;
+  --white: #fff;
+  --black: #000;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--light-gray);
+  overflow-x: hidden;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--heading-color);
+  font-weight: 900;
+  margin: 0 auto 15px;
+}
+
+h1 { font-size: 50px; }
+h2 { font-size: 40px; }
+h3 { font-size: 28px; }
+h4 { font-size: 22px; }
+h5 { font-size: 20px; line-height: 32px; }
+h6 { font-size: 18px; }
+
+p {
+  font-size: 16px;
+  line-height: 26px;
+  margin-bottom: 15px;
+}
+
+/* Links */
+a {
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+a:hover, a:focus {
+  text-decoration: none;
+  outline: none;
+}
+
+/* Buttons */
+.btn {
+  border: none;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 30px;
+  padding: 7px 36px;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  color: #fff;
+  background: var(--primary-color);
+}
+
+/* Forms */
+.form-control {
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  padding: 10px 15px;
+  height: auto;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: none;
+}
+
+/* Cards and Listings */
+.card {
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  margin-bottom: 30px;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.vehicle-listing {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.vehicle-listing img {
+  width: 100%;
+  height: auto;
+}
+
+.vehicle-info {
+  padding: 15px;
+}
+
+.vehicle-info h5 {
+  margin-bottom: 10px;
+}
+
+.price {
+  color: var(--primary-color);
+  font-weight: 800;
+}
+
+/* Booking Form */
+.booking-form {
+  background: var(--light-bg);
+  padding: 30px;
+  border-radius: 3px;
+}
+
+.booking-form .form-group {
+  margin-bottom: 20px;
+}
+
+/* Footer */
+.footer {
+  background: var(--heading-color);
+  color: #fff;
+  padding: 50px 0 20px;
+}
+
+.footer a {
+  color: #fff;
+}
+
+.footer a:hover {
+  color: var(--primary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 991px) {
+  h1 { font-size: 40px; }
+  h2 { font-size: 32px; }
+  h3 { font-size: 24px; }
+  h4 { font-size: 20px; }
+  h5 { font-size: 18px; }
+}
+
+@media (max-width: 767px) {
+  .container {
+    padding: 0 15px;
+  }
+  
+  .btn {
+    padding: 5px 20px;
+  }
+}
+
+/* Utility Classes */
+.text-primary { color: var(--primary-color); }
+.text-secondary { color: var(--secondary-color); }
+.bg-light { background: var(--light-bg); }
+.mb-30 { margin-bottom: 30px; }
+.mt-30 { margin-top: 30px; }
+
+/* Animations */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Page Headers */
+.page-header {
+  background: var(--light-bg);
+  padding: 50px 0;
+  margin-bottom: 50px;
+}
+
+.page-header h1 {
+  margin-bottom: 10px;
+}
+
+/* About Us Page */
+.about-section {
+  padding: 50px 0;
+}
+
+.about-img {
+  position: relative;
+  overflow: hidden;
+}
+
+.about-img img {
+  transition: transform 0.3s ease;
+}
+
+.about-img:hover img {
+  transform: scale(1.05);
+}
+
+/* Contact Us Page */
+.contact-section {
+  padding: 50px 0;
+}
+
+.contact-info {
+  margin-bottom: 30px;
+}
+
+.contact-info i {
+  color: var(--primary-color);
+  margin-right: 10px;
+}
+
+/* Car Listing Page */
+.filter-section {
+  background: var(--light-bg);
+  padding: 30px;
+  margin-bottom: 30px;
+}
+
+.sorting-options {
+  margin-bottom: 20px;
+}
+
+/* Vehicle Details Page */
+.vehicle-details {
+  margin-bottom: 50px;
+}
+
+.vehicle-gallery {
+  margin-bottom: 30px;
+}
+
+.vehicle-specs {
+  margin-bottom: 30px;
+}
+
+.specs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.specs-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Form Elements */
+.form-label {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.form-check {
+  margin-bottom: 10px;
+}
+
+/* Error and Success Messages */
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 3px;
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Font Awesome Fixes */
+.fa {
+  line-height: inherit;
+}
+
+/* Navigation Tabs */
+.nav-tabs {
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 20px;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  color: var(--text-color);
+  padding: 10px 20px;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--primary-color);
+}
+
+/* Tables */
+.table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.table th {
+  background: var(--light-bg);
+  padding: 10px;
+}
+
+.table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Image Slider */
+.slider {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.slider img {
+  width: 100%;
+  height: auto;
+}
+
+/* Bootstrap Tab Fixes */
+.tab-content {
+  padding: 20px 0;
+}
+
+.tab-pane {
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Header Styles */
+.header {
+  background-color: var(--white);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logo img {
+  max-height: 50px;
+}
+
+.header_info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+}
+
+.header_widgets {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.circle_icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--light-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Navigation */
+.navbar-default {
+  background-color: var(--white);
+  border: none;
+  margin-bottom: 0;
+}
+
+.navbar-nav > li > a {
+  color: var(--text-color);
+  font-weight: 500;
+  padding: 15px 20px;
+}
+
+.navbar-nav > li > a:hover {
+  color: var(--secondary-color);
+}
+
+/* Login Button */
+.login_btn a {
+  background: #007bff;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.welcome_msg {
+  margin-left: 15px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Navigation Bar */
+#navigation_bar {
+  background: #2c3e50;
+  border: none;
+  border-radius: 0;
+  margin-bottom: 0;
+}
+
+#navigation .nav > li > a {
+  color: #fff;
+  padding: 15px;
+}
+
+#navigation .nav > li > a:hover {
+  background-color: #34495e;
+}
+
+/* User Login Dropdown */
+.user_login {
+  position: relative;
+}
+
+.user_login ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.user_login .dropdown-menu {
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border: none;
+}
+
+.user_login .dropdown-menu li a {
+  color: #333;
+  padding: 8px 15px;
+}
+
+.user_login .dropdown-menu li a:hover {
+  background: #f8f8f8;
+  color: #007bff;
+}
+
+/* Search Bar Fix */
+.header_search {
+  position: relative;
+}
+
+#search_toggle {
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+#header-search-form {
+  display: flex;
+}
+
+#header-search-form input {
+  border-radius: 3px 0 0 3px;
+  border: 1px solid #ddd;
+  padding: 8px 10px;
+  width: 100%;
+}
+
+#header-search-form button {
+  background: #007bff;
+  border: none;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 0 3px 3px 0;
+}
+
+/* Banner Section Fix */
+.banner-section {
+  background-position: center;
+  padding: 80px 0;
+  position: relative;
+  color: #fff;
+}
+
+.banner_content {
+  background: rgba(0,0,0,0.7);
+  padding: 25px;
+  border-radius: 5px;
+}
+
+.banner_content h1 {
+  font-size: 32px;
+  margin-bottom: 15px;
+}
+
+.banner_content .btn {
+  background: #007bff;
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-top: 15px;
+}
+
+/* Section Headers */
+.section-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.section-header h2 {
+  font-size: 28px;
+  margin-bottom: 15px;
+}
+
+.section-header p {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Car Listing */
+.recent-car-list {
+  background: #fff;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.car-info-box img {
+  width: 100%;
+  height: auto;
+}
+
+.car-info-box ul {
+  list-style: none;
+  padding: 10px;
+  display: flex;
+  background: #f8f8f8;
+  margin: 0;
+}
+
+.car-info-box ul li {
+  margin-right: 15px;
+  font-size: 13px;
+}
+
+.car-title-m {
+  padding: 15px;
+}
+
+.car-title-m h6 {
+  margin: 0 0 5px;
+  font-size: 16px;
+}
+
+.car-title-m .price {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.inventory_info_m {
+  padding: 0 15px 15px;
+  font-size: 13px;
+}
+
+/* Header Layout Fix */
+.default-header {
+  background: #fff;
+  padding: 15px 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logo {
+  display: block;
+}
+
+.logo img {
+  max-height: 60px;
+}
+
+/* Support Info Area */
+.header_info {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.header_widgets {
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+}
+
+.circle_icon {
+  margin-right: 8px;
+  width: 30px;
+  height: 30px;
+  background: #f1f1f1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2c3e50;
+}
+
+.uppercase_text {
+  margin: 0 5px 0 0;
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.header_widgets a {
+  color: #007bff;
+  font-weight: 600;
+}
+
+/* Social Icons Fixes */
+.social-follow {
+  margin-right: 15px;
+}
+
+.social-follow ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.social-follow li {
+  margin-left: 10px;
+  list-style: none;
+}
+
+.social-follow a {
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.social-follow a:hover {
+  color: #007bff;
+}
+
+/* Login Button */
+.login_btn a {
+  background: #007bff;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.welcome_msg {
+  margin-left: 15px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Navigation Bar */
+#navigation_bar {
+  background: #2c3e50;
+  border: none;
+  border-radius: 0;
+  margin-bottom: 0;
+}
+
+#navigation .nav > li > a {
+  color: #fff;
+  padding: 15px;
+}
+
+#navigation .nav > li > a:hover {
+  background-color: #34495e;
+}
+
+/* User Login Dropdown */
+.user_login {
+  position: relative;
+}
+
+.user_login ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.user_login .dropdown-menu {
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border: none;
+}
+
+.user_login .dropdown-menu li a {
+  color: #333;
+  padding: 8px 15px;
+}
+
+.user_login .dropdown-menu li a:hover {
+  background: #f8f8f8;
+  color: #007bff;
+}
+
+/* Search Bar Fix */
+.header_search {
+  position: relative;
+}
+
+#search_toggle {
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+#header-search-form {
+  display: flex;
+}
+
+#header-search-form input {
+  border-radius: 3px 0 0 3px;
+  border: 1px solid #ddd;
+  padding: 8px 10px;
+  width: 100%;
+}
+
+#header-search-form button {
+  background: #007bff;
+  border: none;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 0 3px 3px 0;
+}
+
+/* Banner Section Fix */
+.banner-section {
+  background-position: center;
+  padding: 80px 0;
+  position: relative;
+  color: #fff;
+}
+
+.banner_content {
+  background: rgba(0,0,0,0.7);
+  padding: 25px;
+  border-radius: 5px;
+}
+
+.banner_content h1 {
+  font-size: 32px;
+  margin-bottom: 15px;
+}
+
+.banner_content .btn {
+  background: #007bff;
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-top: 15px;
+}
+
+/* Section Headers */
+.section-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.section-header h2 {
+  font-size: 28px;
+  margin-bottom: 15px;
+}
+
+.section-header p {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Car Listing */
+.recent-car-list {
+  background: #fff;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.car-info-box img {
+  width: 100%;
+  height: auto;
+}
+
+.car-info-box ul {
+  list-style: none;
+  padding: 10px;
+  display: flex;
+  background: #f8f8f8;
+  margin: 0;
+}
+
+.car-info-box ul li {
+  margin-right: 15px;
+  font-size: 13px;
+}
+
+.car-title-m {
+  padding: 15px;
+}
+
+.car-title-m h6 {
+  margin: 0 0 5px;
+  font-size: 16px;
+}
+
+.car-title-m .price {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.inventory_info_m {
+  padding: 0 15px 15px;
+  font-size: 13px;
+}
+
+/* Footer */
+.footer {
+  background: #2c3e50;
+  color: #fff;
+  padding: 30px 0;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 767px) {
+  .header_info {
+    justify-content: center;
+  }
+  
+  .header_widgets {
+    margin: 10px;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .social-follow {
+    margin-top: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .login_btn {
+    margin: 10px auto;
+  }
+  
+  #navigation_bar .navbar-toggle {
+    border-color: #fff;
+  }
+  
+  #navigation_bar .navbar-toggle .icon-bar {
+    background: #fff;
+  }
+  
+  .header_wrap {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  /* Header */
+  .default-header {
+    padding: 10px 0;
+  }
+  
+  .logo img {
+    max-height: 40px;
+  }
+  
+  .header_info {
+    margin-top: 10px;
+  }
+  
+  /* Nav */
+  #navigation_bar {
+    padding: 0;
+  }
+  
+  #navigation .nav {
+    margin: 0;
+  }
+  
+  #navigation .nav > li {
+    display: block;
+    width: 100%;
+  }
+  
+  .navbar-collapse {
+    padding: 0;
+  }
+  
+  /* Banner */
+  .banner-section {
+    padding: 50px 0;
+  }
+  
+  .banner_content {
+    padding: 20px;
+  }
+  
+  .banner_content h1 {
+    font-size: 24px;
+  }
+  
+  /* Car Listing */
+  .product-listing-m {
+    flex-direction: column;
+  }
+  
+  .product-listing-img {
+    width: 100%;
+  }
+  
+  .product-listing-content {
+    width: 100%;
+  }
+  
+  /* Vehicle Detail */
+  .listing_detail_head {
+    flex-direction: column;
+  }
+  
+  .main_features ul {
+    flex-direction: column;
+  }
+  
+  .main_features li {
+    margin-bottom: 15px;
+  }
+  
+  /* About and Contact */
+  .aboutus_page .page-heading h1,
+  .contactus_page .page-heading h1,
+  .listing_page .page-heading h1 {
+    font-size: 28px;
+  }
+  
+  /* Forms */
+  .form-group {
+    margin-bottom: 10px;
+  }
+}
+
+/* Base Styles */
+body {
+  font-size: 14px;
+  background-color: #f8f8f8;
+}
+
+/* Header Styles */
+.header {
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Button Styles */
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+/* Form Styles */
+.form-control {
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+}
+
+/* Card Styles */
+.card {
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+/* Vehicle Listing Styles */
+.vehicle-card {
+  transition: transform 0.3s ease;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Booking Styles */
+.booking-form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+  
+  .navbar-nav {
+    margin: 7.5px -15px;
+  }
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+/* Animation Styles */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Page Header Styles */
+.page-header {
+  background-image: url('../images/banner-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 60px 0;
+  position: relative;
+  color: #fff;
+}
+
+.aboutus_page, .contactus_page, .listing_page {
+  position: relative;
+  color: #fff;
+  text-align: center;
+}
+
+.page-header_wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.page-heading {
+  margin-bottom: 15px;
+}
+
+.page-heading h1 {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.coustom-breadcrumb {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+
+.coustom-breadcrumb li {
+  margin: 0 5px;
+  font-size: 14px;
+}
+
+.coustom-breadcrumb li a {
+  color: #fff;
+  opacity: 0.8;
+}
+
+.coustom-breadcrumb li a:hover {
+  opacity: 1;
+}
+
+.dark-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+}
+
+/* About Us Page */
+.about_us {
+  padding: 60px 0;
+}
+
+/* Contact Us Page */
+.contact_us {
+  padding: 60px 0;
+}
+
+.contact_detail {
+  margin-top: 20px;
+}
+
+.contact_detail ul {
+  list-style: none;
+  padding: 0;
+}
+
+.contact_detail li {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.icon_wrap {
+  width: 40px;
+  height: 40px;
+  background: #f1f1f1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  color: #2c3e50;
+}
+
+.contact_info_m {
+  flex: 1;
+}
+
+.contact_form {
+  background: #f8f8f8;
+  padding: 20px;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+/* Car Listing Page */
+.listing-page {
+  padding: 60px 0;
+}
+
+.sidebar_widget {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+.widget_heading {
+  background: #2c3e50;
+  color: #fff;
+  padding: 15px;
+}
+
+.widget_heading h5 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.sidebar_filter {
+  padding: 15px;
+}
+
+.product-listing-m {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 4px;
+  margin-bottom: 30px;
+  overflow: hidden;
+  display: flex;
+}
+
+.product-listing-img {
+  width: 30%;
+  overflow: hidden;
+}
+
+.product-listing-content {
+  width: 70%;
+  padding: 20px;
+}
+
+.product-listing-content h5 {
+  margin-top: 0;
+  font-size: 18px;
+}
+
+.recent_addedcars ul {
+  padding: 15px;
+  list-style: none;
+}
+
+.recent_addedcars li {
+  display: flex;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.recent_post_img {
+  width: 80px;
+  margin-right: 15px;
+}
+
+.recent_post_title {
+  flex: 1;
+}
+
+/* Vehicle Details Page */
+.listing-detail {
+  padding: 60px 0;
+}
+
+.listing_detail_head {
+  margin-bottom: 20px;
+}
+
+.price_info {
+  background: #2c3e50;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.main_features {
+  display: flex;
+  background: #f8f8f8;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  justify-content: space-between;
+}
+
+.main_features ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.main_features li {
+  text-align: center;
+}
+
+.main_features i {
+  font-size: 24px;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.tab-content {
+  padding: 20px;
+  background: #fff;
+}
+
+/* Form Elements in Vehicle Pages */
+.form-group {
+  margin-bottom: 15px;
+}
+
+/* Error & Success Messages */
+.errorWrap, .succWrap {
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.errorWrap {
+  background: #f8d7da;
+  border-left: 4px solid #dc3545;
+}
+
+.succWrap {
+  background: #d4edda;
+  border-left: 4px solid #28a745;
+}
+
+/* Font Awesome Icon Fixes */
+.fa {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.fa-twitter:before {
+  content: "\f099";
+}
+
+.fa-facebook:before {
+  content: "\f09a";
+}
+
+.fa-linkedin:before, .fa-linkedin-square:before {
+  content: "\f0e1";
+}
+
+.fa-instagram:before {
+  content: "\f16d";
+}
+
+.fa-search:before {
+  content: "\f002";
+}
+
+.fa-user-circle:before {
+  content: "\f2bd";
+}
+
+.fa-angle-down:before {
+  content: "\f107";
+}
+
+.fa-angle-right:before {
+  content: "\f105";
+}
+
+.fa-angle-up:before {
+  content: "\f106";
+}
+
+.fa-envelope:before {
+  content: "\f0e0";
+}
+
+.fa-phone:before {
+  content: "\f095";
+}
+
+.fa-car:before {
+  content: "\f1b9";
+}
+
+.fa-calendar:before {
+  content: "\f073";
+}
+
+.fa-user:before {
+  content: "\f007";
+}
+
+.fa-user-plus:before {
+  content: "\f234";
+}
+
+.fa-cogs:before {
+  content: "\f085";
+}
+
+.fa-check:before {
+  content: "\f00c";
+}
+
+.fa-close:before, .fa-times:before {
+  content: "\f00d";
+}
+
+.fa-map-marker:before {
+  content: "\f041";
+}
+
+.fa-filter:before {
+  content: "\f0b0";
+}
+
+/* Navigation Tab Styles */
+.nav-tabs {
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.nav-tabs > li {
+  margin-bottom: -1px;
+}
+
+.nav-tabs > li > a {
+  margin-right: 2px;
+  line-height: 1.42857143;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+  padding: 10px 15px;
+  display: block;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+  color: #555;
+  cursor: default;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-bottom-color: transparent;
+}
+
+/* Table Styles for Vehicle Details */
+table {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 20px;
+  background-color: transparent;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+th {
+  text-align: left;
+  font-weight: bold;
+  padding: 8px;
+  line-height: 1.42857143;
+  vertical-align: top;
+  border-top: 1px solid #ddd;
+}
+
+td {
+  padding: 8px;
+  line-height: 1.42857143;
+  vertical-align: top;
+  border-top: 1px solid #ddd;
+}
+
+/* Fix vehicle image slider in details page */
+#listing_img_slider img {
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* Fix Bootstrap tabs for car details */
+.vehicle_details .tab-content {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-top: none;
+  background: #fff;
+}
+
+.vehicle_details .nav-tabs {
+  border-bottom: 1px solid #ddd;
+}
+
+.vehicle_details .nav-tabs > li > a {
+  margin-right: 2px;
+  line-height: 1.42857143;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+}
+
+.vehicle_details .nav-tabs > li.active > a,
+.vehicle_details .nav-tabs > li.active > a:hover,
+.vehicle_details .nav-tabs > li.active > a:focus {
+  color: #555;
+  cursor: default;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-bottom-color: transparent;
+} 

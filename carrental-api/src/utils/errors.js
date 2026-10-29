@@ -1,0 +1,56 @@
+'use strict';
+/**
+ * Custom application error classes.
+ * Controllers throw these; the global error handler maps them to HTTP responses.
+ */
+
+class AppError extends Error {
+  /** @param {string} message @param {number} statusCode */
+  constructor(message, statusCode = 500) {
+    super(message);
+    this.name = this.constructor.name;
+    this.statusCode = statusCode;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+class ValidationError extends AppError {
+  constructor(message, details) {
+    super(message, 422);
+    this.details = details;
+  }
+}
+
+class AuthError extends AppError {
+  constructor(message = 'Authentication required') {
+    super(message, 401);
+  }
+}
+
+class ForbiddenError extends AppError {
+  constructor(message = 'Access denied') {
+    super(message, 403);
+  }
+}
+
+class NotFoundError extends AppError {
+  constructor(resource = 'Resource') {
+    super(`${resource} not found`, 404);
+  }
+}
+
+class ConflictError extends AppError {
+  constructor(message, details) {
+    super(message, 409);
+    this.details = details;
+  }
+}
+
+module.exports = {
+  AppError,
+  ValidationError,
+  AuthError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+};
