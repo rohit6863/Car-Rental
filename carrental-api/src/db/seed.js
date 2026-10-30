@@ -199,8 +199,8 @@ async function seed() {
   const [existingUser] = await conn.execute('SELECT id FROM tblusers WHERE EmailId = ?', [customerEmail]);
   if (existingUser.length === 0) {
     await conn.execute(`
-      INSERT INTO tblusers (FullName, EmailId, ContactNo, Password, password_hash, Address, City, Country, auth_provider)
-      VALUES ('Test Customer', ?, '9876543210', '', ?, '123 Test Street', 'Pune', 'India', 'local')
+      INSERT INTO tblusers (FullName, EmailId, ContactNo, Password, password_hash, Address, City, Country, auth_provider, email_verified)
+      VALUES ('Test Customer', ?, '9876543210', '', ?, '123 Test Street', 'Pune', 'India', 'local', 0)
     `, [customerEmail, customerHash]);
     console.log(`  + Seeded test customer: ${customerEmail}`);
   } else {

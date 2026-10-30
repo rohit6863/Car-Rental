@@ -109,6 +109,21 @@ class AuthService {
     }
 
     const userRow = rows[0];
+
+    // If account has no password set (e.g. Google sign-up or linked account), run dummy Argon2
+    // verification to guarantee constant-time execution and prevent user password-state enumeration
+    if (!userRow.password_hash && !userRow.Password) {
+      await verifyArgon2(DUMMY_ARGON2_HASH, password);
+      await recordFailedAttempt(email, ip);
+      auditLog('USER_LOGIN_FAILED', {
+        actorType: 'user',
+        actorId: userRow.id,
+        ip,
+        details: { email, reason: 'passwordless_account' },
+      });
+      throw new AuthError('Invalid Details');
+    }
+
     const { valid, needsRehash } = await verifyPassword(password, userRow);
 
     if (!valid) {

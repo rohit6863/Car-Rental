@@ -6,6 +6,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [providers, setProviders] = useState({ google: false });
 
   const checkAuth = async () => {
     try {
@@ -22,8 +23,18 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const loadProviders = async () => {
+    try {
+      const res = await api.get('/api/auth/providers');
+      if (res.data) setProviders(res.data);
+    } catch {
+      setProviders({ google: false });
+    }
+  };
+
   useEffect(() => {
     checkAuth();
+    loadProviders();
   }, []);
 
   const login = async (email, password) => {
@@ -55,7 +66,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth }}>
+    <AuthContext.Provider value={{ user, loading, providers, login, register, logout, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );

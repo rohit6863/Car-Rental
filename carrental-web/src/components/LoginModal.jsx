@@ -1,12 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginModal() {
-  const { login } = useAuth();
+  const { login, providers } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const err = params.get('error');
+      if (err) {
+        if (err === 'cancelled') {
+          setError('Google sign-in was cancelled. Please try again.');
+        } else if (err === 'email_unverified') {
+          setError('Your Google email address is not verified. Please verify your email with Google and try again.');
+        } else {
+          setError('Google sign-in failed. Please try again.');
+        }
+        if (window.$) {
+          window.$('#loginform').modal('show');
+        }
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,6 +108,37 @@ export default function LoginModal() {
                       />
                     </div>
                   </form>
+
+                  {providers?.google && (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', margin: '15px 0' }}>
+                        <div style={{ flex: 1, borderTop: '1px solid #e4e4e4' }}></div>
+                        <span style={{ padding: '0 10px', color: '#888', fontSize: '13px', textTransform: 'uppercase' }}>or</span>
+                        <div style={{ flex: 1, borderTop: '1px solid #e4e4e4' }}></div>
+                      </div>
+                      <div className="form-group">
+                        <a
+                          href="/api/auth/google"
+                          className="btn btn-block"
+                          style={{
+                            backgroundColor: '#fff',
+                            color: '#333',
+                            border: '1px solid #ccc',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '10px',
+                            fontWeight: 600,
+                            textDecoration: 'none',
+                            padding: '10px 16px',
+                          }}
+                        >
+                          <img src="/assets/images/google-logo.svg" alt="Google" width="18" height="18" style={{ display: 'inline-block' }} />
+                          <span>Continue with Google</span>
+                        </a>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

@@ -8,6 +8,7 @@ const {
   forgotPasswordLimiter,
   checkEmailLimiter,
   readOnlyAuthLimiter,
+  googleAuthLimiter,
 } = require('../middleware/rateLimiter');
 const { requireAuth } = require('../middleware/auth');
 const {
@@ -22,6 +23,9 @@ const router = express.Router();
 
 router.get('/csrf', readOnlyAuthLimiter, authController.getCsrf);
 router.get('/csrf-token', readOnlyAuthLimiter, authController.getCsrf);
+router.get('/providers', readOnlyAuthLimiter, authController.getProviders);
+router.get('/google', googleAuthLimiter, authController.googleAuth);
+router.get('/google/callback', googleAuthLimiter, authController.googleCallback);
 router.post('/register', registrationLimiter, validate({ body: registerSchema }), authController.register);
 router.post('/login', customerLoginLimiter, validate({ body: loginSchema }), authController.login);
 router.post('/logout', authController.logout);

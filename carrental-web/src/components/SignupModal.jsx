@@ -3,7 +3,7 @@ import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
 
 export default function SignupModal() {
-  const { register } = useAuth();
+  const { register, providers } = useAuth();
   const [formData, setFormData] = useState({
     fullname: '',
     mobileno: '',
@@ -159,6 +159,37 @@ export default function SignupModal() {
                       />
                     </div>
                   </form>
+
+                  {providers?.google && (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', margin: '15px 0' }}>
+                        <div style={{ flex: 1, borderTop: '1px solid #e4e4e4' }}></div>
+                        <span style={{ padding: '0 10px', color: '#888', fontSize: '13px', textTransform: 'uppercase' }}>or</span>
+                        <div style={{ flex: 1, borderTop: '1px solid #e4e4e4' }}></div>
+                      </div>
+                      <div className="form-group">
+                        <a
+                          href="/api/auth/google"
+                          className="btn btn-block"
+                          style={{
+                            backgroundColor: '#fff',
+                            color: '#333',
+                            border: '1px solid #ccc',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '10px',
+                            fontWeight: 600,
+                            textDecoration: 'none',
+                            padding: '10px 16px',
+                          }}
+                        >
+                          <img src="/assets/images/google-logo.svg" alt="Google" width="18" height="18" style={{ display: 'inline-block' }} />
+                          <span>Continue with Google</span>
+                        </a>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

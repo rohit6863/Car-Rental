@@ -19,7 +19,17 @@ export default function ProfilePage() {
   });
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('notice') === 'missing_contact') {
+        setNotice('Please provide your contact number to complete your profile.');
+      }
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -115,6 +125,11 @@ export default function ProfilePage() {
             <div className="col-md-6 col-sm-8">
               <div className="profile_wrap">
                 <h5 className="uppercase underline">GENRAL SETTINGS</h5>
+                {(notice || (profile && !profile.ContactNo)) && (
+                  <div className="errorWrap" style={{ padding: '10px', margin: '0 0 20px 0', background: '#fff', borderLeft: '4px solid #337ab7', boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)' }}>
+                    <strong>NOTICE</strong>: {notice || 'Please provide your contact number to complete your profile.'}
+                  </div>
+                )}
                 {msg && (
                   <div className="succWrap" style={{ padding: '10px', margin: '0 0 20px 0', background: '#fff', borderLeft: '4px solid #5cb85c' }}>
                     <strong>SUCCESS</strong>:{msg}

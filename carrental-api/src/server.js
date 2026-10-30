@@ -1,6 +1,7 @@
 'use strict';
 require('dotenv').config();
 const app = require('./app');
+const { reportGoogleAuthConfig, validateGoogleOAuthConfig } = require('./services/googleAuth.service');
 
 function validateEnvironment() {
   const isProd = process.env.NODE_ENV === 'production';
@@ -33,6 +34,10 @@ function validateEnvironment() {
       console.warn('[SECURITY WARNING] Using weak or default JWT_REFRESH_SECRET in non-production mode.');
     }
   }
+
+  // Report and validate Google OAuth environment variables
+  reportGoogleAuthConfig();
+  validateGoogleOAuthConfig();
 
   if (errors.length > 0) {
     console.error('\n============================================================');

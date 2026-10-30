@@ -12,6 +12,7 @@ const REGISTER_MAX       = parseInt(process.env.RATE_LIMIT_REGISTER_MAX       ||
 const CHECK_EMAIL_MAX    = parseInt(process.env.RATE_LIMIT_CHECK_EMAIL_MAX    || (isProd ? '20' : '60'), 10);
 const FORM_MAX           = parseInt(process.env.RATE_LIMIT_FORM_MAX           || (isProd ? '10' : '30'), 10);
 const READONLY_MAX       = parseInt(process.env.RATE_LIMIT_READONLY_MAX       || (isProd ? '100': '300'), 10);
+const GOOGLE_AUTH_MAX    = parseInt(process.env.RATE_LIMIT_GOOGLE_AUTH_MAX    || (isProd ? '10' : '30'), 10);
 const GENERAL_MAX        = parseInt(process.env.RATE_LIMIT_GENERAL_MAX        || (isProd ? '100': '300'), 10);
 
 function createLimitHandler(message) {
@@ -102,6 +103,16 @@ const readOnlyAuthLimiter = rateLimit({
   skip: shouldSkip,
 });
 
+/** Google OAuth limiter (keyed on IP + route group) */
+const googleAuthLimiter = rateLimit({
+  windowMs: WINDOW_MS,
+  max: () => (process.env.RATE_LIMIT_GOOGLE_AUTH_MAX ? parseInt(process.env.RATE_LIMIT_GOOGLE_AUTH_MAX, 10) : GOOGLE_AUTH_MAX),
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: createLimitHandler('Too many Google sign-in attempts. Please try again later.'),
+  skip: shouldSkip,
+});
+
 /** General application limiter */
 const generalLimiter = rateLimit({
   windowMs: WINDOW_MS,
@@ -120,6 +131,7 @@ module.exports = {
   checkEmailLimiter,
   publicFormLimiter,
   readOnlyAuthLimiter,
+  googleAuthLimiter,
   generalLimiter,
   CONFIG: {
     WINDOW_MS,
@@ -130,6 +142,7 @@ module.exports = {
     CHECK_EMAIL_MAX,
     FORM_MAX,
     READONLY_MAX,
+    GOOGLE_AUTH_MAX,
     GENERAL_MAX,
   },
 };

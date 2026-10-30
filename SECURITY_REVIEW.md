@@ -251,8 +251,142 @@ upgradeInsecureRequests: isProd ? [] : null,
 
 ### 5. Test Suite Verification Summary
 
-- **API Test Suites:** 7 passed, 7 total (59 passed, 59 total)
+- **API Test Suites:** 8 passed, 8 total (77 passed, 77 total)
 - **Playwright E2E Suites:**
   - `test-phase3b-playwright.cjs`: Customer login lockout (showing wait time in UI), admin login isolation without blockage, customer booking flow, and admin booking confirmation. **PASS (100%)**
   - `test-e2e-flow.cjs`: Two customers overlapping booking race condition, admin confirmation, and inline 409 conflict error banner. **PASS (100%)**
+  - `test-post-vehicle.cjs`: Real-click vehicle accessory toggling, multipart image validation, and file size limits. **PASS (100%)**
+  - `test-google-playwright.cjs`: Real-click Google sign-in navigation, parameter verification at Google, full mock OIDC browser login, and cancellation flow. **PASS (100%)**
+
+---
+
+## Phase 4: Customer Google OAuth Authentication & Pre-Hijacking Defense
+
+**Scope:** Customer Google Sign-In (`carrental-api`, `carrental-web`)  
+**Strict Rule:** Customers only. Admins can never sign in or be created via Google.  
+**Status:** Remediated & Fully Verified (All 77 Unit/Integration Tests + All 3 Browser Playwright Scenarios Passing)
+
+---
+
+### 1. Threat Modeling & Vulnerability Remediation Register
+
+#### SEC-012 (Critical): Pre-Hijacking Account Takeover via Existing Local Account Linkage
+- **Threat Model / Attack Vector:**
+  An attacker registers an account locally using a victim's email address (e.g. `victim@gmail.com`) before the victim joins the platform. When the real victim later clicks "Continue with Google", a naive OAuth implementation might associate the Google ID to the existing account without revoking credentials. The attacker could retain access using their known password or retain active session tokens created prior to the OAuth link.
+- **How to Exploit:**
+  1. Attacker registers `victim@example.com` with password `AttackerPassword123!`.
+  2. Attacker logs in and maintains an active refresh token.
+  3. Victim logs in with Google OAuth using verified email `victim@example.com`.
+  4. If passwords or active sessions are not invalidated, attacker retains full persistent access through their previous credentials and refresh tokens.
+- **Fix:**
+  In `carrental-api/src/services/googleAuth.service.js` (`processCallback`), when an account is linked to Google for the first time:
+  1. Local passwords are completely wiped: `Password = NULL`, `password_hash = NULL`.
+  2. All existing refresh tokens for the user in `tbl_refresh_tokens` are revoked (`is_revoked = 1`).
+  3. The account's status is set to `email_verified = 1` and `auth_provider = 'google'`.
+  4. A security audit event (`GOOGLE_USER_LINKED`) is dispatched with masked email and IP.
+- **Proving Test:**
+  `tests/google-auth.test.js` ("PRE-HIJACKING DEFENSE: first Google link clears local password hash, revokes sessions, and sets email_verified=1").
+
+---
+
+#### SEC-013 (High): Open Redirect Vulnerability via OAuth `returnTo` Parameter
+- **Threat Model / Attack Vector:**
+  OAuth flows frequently support a post-authentication redirect parameter (e.g. `returnTo`). If untrusted, attackers construct links like `/api/auth/google?returnTo=https://evil.com/phish` or `//evil.com` or `/\evil.com`. Victims authenticate on the legitimate site, and the application redirects their browser to the attacker's phishing site.
+- **How to Exploit:**
+  Crafting phishing links with protocol-relative (`//evil.com`), backslash bypasses (`/\\evil.com`), or external schemes (`https://attacker.site`).
+- **Fix:**
+  Implemented strict, defense-in-depth sanitization `sanitizeReturnTo(returnTo)`:
+  1. Must start with a single `/`.
+  2. Must NOT start with `//` (rejects protocol-relative URLs).
+  3. Must NOT contain `\` (rejects Windows/parser bypasses).
+  4. Must NOT contain `://` (rejects URI schemes).
+  5. Any malformed input strictly falls back to `'/'`.
+  6. The sanitized `returnTo` is embedded inside the signed, HMAC-protected `g_oauth_state` cookie, preventing client-side tampering during the authorization redirect.
+- **Proving Test:**
+  `tests/google-auth.test.js` ("Open Redirect Defense: sanitizes returnTo targeting external URLs or protocol-relative paths").
+
+---
+
+#### SEC-014 (High): Cross-Site Request Forgery (CSRF) & State Tampering in Authorization Code Flow
+- **Threat Model / Attack Vector:**
+  Without cryptographic binding of authorization requests, an attacker can initiate an OAuth flow, capture their own authorization code, and trick a victim into submitting the attacker's code (`/api/auth/google/callback?code=...`), causing the victim's browser session to be tied to the attacker's account.
+- **How to Exploit:**
+  Sending a callback URL with attacker-controlled state or replaying intercepted authorization codes.
+- **Fix:**
+  1. Full **PKCE (Proof Key for Code Exchange)** with `S256` (`code_verifier` generated with 32 bytes of cryptographic randomness, hashed using SHA-256 to create `code_challenge`).
+  2. Signed OAuth State: Server generates random 32-byte `state` and random 32-byte `nonce`. The state payload `{ state, codeVerifier, nonce, returnTo, exp }` is HMAC-SHA256 signed using a server-side secret and stored in an `HttpOnly`, `SameSite=Lax` cookie (`g_oauth_state`) with a 10-minute TTL.
+  3. On callback, the cookie signature, expiration, state equality, and ID token `nonce` claim are strictly validated.
+  4. The state cookie is immediately deleted upon use.
+  5. The post-callback session sets a fresh `csrf_nonce` with `SameSite=Strict`.
+- **Proving Test:**
+  `tests/google-auth.test.js` ("rejects request with wrong or tampered state", "rejects request when signed state cookie is expired", "rejects ID token with wrong or mismatched nonce").
+
+---
+
+#### SEC-015 (Medium): User Enumeration & Timing Attacks on Passwordless Accounts
+- **Threat Model / Attack Vector:**
+  Accounts created via Google OAuth have `Password = NULL` and `password_hash = NULL`. If the traditional password login endpoint (`/api/auth/login`) checked `if (!user.password_hash) return 401;` before computing Argon2id hashes, the request would return in ~1ms, whereas accounts with passwords take ~150-250ms. Attackers could measure response latency to discover which accounts use Google OAuth versus traditional passwords.
+- **How to Exploit:**
+  Sending password login attempts for `target@gmail.com` and measuring server execution time.
+- **Fix:**
+  In `carrental-api/src/services/auth.service.js`, if a user account exists but has neither `password_hash` nor `Password`, the service executes `verifyArgon2(DUMMY_ARGON2_HASH, password)` before returning the generic `AuthError('Invalid Details')`. Both valid password accounts and passwordless OAuth accounts exhibit constant execution time.
+- **Proving Test:**
+  `tests/google-auth.test.js` ("password login for passwordless account fails with generic Invalid Details and dummy Argon2 execution").
+
+---
+
+#### SEC-016 (Critical): Admin Privilege Escalation Boundary via OAuth
+- **Threat Model / Attack Vector:**
+  If an admin email (e.g. `admin@gmail.com`) is used to sign in via Google OAuth, an attacker possessing that Google account might gain administrative access if the authentication flow shared admin lookup or granted admin tokens.
+- **How to Exploit:**
+  Attempting to sign in with an email address matching an entry in the `admin` database table.
+- **Fix:**
+  1. The Google OAuth flow queries and operates **exclusively** on `tblusers` (customers). The `admin` database table is never queried.
+  2. The OAuth callback issues customer JWT tokens (`user_type = 'user'`) signed with `JWT_ACCESS_SECRET` (not admin credentials).
+  3. Any attempt by an OAuth-authenticated customer to request `/api/admin/*` routes is rejected with `401 Unauthorized` / `403 Forbidden` by `requireAdmin`.
+  4. Admin portal contains zero OAuth buttons or Google hooks.
+- **Proving Test:**
+  `tests/google-auth.test.js` ("Admin Isolation Guarantee: Google sign-in matching admin email/username creates only customer session and cannot access admin routes").
+
+---
+
+### 2. Updated Authorization Matrix (Phase 4 Additions)
+
+| Method | Endpoint | Anonymous | Customer (`user`) | Admin (`admin`) | Security Enforcement |
+|:---|:---|:---:|:---:|:---:|:---|
+| `GET` | `/api/auth/providers` | 200 | 200 | 200 | Returns `{ google: true/false }` based on runtime config |
+| `GET` | `/api/auth/google` | 302 / 404 | 302 / 404 | 302 / 404 | Generates PKCE, signed `g_oauth_state` (SameSite=Lax, 10 min), redirects to Google; 404 if disabled; rate limited |
+| `GET` | `/api/auth/google/callback` | 302 / 404 | 302 / 404 | 302 / 404 | Validates state, PKCE code exchange, verifies ID token (`iss`, `aud`, `exp`, `nonce`, `email_verified=true`); pre-hijacking session wipe; issues customer session; 404 if disabled; rate limited |
+
+---
+
+### 3. Architecture & Security Controls Summary
+
+1. **Protocol Implementation:**
+   - Server-side Authorization Code Flow with PKCE (`S256`).
+   - Zero client-side Google SDKs or third-party tracking scripts loaded in the browser (ensures full compliance with Content Security Policy `script-src 'self'`).
+   - Bundled local Google "G" logo SVG (`/public/assets/images/google-logo.svg`).
+2. **Provider Failure & Cancellation Resilience:**
+   - Provider errors or user cancellation (`error=access_denied`) redirect cleanly to `/?error=cancelled`.
+   - `LoginModal.jsx` listens for error query parameters and presents inline user-friendly error banners inside the existing `#loginform` modal.
+3. **Missing Contact Information Notice:**
+   - Google OAuth profiles do not supply phone numbers. New customers created via Google have `ContactNo = NULL`.
+   - On first login, new Google users are redirected to `/profile?notice=missing_contact` with an inline `.errorWrap` notice informing them to complete their contact number. Bookings are not blocked.
+4. **Environment & Production Safety:**
+   - `validateGoogleOAuthConfig()` runs at server startup: if any one of `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, or `GOOGLE_REDIRECT_URI` is set while others are missing, the server crashes in production with a fatal configuration error.
+   - Credentials check reports only `"set"` or `"missing"` without ever printing or logging secrets.
+   - Dedicated `googleAuthLimiter` bucket prevents brute-force token generation and callback replay.
+
+---
+
+### 4. Verification Test Results
+
+- **Automated Unit & Integration Tests (`carrental-api`):**
+  - `tests/google-auth.test.js`: 18 tests passing (100%).
+  - Full Jest suite: 8 suites, 77 tests passing (100%).
+- **Automated Playwright Real-Browser Tests (`test-google-playwright.cjs`):**
+  - **Case A:** Real click on "Login / Register", assert "Continue with Google" visible, click button, verify redirection to `https://accounts.google.com/o/oauth2/v2/auth` with exact parameters (`client_id`, `redirect_uri`, `response_type=code`, `scope`, `state`, `code_challenge`, `nonce`, `prompt=select_account`). **PASS (100%)**
+  - **Case B:** Full browser flow against local mock OIDC server (port 9099). Token exchange, verification, customer creation in `tblusers`, redirection to `/profile?notice=missing_contact`, notice banner verification, and rendered customer name in header navbar. **PASS (100%)**
+  - **Case C:** Provider cancellation (`error=access_denied`). Real click, simulation of provider cancellation, redirection to `/?error=cancelled`, and automatic reopening of `#loginform` modal with cancellation error banner. **PASS (100%)**
+
 
