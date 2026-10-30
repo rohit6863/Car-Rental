@@ -44,7 +44,11 @@ export default function AdminEditBrandPage() {
         navigate('/manage-brands');
       }, 1200);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to update brand');
+      if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
+        setError(err.response.data.details.map((d) => d.message).join('. '));
+      } else {
+        setError(err.response?.data?.error || 'Failed to update brand');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -88,7 +92,7 @@ export default function AdminEditBrandPage() {
                 ) : (
                   <form className="form-horizontal" onSubmit={handleSubmit}>
                     <div className="form-group">
-                      <label className="col-sm-4 control-label">Brand Name</label>
+                      <label className="col-sm-4 control-label" htmlFor="brand">Brand Name</label>
                       <div className="col-sm-8">
                         <input
                           type="text"

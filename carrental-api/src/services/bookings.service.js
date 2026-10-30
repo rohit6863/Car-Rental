@@ -2,6 +2,7 @@
 const { query, withTransaction } = require('../db/pool');
 const { computeRentalAmount } = require('../utils/dates');
 const { ConflictError, NotFoundError, ForbiddenError, ValidationError } = require('../utils/errors');
+const { auditLog } = require('../utils/auditLogger');
 
 class BookingsService {
   /**
@@ -170,6 +171,12 @@ class BookingsService {
       await conn.execute('UPDATE tblbooking SET Status = 1 WHERE id = ?', [bookingId]);
       await conn.execute("UPDATE tblvehicles SET vehicle_status = 'Rented' WHERE id = ?", [target.VehicleId]);
 
+      auditLog('BOOKING_CONFIRMED', {
+        actorType: 'admin',
+        actorId: bookingId,
+        details: { vehicleId: target.VehicleId, fromDate: target.FromDate, toDate: target.ToDate },
+      });
+
       return { success: true, message: 'Booking Confirmed and Vehicle Marked as Rented' };
     });
   }
@@ -200,6 +207,12 @@ class BookingsService {
       if (activeBookings.length === 0) {
         await conn.execute("UPDATE tblvehicles SET vehicle_status = 'Available' WHERE id = ?", [booking.VehicleId]);
       }
+
+      auditLog('BOOKING_CANCELLED_BY_ADMIN', {
+        actorType: 'admin',
+        actorId: bookingId,
+        details: { vehicleId: booking.VehicleId },
+      });
 
       return { success: true, message: 'Booking Cancelled and Vehicle Marked as Available' };
     });
@@ -235,6 +248,12 @@ class BookingsService {
       if (activeBookings.length === 0) {
         await conn.execute("UPDATE tblvehicles SET vehicle_status = 'Available' WHERE id = ?", [booking.VehicleId]);
       }
+
+      auditLog('BOOKING_CANCELLED_BY_USER', {
+        actorType: 'user',
+        actorId: bookingId,
+        details: { email: userEmail, vehicleId: booking.VehicleId },
+      });
 
       return { success: true, message: 'Booking Cancelled successfully' };
     });

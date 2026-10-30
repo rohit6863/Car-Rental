@@ -34,7 +34,11 @@ export default function AdminChangePasswordPage() {
       setNewPassword('');
       setConfirmPassword('');
     } catch (err) {
-      setError(err.response?.data?.error || 'Your current password is not valid.');
+      if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
+        setError(err.response.data.details.map((d) => d.message).join('. '));
+      } else {
+        setError(err.response?.data?.error || 'Your current password is not valid.');
+      }
     } finally {
       setSubmitting(false);
       if (typeof window !== 'undefined' && window.scrollTo) {
@@ -84,7 +88,7 @@ export default function AdminChangePasswordPage() {
 
                 <form className="form-horizontal" onSubmit={handleSubmit}>
                   <div className="form-group">
-                    <label className="col-sm-4 control-label">Current Password</label>
+                    <label className="col-sm-4 control-label" htmlFor="password">Current Password</label>
                     <div className="col-sm-8">
                       <input
                         type="password"
@@ -100,7 +104,7 @@ export default function AdminChangePasswordPage() {
                   <div className="hr-dashed" style={{ borderTop: '1px dashed #e4e4e4', margin: '20px 0' }}></div>
 
                   <div className="form-group">
-                    <label className="col-sm-4 control-label">New Password</label>
+                    <label className="col-sm-4 control-label" htmlFor="newpassword">New Password</label>
                     <div className="col-sm-8">
                       <input
                         type="password"
@@ -116,7 +120,7 @@ export default function AdminChangePasswordPage() {
                   <div className="hr-dashed" style={{ borderTop: '1px dashed #e4e4e4', margin: '20px 0' }}></div>
 
                   <div className="form-group">
-                    <label className="col-sm-4 control-label">Confirm Password</label>
+                    <label className="col-sm-4 control-label" htmlFor="confirmpassword">Confirm Password</label>
                     <div className="col-sm-8">
                       <input
                         type="password"

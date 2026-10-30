@@ -11,7 +11,9 @@
     "migrate:dryrun": "node src/migrations/005_date_migration_dryrun.js",
     "test": "jest --runInBand --forceExit",
     "test:watch": "jest --watch --runInBand",
-    "test:coverage": "jest --coverage --runInBand --forceExit"
+    "test:coverage": "jest --coverage --runInBand --forceExit",
+    "security": "jest tests/security-hardening.test.js --runInBand --forceExit",
+    "dev:reset-limits": "node scripts/reset-limits.js"
   },
   "dependencies": {
     "argon2": "^0.40.3",
@@ -21,12 +23,13 @@
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.0.0",
+    "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.12.0",
-    "nodemailer": "^6.9.16",
+    "nodemailer": "^10.3.1",
     "uuid": "^11.0.5",
-    "zod": "^3.24.1"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "jest": "^29.7.0",
@@ -36,6 +39,8 @@
   "jest": {
     "testEnvironment": "node",
     "testTimeout": 30000,
-    "setupFiles": ["./tests/setup.js"]
+    "setupFiles": [
+      "./tests/setup.js"
+    ]
   }
 }

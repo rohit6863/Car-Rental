@@ -42,7 +42,11 @@ export default function AdminUpdateContactInfoPage() {
       await client.put('/api/admin/contact-info', formData);
       setMsg('Info Updateed successfully'); // legacy copy phrasing
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to update contact info');
+      if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
+        setError(err.response.data.details.map((d) => d.message).join('. '));
+      } else {
+        setError(err.response?.data?.error || 'Failed to update contact info');
+      }
     } finally {
       setSubmitting(false);
       if (typeof window !== 'undefined' && window.scrollTo) {
@@ -89,7 +93,7 @@ export default function AdminUpdateContactInfoPage() {
                 ) : (
                   <form className="form-horizontal" onSubmit={handleSubmit}>
                     <div className="form-group">
-                      <label className="col-sm-4 control-label">Address</label>
+                      <label className="col-sm-4 control-label" htmlFor="address">Address</label>
                       <div className="col-sm-8">
                         <textarea
                           className="form-control"
@@ -103,7 +107,7 @@ export default function AdminUpdateContactInfoPage() {
                     </div>
 
                     <div className="form-group">
-                      <label className="col-sm-4 control-label">Email id</label>
+                      <label className="col-sm-4 control-label" htmlFor="email">Email id</label>
                       <div className="col-sm-8">
                         <input
                           type="email"
@@ -118,7 +122,7 @@ export default function AdminUpdateContactInfoPage() {
                     </div>
 
                     <div className="form-group">
-                      <label className="col-sm-4 control-label">Contact Number</label>
+                      <label className="col-sm-4 control-label" htmlFor="contactno">Contact Number</label>
                       <div className="col-sm-8">
                         <input
                           type="text"

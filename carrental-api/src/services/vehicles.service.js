@@ -241,8 +241,18 @@ class VehiclesService {
   }
 
   async adminUpdateImage(id, imageNum, filename) {
-    const colName = `Vimage${imageNum}`;
-    await query(`UPDATE tblvehicles SET ${colName} = ? WHERE id = ?`, [filename, id]);
+    const queries = {
+      1: 'UPDATE tblvehicles SET Vimage1 = ? WHERE id = ?',
+      2: 'UPDATE tblvehicles SET Vimage2 = ? WHERE id = ?',
+      3: 'UPDATE tblvehicles SET Vimage3 = ? WHERE id = ?',
+      4: 'UPDATE tblvehicles SET Vimage4 = ? WHERE id = ?',
+      5: 'UPDATE tblvehicles SET Vimage5 = ? WHERE id = ?',
+    };
+    const updateSql = queries[Number(imageNum)];
+    if (!updateSql) {
+      throw new ValidationError('Invalid image slot number (must be 1-5)');
+    }
+    await query(updateSql, [filename, id]);
     return { success: true };
   }
 

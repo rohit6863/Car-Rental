@@ -31,6 +31,16 @@ function requireAdmin(req, _res, next) {
     const payload = verifyAccessToken(token);
     if (payload.role !== 'admin') throw new ForbiddenError('Admin access required');
     req.admin = payload;
+
+    // Server-side enforcement of mustChangePassword across all admin routes
+    if (payload.mustChangePassword) {
+      const url = req.originalUrl || req.url || '';
+      const isAllowed = url.endsWith('/change-password') || url.endsWith('/logout') || url.endsWith('/me') || url.includes('/csrf');
+      if (!isAllowed) {
+        throw new ForbiddenError('You must change your password before proceeding');
+      }
+    }
+
     next();
   } catch (err) {
     next(err);

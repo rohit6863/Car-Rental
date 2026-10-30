@@ -46,6 +46,13 @@ class ConflictError extends AppError {
   }
 }
 
+class LockoutError extends AppError {
+  constructor(message = 'Too many attempts. Please try again later.', retryAfter = 60) {
+    super(message, 429);
+    this.retryAfter = retryAfter;
+  }
+}
+
 module.exports = {
   AppError,
   ValidationError,
@@ -53,4 +60,5 @@ module.exports = {
   ForbiddenError,
   NotFoundError,
   ConflictError,
+  LockoutError,
 };

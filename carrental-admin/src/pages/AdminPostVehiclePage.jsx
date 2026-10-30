@@ -90,16 +90,18 @@ export default function AdminPostVehiclePage() {
       if (files.img4) data.append('img4', files.img4);
       if (files.img5) data.append('img5', files.img5);
 
-      await client.post('/api/admin/vehicles', data, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      await client.post('/api/admin/vehicles', data);
 
       setMsg('Vehicle posted successfully');
       setTimeout(() => {
         navigate('/manage-vehicles');
       }, 1200);
     } catch (err) {
-      setError(err.response?.data?.error || 'Something went wrong. Please try again');
+      if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
+        setError(err.response.data.details.map((d) => d.message).join('. '));
+      } else {
+        setError(err.response?.data?.error || 'Something went wrong. Please try again');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -139,7 +141,7 @@ export default function AdminPostVehiclePage() {
               )}
 
               <div className="panel-body">
-                <form className="form-horizontal" onSubmit={handleSubmit}>
+                <form className="form-horizontal" onSubmit={handleSubmit} noValidate>
                   <div className="form-group">
                     <label className="col-sm-2 control-label">
                       Vehicle Title<span style={{ color: 'red' }}>*</span>
@@ -299,58 +301,50 @@ export default function AdminPostVehiclePage() {
                           <div className="form-group">
                             <div className="col-sm-3">
                               <div className="checkbox checkbox-inline">
-                                <label>
-                                  <input
-                                    type="checkbox"
-                                    id="airconditioner"
-                                    name="airconditioner"
-                                    checked={formData.airconditioner === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  Air Conditioner
-                                </label>
+                                <input
+                                  type="checkbox"
+                                  id="airconditioner"
+                                  name="airconditioner"
+                                  checked={formData.airconditioner === 1}
+                                  onChange={handleInputChange}
+                                />
+                                <label htmlFor="airconditioner"> Air Conditioner </label>
                               </div>
                             </div>
                             <div className="col-sm-3">
                               <div className="checkbox checkbox-inline">
-                                <label>
-                                  <input
-                                    type="checkbox"
-                                    id="powerdoorlocks"
-                                    name="powerdoorlocks"
-                                    checked={formData.powerdoorlocks === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  Power Door Locks
-                                </label>
+                                <input
+                                  type="checkbox"
+                                  id="powerdoorlocks"
+                                  name="powerdoorlocks"
+                                  checked={formData.powerdoorlocks === 1}
+                                  onChange={handleInputChange}
+                                />
+                                <label htmlFor="powerdoorlocks"> Power Door Locks </label>
                               </div>
                             </div>
                             <div className="col-sm-3">
                               <div className="checkbox checkbox-inline">
-                                <label>
-                                  <input
-                                    type="checkbox"
-                                    id="antilockbrakingsys"
-                                    name="antilockbrakingsys"
-                                    checked={formData.antilockbrakingsys === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  AntiLock Braking System
-                                </label>
+                                <input
+                                  type="checkbox"
+                                  id="antilockbrakingsys"
+                                  name="antilockbrakingsys"
+                                  checked={formData.antilockbrakingsys === 1}
+                                  onChange={handleInputChange}
+                                />
+                                <label htmlFor="antilockbrakingsys"> AntiLock Braking System </label>
                               </div>
                             </div>
                             <div className="col-sm-3">
                               <div className="checkbox checkbox-inline">
-                                <label>
-                                  <input
-                                    type="checkbox"
-                                    id="brakeassist"
-                                    name="brakeassist"
-                                    checked={formData.brakeassist === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  Brake Assist
-                                </label>
+                                <input
+                                  type="checkbox"
+                                  id="brakeassist"
+                                  name="brakeassist"
+                                  checked={formData.brakeassist === 1}
+                                  onChange={handleInputChange}
+                                />
+                                <label htmlFor="brakeassist"> Brake Assist </label>
                               </div>
                             </div>
                           </div>
@@ -358,58 +352,50 @@ export default function AdminPostVehiclePage() {
                           <div className="form-group">
                             <div className="col-sm-3">
                               <div className="checkbox checkbox-inline">
-                                <label>
-                                  <input
-                                    type="checkbox"
-                                    id="powersteering"
-                                    name="powersteering"
-                                    checked={formData.powersteering === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  Power Steering
-                                </label>
+                                <input
+                                  type="checkbox"
+                                  id="powersteering"
+                                  name="powersteering"
+                                  checked={formData.powersteering === 1}
+                                  onChange={handleInputChange}
+                                />
+                                <label htmlFor="powersteering"> Power Steering </label>
                               </div>
                             </div>
                             <div className="col-sm-3">
                               <div className="checkbox checkbox-inline">
-                                <label>
-                                  <input
-                                    type="checkbox"
-                                    id="driverairbag"
-                                    name="driverairbag"
-                                    checked={formData.driverairbag === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  Driver Airbag
-                                </label>
+                                <input
+                                  type="checkbox"
+                                  id="driverairbag"
+                                  name="driverairbag"
+                                  checked={formData.driverairbag === 1}
+                                  onChange={handleInputChange}
+                                />
+                                <label htmlFor="driverairbag"> Driver Airbag </label>
                               </div>
                             </div>
                             <div className="col-sm-3">
                               <div className="checkbox checkbox-inline">
-                                <label>
-                                  <input
-                                    type="checkbox"
-                                    id="passengerairbag"
-                                    name="passengerairbag"
-                                    checked={formData.passengerairbag === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  Passenger Airbag
-                                </label>
+                                <input
+                                  type="checkbox"
+                                  id="passengerairbag"
+                                  name="passengerairbag"
+                                  checked={formData.passengerairbag === 1}
+                                  onChange={handleInputChange}
+                                />
+                                <label htmlFor="passengerairbag"> Passenger Airbag </label>
                               </div>
                             </div>
                             <div className="col-sm-3">
                               <div className="checkbox checkbox-inline">
-                                <label>
-                                  <input
-                                    type="checkbox"
-                                    id="powerwindow"
-                                    name="powerwindow"
-                                    checked={formData.powerwindow === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  Power Windows
-                                </label>
+                                <input
+                                  type="checkbox"
+                                  id="powerwindow"
+                                  name="powerwindow"
+                                  checked={formData.powerwindow === 1}
+                                  onChange={handleInputChange}
+                                />
+                                <label htmlFor="powerwindow"> Power Windows </label>
                               </div>
                             </div>
                           </div>
@@ -417,58 +403,50 @@ export default function AdminPostVehiclePage() {
                           <div className="form-group">
                             <div className="col-sm-3">
                               <div className="checkbox checkbox-inline">
-                                <label>
-                                  <input
-                                    type="checkbox"
-                                    id="cdplayer"
-                                    name="cdplayer"
-                                    checked={formData.cdplayer === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  CD Player
-                                </label>
+                                <input
+                                  type="checkbox"
+                                  id="cdplayer"
+                                  name="cdplayer"
+                                  checked={formData.cdplayer === 1}
+                                  onChange={handleInputChange}
+                                />
+                                <label htmlFor="cdplayer"> CD Player </label>
                               </div>
                             </div>
                             <div className="col-sm-3">
                               <div className="checkbox checkbox-inline">
-                                <label>
-                                  <input
-                                    type="checkbox"
-                                    id="centrallocking"
-                                    name="centrallocking"
-                                    checked={formData.centrallocking === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  Central Locking
-                                </label>
+                                <input
+                                  type="checkbox"
+                                  id="centrallocking"
+                                  name="centrallocking"
+                                  checked={formData.centrallocking === 1}
+                                  onChange={handleInputChange}
+                                />
+                                <label htmlFor="centrallocking"> Central Locking </label>
                               </div>
                             </div>
                             <div className="col-sm-3">
                               <div className="checkbox checkbox-inline">
-                                <label>
-                                  <input
-                                    type="checkbox"
-                                    id="crashcensor"
-                                    name="crashcensor"
-                                    checked={formData.crashcensor === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  Crash Sensor
-                                </label>
+                                <input
+                                  type="checkbox"
+                                  id="crashcensor"
+                                  name="crashcensor"
+                                  checked={formData.crashcensor === 1}
+                                  onChange={handleInputChange}
+                                />
+                                <label htmlFor="crashcensor"> Crash Sensor </label>
                               </div>
                             </div>
                             <div className="col-sm-3">
                               <div className="checkbox checkbox-inline">
-                                <label>
-                                  <input
-                                    type="checkbox"
-                                    id="leatherseats"
-                                    name="leatherseats"
-                                    checked={formData.leatherseats === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  Leather Seats
-                                </label>
+                                <input
+                                  type="checkbox"
+                                  id="leatherseats"
+                                  name="leatherseats"
+                                  checked={formData.leatherseats === 1}
+                                  onChange={handleInputChange}
+                                />
+                                <label htmlFor="leatherseats"> Leather Seats </label>
                               </div>
                             </div>
                           </div>

@@ -5,7 +5,7 @@ const contactQuerySchema = z.object({
   fullname: z.string().trim().min(2).max(100),
   email: z.string().trim().email().max(120),
   contactno: z.string().trim().min(7).max(15),
-  message: z.string().trim().min(5),
+  message: z.string().trim().min(5).max(2000),
 });
 
 const newsletterSchema = z.object({
@@ -17,11 +17,11 @@ const pageTypeParamSchema = z.object({
 });
 
 const pageUpdateSchema = z.object({
-  detail: z.string().min(1, 'Content is required'),
+  detail: z.string().min(1, 'Content is required').max(50000),
 });
 
 const contactInfoUpdateSchema = z.object({
-  address: z.string().trim().min(5),
+  address: z.string().trim().min(5).max(255),
   email: z.string().trim().email().max(255),
   contactno: z.string().trim().min(7).max(15),
 });

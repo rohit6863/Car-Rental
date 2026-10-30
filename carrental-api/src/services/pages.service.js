@@ -1,6 +1,7 @@
 'use strict';
 const { query } = require('../db/pool');
 const { NotFoundError } = require('../utils/errors');
+const { sanitizeHtml } = require('../utils/sanitizeHtml');
 
 class PagesService {
   async getPage(type) {
@@ -20,11 +21,12 @@ class PagesService {
   }
 
   async adminUpdate(type, detail) {
+    const cleanedDetail = sanitizeHtml(detail);
     const [result] = await query(`
       UPDATE tblpages
       SET detail = ?
       WHERE type = ?
-    `, [detail, type]);
+    `, [cleanedDetail, type]);
 
     if (result.affectedRows === 0) throw new NotFoundError('Page');
     return { success: true, message: 'Page data updated successfully' };

@@ -2,6 +2,7 @@
 const { query, withTransaction } = require('../db/pool');
 const { computeRentalAmount } = require('../utils/dates');
 const { ConflictError, NotFoundError, ForbiddenError, ValidationError } = require('../utils/errors');
+const { auditLog } = require('../utils/auditLogger');
 
 class PaymentsService {
   /**
@@ -183,6 +184,11 @@ class PaymentsService {
     `, [paymentId]);
 
     if (result.affectedRows === 0) throw new NotFoundError('Payment');
+    auditLog('PAYMENT_CONFIRMED', {
+      actorType: 'admin',
+      actorId: paymentId,
+      details: { paymentId },
+    });
     return { success: true, message: 'Payment Confirmed Successfully' };
   }
 
@@ -197,6 +203,11 @@ class PaymentsService {
     `, [paymentId]);
 
     if (result.affectedRows === 0) throw new NotFoundError('Payment');
+    auditLog('PAYMENT_REJECTED', {
+      actorType: 'admin',
+      actorId: paymentId,
+      details: { paymentId },
+    });
     return { success: true, message: 'Payment Rejected Successfully' };
   }
 }

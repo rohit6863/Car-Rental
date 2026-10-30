@@ -18,7 +18,11 @@ export default function AdminCreateBrandPage() {
       setMsg('Brand Created successfully');
       setBrand('');
     } catch (err) {
-      setError(err.response?.data?.error || 'Something went wrong. Please try again');
+      if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
+        setError(err.response.data.details.map((d) => d.message).join('. '));
+      } else {
+        setError(err.response?.data?.error || 'Something went wrong. Please try again');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -59,7 +63,7 @@ export default function AdminCreateBrandPage() {
 
                 <form className="form-horizontal" onSubmit={handleSubmit}>
                   <div className="form-group">
-                    <label className="col-sm-4 control-label">Brand Name</label>
+                    <label className="col-sm-4 control-label" htmlFor="brand">Brand Name</label>
                     <div className="col-sm-8">
                       <input
                         type="text"

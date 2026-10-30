@@ -5,7 +5,7 @@ const { accessCookieOptions, refreshCookieOptions, clearCookies } = require('../
 class AuthController {
   async register(req, res, next) {
     try {
-      const { user, accessToken, refreshToken } = await authService.register(req.body);
+      const { user, accessToken, refreshToken } = await authService.register(req.body, req.ip);
 
       res.cookie('access_token', accessToken, accessCookieOptions());
       res.cookie('refresh_token', refreshToken, refreshCookieOptions());
@@ -22,7 +22,7 @@ class AuthController {
 
   async login(req, res, next) {
     try {
-      const { user, accessToken, refreshToken } = await authService.login(req.body);
+      const { user, accessToken, refreshToken } = await authService.login(req.body, req.ip);
 
       res.cookie('access_token', accessToken, accessCookieOptions());
       res.cookie('refresh_token', refreshToken, refreshCookieOptions());
@@ -37,14 +37,20 @@ class AuthController {
     }
   }
 
-  async logout(_req, res) {
-    clearCookies(res);
-    res.json({ message: 'Logged out successfully' });
+  async logout(req, res, next) {
+    try {
+      if (req.cookies && req.cookies.refresh_token) {
+        await authService.revokeRefreshToken(req.cookies.refresh_token);
+      }
+      clearCookies(res);
+      res.json({ message: 'Logged out successfully' });
+    } catch (err) {
+      next(err);
+    }
   }
 
   async me(req, res, next) {
     try {
-      // req.user is set by requireAuth
       res.json({ user: req.user });
     } catch (err) {
       next(err);
@@ -63,7 +69,7 @@ class AuthController {
 
   async forgotPassword(req, res, next) {
     try {
-      const result = await authService.forgotPassword(req.body.email);
+      const result = await authService.forgotPassword(req.body.email, req.ip);
       res.json(result);
     } catch (err) {
       next(err);
@@ -72,7 +78,7 @@ class AuthController {
 
   async resetPassword(req, res, next) {
     try {
-      const result = await authService.resetPassword(req.body);
+      const result = await authService.resetPassword(req.body, req.ip);
       res.json(result);
     } catch (err) {
       next(err);
@@ -81,14 +87,16 @@ class AuthController {
 
   async refresh(req, res, next) {
     try {
-      const token = req.cookies.refresh_token;
+      const token = req.cookies && req.cookies.refresh_token;
       if (!token) {
         return res.status(401).json({ error: 'Refresh token missing' });
       }
-      const { accessToken } = await authService.refreshToken(token);
+      const { accessToken, refreshToken } = await authService.refreshToken(token, req.ip);
       res.cookie('access_token', accessToken, accessCookieOptions());
+      res.cookie('refresh_token', refreshToken, refreshCookieOptions());
       res.json({ success: true });
     } catch (err) {
+      clearCookies(res);
       next(err);
     }
   }

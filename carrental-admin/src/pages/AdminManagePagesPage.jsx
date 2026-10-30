@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
+import DOMPurify from 'dompurify';
 import client from '../api/client';
 
 const PAGE_NAMES = {
@@ -47,7 +48,7 @@ export default function AdminManagePagesPage() {
         const res = await client.get('/api/admin/pages');
         const found = res.data.find((p) => p.type === selectedType);
         if (quillInstanceRef.current) {
-          quillInstanceRef.current.root.innerHTML = found?.detail || '';
+          quillInstanceRef.current.root.innerHTML = DOMPurify.sanitize(found?.detail || '');
         }
       } catch (err) {
         setError('Failed to load page content');
@@ -68,14 +69,19 @@ export default function AdminManagePagesPage() {
       return;
     }
 
-    const detail = quillInstanceRef.current ? quillInstanceRef.current.root.innerHTML : '';
+    const rawDetail = quillInstanceRef.current ? quillInstanceRef.current.root.innerHTML : '';
+    const detail = DOMPurify.sanitize(rawDetail);
 
     setSubmitting(true);
     try {
       await client.put(`/api/admin/pages/${selectedType}`, { detail });
       setMsg('Page data updated  successfully'); // legacy phrasing
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to update page data');
+      if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
+        setError(err.response.data.details.map((d) => d.message).join('. '));
+      } else {
+        setError(err.response?.data?.error || 'Failed to update page data');
+      }
     } finally {
       setSubmitting(false);
       if (typeof window !== 'undefined' && window.scrollTo) {
@@ -119,9 +125,10 @@ export default function AdminManagePagesPage() {
 
                 <form className="form-horizontal" onSubmit={handleSubmit}>
                   <div className="form-group">
-                    <label className="col-sm-4 control-label">select Page</label>
+                    <label className="col-sm-4 control-label" htmlFor="menu1">select Page</label>
                     <div className="col-sm-8">
                       <select
+                        id="menu1"
                         name="menu1"
                         className="form-control"
                         value={selectedType}

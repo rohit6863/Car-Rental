@@ -30,6 +30,10 @@ export async function fetchCsrfToken(forceRefresh = false) {
 }
 
 client.interceptors.request.use(async (config) => {
+  if (config.data instanceof FormData) {
+    // Crucial for browser FormData: let the browser calculate and attach the multipart boundary
+    delete config.headers['Content-Type'];
+  }
   const method = (config.method || '').toUpperCase();
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
     let token = cachedCsrfToken;

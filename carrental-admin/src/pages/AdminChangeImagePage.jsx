@@ -48,9 +48,7 @@ export default function AdminChangeImagePage({ fixedNum }) {
       const data = new FormData();
       data.append('img', file);
 
-      const res = await client.put(`/api/admin/vehicles/${id}/image/${num}`, data, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const res = await client.put(`/api/admin/vehicles/${id}/image/${num}`, data);
 
       setMsg('Image updated successfully');
       setCurrentImage(res.data.filename);
@@ -59,7 +57,11 @@ export default function AdminChangeImagePage({ fixedNum }) {
         navigate(`/edit-vehicle/${id}`);
       }, 1200);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to update image');
+      if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
+        setError(err.response.data.details.map((d) => d.message).join('. '));
+      } else {
+        setError(err.response?.data?.error || 'Failed to update image');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -120,12 +122,13 @@ export default function AdminChangeImagePage({ fixedNum }) {
                     </div>
 
                     <div className="form-group">
-                      <label className="col-sm-4 control-label">
+                      <label className="col-sm-4 control-label" htmlFor="img">
                         Upload New Image {num} <span style={{ color: 'red' }}>*</span>
                       </label>
                       <div className="col-sm-8">
                         <input
                           type="file"
+                          id="img"
                           name="img"
                           onChange={(e) => setFile(e.target.files?.[0] || null)}
                           required

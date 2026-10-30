@@ -21,6 +21,15 @@ export default function LoginModal() {
       setEmail('');
       setPassword('');
     } catch (err) {
+      if (err.response?.status === 429) {
+        const retryHeader = err.response.headers?.['retry-after'];
+        const retryAfter = err.response.data?.retryAfter || (retryHeader ? parseInt(retryHeader, 10) : null);
+        if (retryAfter) {
+          const mins = Math.max(1, Math.ceil(retryAfter / 60));
+          setError(`Too many attempts. Try again in ${mins} minute${mins > 1 ? 's' : ''}.`);
+          return;
+        }
+      }
       const msg = err.response?.data?.error || 'Invalid Details';
       setError(msg);
     } finally {
