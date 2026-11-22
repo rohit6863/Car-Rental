@@ -120,7 +120,7 @@ export default function AdminDashboardPage() {
                       <div className="stat-panel-number h1">
                         {loading ? '...' : stats.subscribers}
                       </div>
-                      <div className="stat-panel-title text-uppercase">Subscibers</div>
+                      <div className="stat-panel-title text-uppercase">Subscribers</div>
                     </div>
                   </div>
                   <Link to="/manage-subscribers" className="block-anchor panel-footer">

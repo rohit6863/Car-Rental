@@ -73,7 +73,9 @@ class BookingsService {
       FROM tblbooking bk
       JOIN tblvehicles v ON bk.VehicleId = v.id
       JOIN tblbrands b ON b.id = v.VehiclesBrand
-      LEFT JOIN tblpayments p ON p.booking_id = bk.id
+      LEFT JOIN tblpayments p ON p.id = (
+        SELECT MAX(id) FROM tblpayments WHERE booking_id = bk.id
+      )
       WHERE bk.userEmail = ?
       ORDER BY bk.id DESC
     `, [userEmail]);
@@ -197,6 +199,24 @@ class BookingsService {
       // Update booking status to 2 (Cancelled)
       await conn.execute('UPDATE tblbooking SET Status = 2 WHERE id = ?', [bookingId]);
 
+      // Invalidate pending payment orders
+      await conn.execute(
+        "UPDATE tblpayments SET payment_status = 'failed', failure_reason = 'Order invalidated: booking cancelled by admin' WHERE booking_id = ? AND payment_status = 'pending'",
+        [bookingId]
+      );
+
+      // Flag confirmed payments for refund
+      const [confirmedPayments] = await conn.execute(
+        "SELECT id FROM tblpayments WHERE booking_id = ? AND payment_status = 'confirmed' FOR UPDATE",
+        [bookingId]
+      );
+      if (confirmedPayments.length > 0) {
+        await conn.execute(
+          "UPDATE tblpayments SET payment_status = 'needs_refund', failure_reason = 'Booking cancelled by admin after payment; flagged for refund' WHERE booking_id = ? AND payment_status = 'confirmed'",
+          [bookingId]
+        );
+      }
+
       // Check if there are any other ongoing confirmed bookings for this vehicle
       const [activeBookings] = await conn.execute(
         'SELECT id FROM tblbooking WHERE VehicleId = ? AND Status = 1 AND id != ?',
@@ -238,7 +258,22 @@ class BookingsService {
         return { success: true, message: 'Booking is already cancelled' };
       }
 
+      // Check if booking has already been paid
+      const [payments] = await conn.execute(
+        "SELECT id, payment_status FROM tblpayments WHERE booking_id = ? AND payment_status = 'confirmed' FOR UPDATE",
+        [bookingId]
+      );
+      if (payments.length > 0) {
+        throw new ValidationError('Cannot cancel a paid booking. Please contact support.');
+      }
+
       await conn.execute('UPDATE tblbooking SET Status = 2 WHERE id = ?', [bookingId]);
+
+      // Invalidate pending payment orders
+      await conn.execute(
+        "UPDATE tblpayments SET payment_status = 'failed', failure_reason = 'Order invalidated: booking cancelled by customer' WHERE booking_id = ? AND payment_status = 'pending'",
+        [bookingId]
+      );
 
       const [activeBookings] = await conn.execute(
         'SELECT id FROM tblbooking WHERE VehicleId = ? AND Status = 1 AND id != ?',

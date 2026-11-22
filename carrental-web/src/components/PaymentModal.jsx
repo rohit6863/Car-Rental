@@ -240,18 +240,154 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
   const isMockGateway = Boolean(!isProd && config && config.gateway === 'mock');
 
   return (
-    <div
-      className="modal"
-      style={{
-        display: 'block',
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        overflowY: 'auto',
-        zIndex: 1050,
-      }}
-    >
-      <div className="modal-dialog" style={{ marginTop: '60px' }}>
-        <div className="modal-content">
-          <div className="modal-header">
+    <div className="modal payment-modal-overlay">
+      <style>{`
+        .payment-modal-overlay {
+          display: block;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.6);
+          overflow-y: auto;
+          overflow-x: hidden;
+          z-index: 1050;
+          box-sizing: border-box;
+          padding: 10px;
+        }
+        .payment-modal-dialog {
+          margin: 60px auto;
+          max-width: 550px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+        .payment-modal-content {
+          border-radius: 6px;
+          background: #fff;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+          overflow: hidden;
+          box-sizing: border-box;
+          width: 100%;
+          border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+        .payment-btn {
+          min-height: 44px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          font-weight: 600;
+          padding: 10px 16px;
+          box-sizing: border-box;
+          cursor: pointer;
+          border-radius: 4px;
+        }
+        .mock-action-buttons {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        .mock-action-buttons .payment-btn {
+          flex: 1 1 auto;
+        }
+        .booking-amount-highlight {
+          font-size: 16px;
+          color: #fa2837;
+          font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+          .payment-modal-overlay {
+            padding: 8px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+          .payment-modal-dialog {
+            margin: 0 auto !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            max-height: calc(100vh - 16px) !important;
+            display: flex !important;
+            flex-direction: column !important;
+          }
+          .payment-modal-content {
+            max-height: calc(100vh - 16px) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            border-radius: 8px !important;
+            width: 100% !important;
+          }
+          .payment-modal-header {
+            padding: 12px 14px !important;
+            flex-shrink: 0 !important;
+            border-bottom: 1px solid #e5e5e5;
+          }
+          .payment-modal-header .close {
+            min-width: 44px;
+            min-height: 44px;
+            margin-top: -6px;
+            font-size: 28px;
+            line-height: 44px;
+            text-align: center;
+            opacity: 0.8;
+          }
+          .payment-modal-body {
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            flex: 1 1 auto !important;
+            padding: 14px !important;
+            max-height: calc(100vh - 150px) !important;
+            box-sizing: border-box;
+          }
+          .payment-modal-footer {
+            flex-shrink: 0 !important;
+            padding: 12px 14px !important;
+            display: flex !important;
+            flex-direction: column-reverse !important;
+            gap: 8px !important;
+            border-top: 1px solid #e5e5e5;
+          }
+          .payment-modal-footer .payment-btn {
+            width: 100% !important;
+            margin: 0 !important;
+            font-size: 15px !important;
+          }
+          .mock-action-buttons {
+            flex-direction: column !important;
+            gap: 8px !important;
+          }
+          .mock-action-buttons .payment-btn {
+            width: 100% !important;
+            font-size: 14px !important;
+          }
+          .mock-tabs {
+            display: flex !important;
+            width: 100% !important;
+            margin-bottom: 12px !important;
+          }
+          .mock-tabs > li {
+            flex: 1 1 0 !important;
+            text-align: center !important;
+          }
+          .mock-tabs > li > a {
+            padding: 10px 4px !important;
+            font-size: 12px !important;
+            min-height: 44px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+          .booking-amount-highlight {
+            font-size: 18px !important;
+          }
+        }
+      `}</style>
+
+      <div className="modal-dialog payment-modal-dialog">
+        <div className="modal-content payment-modal-content">
+          <div className="modal-header payment-modal-header">
             <button
               type="button"
               className="close"
@@ -261,12 +397,12 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
             >
               <span aria-hidden="true">&times;</span>
             </button>
-            <h4 className="modal-title">
+            <h4 className="modal-title" style={{ fontSize: '16px', fontWeight: 'bold' }}>
               Secure Online Payment — Booking #{bookingId}
             </h4>
           </div>
 
-          <div className="modal-body">
+          <div className="modal-body payment-modal-body">
             {/* Mock Safety Banner */}
             {isMockGateway && (
               <div
@@ -278,6 +414,7 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
                   padding: '10px 14px',
                   marginBottom: '15px',
                   borderRadius: '4px',
+                  fontSize: '13px',
                 }}
               >
                 <strong>Test Mode:</strong> Test payment gateway (mock): no real money is charged.
@@ -309,7 +446,7 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
                 <div><strong>Dates:</strong> {booking.FromDate} to {booking.ToDate}</div>
                 <div><strong>Rate per Day:</strong> Rs. {booking.PricePerDay}</div>
                 <div style={{ marginTop: '8px', fontSize: '15px', color: '#111' }}>
-                  <strong>Total Amount:</strong> <span style={{ color: '#fa2837', fontWeight: 'bold' }}>Rs. {booking.totalAmount}</span>
+                  <strong>Total Amount:</strong> <span className="booking-amount-highlight">Rs. {booking.totalAmount}</span>
                 </div>
               </div>
             </div>
@@ -357,7 +494,7 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
                 <Link
                   to={`/receipt/${bookingId}`}
                   target="_blank"
-                  className="btn btn-sm btn-success"
+                  className="btn btn-success payment-btn"
                   style={{ textDecoration: 'none' }}
                 >
                   View Receipt
@@ -373,7 +510,7 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
                 </p>
                 <button
                   type="button"
-                  className="btn btn-sm btn-primary"
+                  className="btn btn-primary payment-btn"
                   onClick={handleRetry}
                 >
                   Retry
@@ -389,7 +526,7 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
                 </p>
                 <button
                   type="button"
-                  className="btn btn-sm btn-primary"
+                  className="btn btn-primary payment-btn"
                   onClick={handleRetry}
                 >
                   Retry
@@ -413,7 +550,7 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
                 </h5>
 
                 {/* Decorative Tabs */}
-                <ul className="nav nav-tabs" style={{ marginBottom: '14px' }}>
+                <ul className="nav nav-tabs mock-tabs" style={{ marginBottom: '14px' }}>
                   <li className={mockTab === 'upi' ? 'active' : ''}>
                     <a href="#" onClick={(e) => { e.preventDefault(); setMockTab('upi'); }}>
                       UPI (Mock)
@@ -467,24 +604,24 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
                   )}
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <div className="mock-action-buttons">
                   <button
                     type="button"
-                    className="btn btn-success btn-sm"
+                    className="btn btn-success payment-btn"
                     onClick={handleMockSuccess}
                   >
                     Simulate success
                   </button>
                   <button
                     type="button"
-                    className="btn btn-danger btn-sm"
+                    className="btn btn-danger payment-btn"
                     onClick={handleMockFailure}
                   >
                     Simulate failure
                   </button>
                   <button
                     type="button"
-                    className="btn btn-default btn-sm"
+                    className="btn btn-default payment-btn"
                     onClick={handleMockCancel}
                   >
                     Close without paying
@@ -494,19 +631,19 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
             )}
           </div>
 
-          <div className="modal-footer">
+          <div className="modal-footer payment-modal-footer">
             {step === 'idle' && (
               <>
                 <button
                   type="button"
-                  className="btn btn-default"
+                  className="btn btn-default payment-btn"
                   onClick={onClose}
                 >
                   Close
                 </button>
                 <button
                   type="button"
-                  className="btn btn-primary"
+                  className="btn btn-primary payment-btn"
                   onClick={handlePayClick}
                   disabled={configLoading || !isOnlineAvailable}
                 >
@@ -518,7 +655,7 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
             {(step === 'success' || step === 'polling_stopped') && (
               <button
                 type="button"
-                className="btn btn-default"
+                className="btn btn-default payment-btn"
                 onClick={onClose}
               >
                 Close

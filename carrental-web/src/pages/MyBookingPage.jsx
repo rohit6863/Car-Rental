@@ -12,6 +12,8 @@ export default function MyBookingPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBookingForPayment, setSelectedBookingForPayment] = useState(null);
+  const [cancelMessage, setCancelMessage] = useState({ type: '', text: '' });
+  const [cancellingId, setCancellingId] = useState(null);
 
   const loadBookings = async () => {
     try {
@@ -21,6 +23,24 @@ export default function MyBookingPage() {
       console.error('Failed to load bookings', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this booking?')) {
+      return;
+    }
+    setCancellingId(bookingId);
+    setCancelMessage({ type: '', text: '' });
+    try {
+      const res = await client.post(`/api/bookings/${bookingId}/cancel`);
+      setCancelMessage({ type: 'success', text: res.data.message || 'Booking Cancelled successfully' });
+      await loadBookings();
+    } catch (err) {
+      const msg = err.response?.data?.error || err.response?.data?.message || 'Failed to cancel booking';
+      setCancelMessage({ type: 'danger', text: msg });
+    } finally {
+      setCancellingId(null);
     }
   };
 
@@ -72,6 +92,11 @@ export default function MyBookingPage() {
             <div className="col-md-9 col-sm-9">
               <div className="profile_wrap">
                 <h5 className="uppercase underline">My Bookings </h5>
+                {cancelMessage.text && (
+                  <div className={`alert alert-${cancelMessage.type}`} style={{ marginBottom: '15px' }}>
+                    {cancelMessage.text}
+                  </div>
+                )}
                 <div className="my_vehicles_list">
                   <ul className="vehicle_listing">
                     {loading ? (
@@ -129,6 +154,9 @@ export default function MyBookingPage() {
                                         >
                                           Download Receipt
                                         </Link>
+                                        <p className="text-muted cancel-support-notice" style={{ margin: '8px 0 0 0', fontSize: '12px', fontStyle: 'italic' }}>
+                                          <Link to="/contact-us">Contact support</Link> to cancel a paid booking
+                                        </p>
                                       </>
                                     ) : (
                                       <>
@@ -155,9 +183,33 @@ export default function MyBookingPage() {
                                   </div>
                                 </>
                               ) : booking.Status === 2 ? (
-                                <a href="#" onClick={(e) => e.preventDefault()} className="btn outline btn-xs">Cancelled</a>
+                                <div>
+                                  <a href="#" onClick={(e) => e.preventDefault()} className="btn outline btn-xs">Cancelled</a>
+                                  {booking.payment_status === 'needs_refund' && (
+                                    <div style={{ marginTop: '6px' }}>
+                                      <span className="label label-warning" style={{ backgroundColor: '#f0ad4e', color: '#fff', padding: '3px 6px', fontSize: '11px' }}>
+                                        Needs Refund
+                                      </span>
+                                      <p className="text-muted" style={{ margin: '4px 0 0 0', fontSize: '11px', fontStyle: 'italic' }}>
+                                        Payment flagged for refund
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
                               ) : (
                                 <a href="#" onClick={(e) => e.preventDefault()} className="btn outline btn-xs">Not Confirm yet</a>
+                              )}
+                              {booking.Status !== 2 && !isPaymentConfirmed && (
+                                <div style={{ marginTop: '8px' }}>
+                                  <button
+                                    type="button"
+                                    className="btn btn-danger btn-xs cancel-booking-btn"
+                                    disabled={cancellingId === bookingId}
+                                    onClick={() => handleCancelBooking(bookingId)}
+                                  >
+                                    {cancellingId === bookingId ? 'Cancelling...' : 'Cancel booking'}
+                                  </button>
+                                </div>
                               )}
                               <div className="clearfix"></div>
                             </div>

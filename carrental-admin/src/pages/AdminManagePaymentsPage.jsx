@@ -175,9 +175,42 @@ export default function AdminManagePaymentsPage() {
                           <td>{p.payment_method || '-'}</td>
                           <td>{p.payment_date ? new Date(p.payment_date).toLocaleString() : ''}</td>
                           <td>
-                            <span style={{ textTransform: 'capitalize', fontWeight: 'bold' }}>
-                              {p.payment_status}
-                            </span>
+                            {p.payment_status === 'needs_refund' ? (
+                              <div>
+                                <span className="label label-danger" style={{ backgroundColor: '#d9534f', fontSize: '11px', padding: '4px 8px', display: 'inline-block' }}>
+                                  Needs Refund
+                                </span>
+                                {p.failure_reason && (
+                                  <div style={{ fontSize: '11px', color: '#c9302c', marginTop: '3px' }}>
+                                    {p.failure_reason}
+                                  </div>
+                                )}
+                              </div>
+                            ) : p.payment_status === 'confirmed' ? (
+                              <span className="label label-success" style={{ backgroundColor: '#5cb85c', fontSize: '11px', padding: '4px 8px' }}>
+                                Confirmed
+                              </span>
+                            ) : p.payment_status === 'failed' ? (
+                              <div>
+                                <span className="label label-default" style={{ backgroundColor: '#777', fontSize: '11px', padding: '4px 8px' }}>
+                                  Failed
+                                </span>
+                                {p.failure_reason && (
+                                  <div style={{ fontSize: '11px', color: '#777', marginTop: '3px' }}>
+                                    {p.failure_reason}
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <span style={{ textTransform: 'capitalize', fontWeight: 'bold' }}>
+                                {p.payment_status}
+                              </span>
+                            )}
+                            {p.booking_status === 2 && p.payment_status !== 'needs_refund' && (
+                              <div style={{ marginTop: '3px' }}>
+                                <span className="label label-warning" style={{ fontSize: '10px' }}>Booking Cancelled</span>
+                              </div>
+                            )}
                           </td>
                           <td>
                             {actionInProgress === p.id ? (

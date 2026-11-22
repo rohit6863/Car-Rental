@@ -2,6 +2,23 @@ import React, { useState } from 'react';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
 
+const COMMON_PASSWORDS = new Set([
+  'password',
+  'password123',
+  '12345678',
+  '123456789',
+  '1234567890',
+  'qwertyuiop',
+  'asdfghjkl',
+  'asdfghjkl1',
+  'admin123456',
+  'administrator',
+  'letmein123',
+  'welcome1234',
+  'iloveyou123',
+  'changeme123',
+]);
+
 export default function SignupModal() {
   const { register, providers } = useAuth();
   const [formData, setFormData] = useState({
@@ -40,7 +57,23 @@ export default function SignupModal() {
     setSuccess('');
 
     if (formData.password !== formData.confirmpassword) {
+      setError('Passwords do not match');
       alert('Password and Confirm Password Field do not match !!');
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
+
+    if (formData.password.length > 128) {
+      setError('Password cannot exceed 128 characters');
+      return;
+    }
+
+    if (COMMON_PASSWORDS.has(formData.password.toLowerCase())) {
+      setError('Password is too common or easily guessed. Please choose a stronger password.');
       return;
     }
 
@@ -55,8 +88,12 @@ export default function SignupModal() {
         setSuccess('');
       }, 1500);
     } catch (err) {
-      const msg = err.response?.data?.error || 'Something went wrong. Please try again';
-      setError(msg);
+      if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
+        setError(err.response.data.details.map((d) => d.message).join('. '));
+      } else {
+        const msg = err.response?.data?.error || 'Something went wrong. Please try again';
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }

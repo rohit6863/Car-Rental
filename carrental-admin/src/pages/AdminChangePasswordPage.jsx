@@ -1,6 +1,23 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
+const COMMON_PASSWORDS = new Set([
+  'password',
+  'password123',
+  '12345678',
+  '123456789',
+  '1234567890',
+  'qwertyuiop',
+  'asdfghjkl',
+  'asdfghjkl1',
+  'admin123456',
+  'administrator',
+  'letmein123',
+  'welcome1234',
+  'iloveyou123',
+  'changeme123',
+]);
+
 export default function AdminChangePasswordPage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -16,20 +33,35 @@ export default function AdminChangePasswordPage() {
     setError('');
     setMsg('');
 
-    if (newPassword !== confirmPassword) {
-      setError('New Password and Confirm Password Field do not match  !!');
+    if (!currentPassword) {
+      setError('Current password is required');
       return;
     }
 
-    if (newPassword.length < 8) {
-      setError('New password must be at least 8 characters long');
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (newPassword.length < 12) {
+      setError('New password must be at least 12 characters');
+      return;
+    }
+
+    if (newPassword.length > 128) {
+      setError('Password cannot exceed 128 characters');
+      return;
+    }
+
+    if (COMMON_PASSWORDS.has(newPassword.toLowerCase())) {
+      setError('Password is too common or easily guessed. Please choose a stronger password.');
       return;
     }
 
     setSubmitting(true);
     try {
-      await changePassword(currentPassword, newPassword);
-      setMsg('Your Password succesfully changed');
+      await changePassword(currentPassword, newPassword, confirmPassword);
+      setMsg('Your Password successfully changed');
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');

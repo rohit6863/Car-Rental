@@ -319,6 +319,59 @@ class PaymentsService {
 
       const paymentRecord = rows[0];
 
+      // Check current booking status with row lock
+      const [bRows] = await conn.execute(
+        'SELECT id, Status FROM tblbooking WHERE id = ? FOR UPDATE',
+        [bookingId]
+      );
+      const currentBooking = bRows[0];
+      const isBookingCancelled = !currentBooking || currentBooking.Status === 2;
+      const isOrderInvalidated = paymentRecord.payment_status === 'failed';
+
+      const method = paymentDetails.method || (gateway.name === 'mock' ? 'mock_upi' : 'online');
+
+      // Race condition check: If booking was cancelled or order invalidated, flag for refund
+      if (isBookingCancelled || isOrderInvalidated) {
+        await conn.execute(`
+          UPDATE tblpayments
+          SET payment_status = 'needs_refund',
+              gateway = ?,
+              gateway_order_id = ?,
+              gateway_payment_id = ?,
+              gateway_signature = ?,
+              payment_method = ?,
+              failure_reason = 'Payment captured after booking was cancelled; flagged for refund',
+              notes = ?
+          WHERE id = ?
+        `, [
+          gateway.name,
+          orderId,
+          paymentId,
+          signature,
+          method,
+          JSON.stringify(paymentDetails),
+          paymentRecord.id,
+        ]);
+
+        auditLog('PAYMENT_NEEDS_REFUND', {
+          actorType: 'customer',
+          actorId: userEmail,
+          details: {
+            bookingId,
+            orderId,
+            paymentId,
+            reason: 'Booking was cancelled before payment verification',
+          },
+        });
+
+        return {
+          success: false,
+          status: 'needs_refund',
+          message: 'Booking was cancelled before payment completed. The payment has been flagged for a full refund.',
+          bookingId,
+        };
+      }
+
       // Idempotency: if already confirmed, return success
       if (paymentRecord.payment_status === 'confirmed') {
         return {
@@ -328,8 +381,6 @@ class PaymentsService {
           receiptUrl: `/my-booking?receipt=${bookingId}`,
         };
       }
-
-      const method = paymentDetails.method || (gateway.name === 'mock' ? 'mock_upi' : 'online');
 
       await conn.execute(`
         UPDATE tblpayments
@@ -431,21 +482,48 @@ class PaymentsService {
 
           if (payments.length > 0) {
             const p = payments[0];
-            if (p.payment_status !== 'confirmed') {
-              await conn.execute(`
-                UPDATE tblpayments
-                SET payment_status = 'confirmed',
-                    gateway_payment_id = COALESCE(?, gateway_payment_id),
-                    payment_method = COALESCE(?, payment_method),
-                    confirmation_date = NOW()
-                WHERE id = ?
-              `, [paymentId || null, method, p.id]);
+            const [bRows] = await conn.execute(
+              'SELECT id, Status FROM tblbooking WHERE id = ? FOR UPDATE',
+              [p.booking_id]
+            );
+            const b = bRows[0];
+            const isBookingCancelled = !b || b.Status === 2;
+            const isOrderInvalidated = p.payment_status === 'failed';
 
-              auditLog('PAYMENT_WEBHOOK_CONFIRMED', {
-                actorType: 'webhook',
-                actorId: gateway.name,
-                details: { eventId: event.eventId, orderId, paymentId, bookingId: p.booking_id },
-              });
+            if (isBookingCancelled || isOrderInvalidated) {
+              if (p.payment_status !== 'needs_refund' && p.payment_status !== 'refunded') {
+                await conn.execute(`
+                  UPDATE tblpayments
+                  SET payment_status = 'needs_refund',
+                      gateway_payment_id = COALESCE(?, gateway_payment_id),
+                      payment_method = COALESCE(?, payment_method),
+                      failure_reason = 'Payment captured via webhook after booking was cancelled; flagged for refund'
+                  WHERE id = ?
+                `, [paymentId || null, method, p.id]);
+
+                auditLog('PAYMENT_WEBHOOK_NEEDS_REFUND', {
+                  actorType: 'webhook',
+                  actorId: gateway.name,
+                  details: { eventId: event.eventId, orderId, paymentId, bookingId: p.booking_id },
+                });
+              }
+            } else {
+              if (p.payment_status !== 'confirmed') {
+                await conn.execute(`
+                  UPDATE tblpayments
+                  SET payment_status = 'confirmed',
+                      gateway_payment_id = COALESCE(?, gateway_payment_id),
+                      payment_method = COALESCE(?, payment_method),
+                      confirmation_date = NOW()
+                  WHERE id = ?
+                `, [paymentId || null, method, p.id]);
+
+                auditLog('PAYMENT_WEBHOOK_CONFIRMED', {
+                  actorType: 'webhook',
+                  actorId: gateway.name,
+                  details: { eventId: event.eventId, orderId, paymentId, bookingId: p.booking_id },
+                });
+              }
             }
           }
         }
@@ -585,6 +663,32 @@ class PaymentsService {
     }
 
     if (fetched && (fetched.status === 'captured' || fetched.status === 'authorized')) {
+      const [bookingRows] = await query('SELECT Status FROM tblbooking WHERE id = ?', [payment.booking_id]);
+      const isBookingCancelled = bookingRows.length > 0 && bookingRows[0].Status === 2;
+
+      if (isBookingCancelled) {
+        await query(`
+          UPDATE tblpayments
+          SET payment_status = 'needs_refund',
+              confirmation_date = NOW(),
+              payment_method = COALESCE(?, payment_method),
+              failure_reason = 'Reconciled payment for cancelled booking; flagged for refund'
+          WHERE id = ?
+        `, [fetched.method || 'online', payment.id]);
+
+        auditLog('PAYMENT_ADMIN_RECONCILED_NEEDS_REFUND', {
+          actorType: 'admin',
+          actorId: 'admin',
+          details: { paymentId: payment.id, gateway: payment.gateway },
+        });
+
+        return {
+          success: true,
+          message: 'Payment captured at gateway but booking was cancelled; flagged as needs_refund',
+          payment_status: 'needs_refund',
+        };
+      }
+
       await query(`
         UPDATE tblpayments
         SET payment_status = 'confirmed',
@@ -706,13 +810,14 @@ class PaymentsService {
         p.*,
         b.id as booking_id,
         b.userEmail,
+        b.Status as booking_status,
         v.VehiclesTitle,
         u.FullName
       FROM tblpayments p
       JOIN tblbooking b ON b.id = p.booking_id
       JOIN tblvehicles v ON v.id = b.VehicleId
       JOIN tblusers u ON u.EmailId = b.userEmail
-      ORDER BY p.payment_date DESC
+      ORDER BY p.id DESC
     `);
     return rows;
   }

@@ -6,6 +6,23 @@ import Sidebar from '../components/Sidebar';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
 
+const COMMON_PASSWORDS = new Set([
+  'password',
+  'password123',
+  '12345678',
+  '123456789',
+  '1234567890',
+  'qwertyuiop',
+  'asdfghjkl',
+  'asdfghjkl1',
+  'admin123456',
+  'administrator',
+  'letmein123',
+  'welcome1234',
+  'iloveyou123',
+  'changeme123',
+]);
+
 export default function UpdatePasswordPage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
@@ -33,8 +50,28 @@ export default function UpdatePasswordPage() {
     setError('');
     setMsg('');
 
+    if (!password) {
+      setError('Current password is required');
+      return;
+    }
+
     if (newpassword !== confirmpassword) {
-      alert('New Password and Confirm Password Field do not match !!');
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (newpassword.length < 8) {
+      setError('New password must be at least 8 characters');
+      return;
+    }
+
+    if (newpassword.length > 128) {
+      setError('Password cannot exceed 128 characters');
+      return;
+    }
+
+    if (COMMON_PASSWORDS.has(newpassword.toLowerCase())) {
+      setError('Password is too common or easily guessed. Please choose a stronger password.');
       return;
     }
 
@@ -45,12 +82,16 @@ export default function UpdatePasswordPage() {
         newpassword,
         confirmpassword,
       });
-      setMsg(res.data.message || 'Your Password succesfully changed');
+      setMsg(res.data.message || 'Your Password successfully changed');
       setPassword('');
       setNewpassword('');
       setConfirmpassword('');
     } catch (err) {
-      setError(err.response?.data?.error || 'Your current password is wrong');
+      if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
+        setError(err.response.data.details.map((d) => d.message).join('. '));
+      } else {
+        setError(err.response?.data?.error || 'Your current password is wrong');
+      }
     } finally {
       setLoading(false);
     }

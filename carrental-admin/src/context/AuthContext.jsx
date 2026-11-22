@@ -44,10 +44,11 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const changePassword = async (currentPassword, newPassword) => {
+  const changePassword = async (currentPassword, newPassword, confirmPassword) => {
     const res = await client.post('/api/admin/change-password', {
-      current_password: currentPassword,
-      new_password: newPassword,
+      password: currentPassword,
+      newpassword: newPassword,
+      confirmpassword: confirmPassword,
     });
     setMustChangePassword(false);
     if (admin) {

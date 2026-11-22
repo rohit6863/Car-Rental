@@ -8,6 +8,9 @@ const crypto = require('crypto');
  * @returns {Promise<string>} Argon2id hash starting with "$argon2id$"
  */
 async function hashPassword(password) {
+  if (typeof password !== 'string' || password.length > 128) {
+    throw new Error('Password must not exceed 128 characters');
+  }
   return argon2.hash(password, {
     type: argon2.argon2id,
     memoryCost: 65536,  // 64 MiB
@@ -62,6 +65,9 @@ function isLegacyMd5(storedHash) {
  * @param {{password_hash: string|null, Password: string|null}} row  DB row
  */
 async function verifyPassword(plaintext, row) {
+  if (typeof plaintext !== 'string' || plaintext.length > 128) {
+    return { valid: false, needsRehash: false };
+  }
   // Try Argon2id first (preferred path)
   if (row.password_hash && row.password_hash.startsWith('$argon2')) {
     const valid = await verifyArgon2(row.password_hash, plaintext);

@@ -4,7 +4,7 @@ const adminAuthController = require('../../controllers/admin/auth.controller');
 const { validate } = require('../../middleware/validate');
 const { adminLoginLimiter, readOnlyAuthLimiter } = require('../../middleware/rateLimiter');
 const { requireAdmin } = require('../../middleware/auth');
-const { adminLoginSchema, changePasswordSchema } = require('../../validators/auth.validator');
+const { adminLoginSchema, adminChangePasswordSchema } = require('../../validators/auth.validator');
 
 const router = express.Router();
 
@@ -12,6 +12,6 @@ router.post('/login', adminLoginLimiter, validate({ body: adminLoginSchema }), a
 router.post('/logout', adminAuthController.logout);
 router.post('/refresh', adminAuthController.refresh);
 router.get('/me', readOnlyAuthLimiter, requireAdmin, adminAuthController.me);
-router.post('/change-password', requireAdmin, validate({ body: changePasswordSchema }), adminAuthController.changePassword);
+router.post('/change-password', requireAdmin, validate({ body: adminChangePasswordSchema }), adminAuthController.changePassword);
 
 module.exports = router;

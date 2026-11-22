@@ -1,6 +1,23 @@
 import React, { useState } from 'react';
 import api from '../api/client';
 
+const COMMON_PASSWORDS = new Set([
+  'password',
+  'password123',
+  '12345678',
+  '123456789',
+  '1234567890',
+  'qwertyuiop',
+  'asdfghjkl',
+  'asdfghjkl1',
+  'admin123456',
+  'administrator',
+  'letmein123',
+  'welcome1234',
+  'iloveyou123',
+  'changeme123',
+]);
+
 export default function ForgotPasswordModal() {
   const [step, setStep] = useState(1); // 1 = request reset, 2 = enter token & new password
   const [email, setEmail] = useState('');
@@ -26,7 +43,11 @@ export default function ForgotPasswordModal() {
       }
       setStep(2);
     } catch (err) {
-      setError(err.response?.data?.error || 'Email id is invalid');
+      if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
+        setError(err.response.data.details.map((d) => d.message).join('. '));
+      } else {
+        setError(err.response?.data?.error || 'Email id is invalid');
+      }
     } finally {
       setLoading(false);
     }
@@ -38,7 +59,22 @@ export default function ForgotPasswordModal() {
     setMsg('');
 
     if (newpassword !== confirmpassword) {
-      alert('New Password and Confirm Password Field do not match !!');
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (newpassword.length < 8) {
+      setError('New password must be at least 8 characters');
+      return;
+    }
+
+    if (newpassword.length > 128) {
+      setError('Password cannot exceed 128 characters');
+      return;
+    }
+
+    if (COMMON_PASSWORDS.has(newpassword.toLowerCase())) {
+      setError('Password is too common or easily guessed. Please choose a stronger password.');
       return;
     }
 
@@ -62,7 +98,11 @@ export default function ForgotPasswordModal() {
         setConfirmpassword('');
       }, 1500);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to reset password');
+      if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
+        setError(err.response.data.details.map((d) => d.message).join('. '));
+      } else {
+        setError(err.response?.data?.error || 'Failed to reset password');
+      }
     } finally {
       setLoading(false);
     }
