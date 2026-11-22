@@ -9,8 +9,23 @@ const submitPaymentSchema = z.object({
   // because the server computes the exact amount from booking dates x price per day!
 });
 
+const createOrderSchema = z.object({
+  bookingId: z.coerce.number().int().positive().optional(),
+  booking_id: z.coerce.number().int().positive().optional(),
+}).refine((data) => data.bookingId || data.booking_id, {
+  message: 'Booking ID is required',
+});
+
+const verifyPaymentSchema = z.object({
+  bookingId: z.coerce.number().int().positive('Booking ID must be a positive integer'),
+  orderId: z.string().trim().min(1, 'Order ID is required'),
+  paymentId: z.string().trim().min(1, 'Payment ID is required'),
+  signature: z.string().trim().min(1, 'Signature is required'),
+});
+
 const paymentIdParamSchema = z.object({
-  id: z.coerce.number().int().positive(),
+  id: z.coerce.number().int().positive().optional(),
+  paymentId: z.coerce.number().int().positive().optional(),
 });
 
 const receiptBookingParamSchema = z.object({
@@ -19,6 +34,8 @@ const receiptBookingParamSchema = z.object({
 
 module.exports = {
   submitPaymentSchema,
+  createOrderSchema,
+  verifyPaymentSchema,
   paymentIdParamSchema,
   receiptBookingParamSchema,
 };

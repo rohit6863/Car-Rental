@@ -13,6 +13,8 @@ const CHECK_EMAIL_MAX    = parseInt(process.env.RATE_LIMIT_CHECK_EMAIL_MAX    ||
 const FORM_MAX           = parseInt(process.env.RATE_LIMIT_FORM_MAX           || (isProd ? '10' : '30'), 10);
 const READONLY_MAX       = parseInt(process.env.RATE_LIMIT_READONLY_MAX       || (isProd ? '100': '300'), 10);
 const GOOGLE_AUTH_MAX    = parseInt(process.env.RATE_LIMIT_GOOGLE_AUTH_MAX    || (isProd ? '10' : '30'), 10);
+const PAYMENT_ORDER_MAX  = parseInt(process.env.RATE_LIMIT_PAYMENT_ORDER_MAX  || (isProd ? '20' : '60'), 10);
+const PAYMENT_VERIFY_MAX = parseInt(process.env.RATE_LIMIT_PAYMENT_VERIFY_MAX || (isProd ? '30' : '90'), 10);
 const GENERAL_MAX        = parseInt(process.env.RATE_LIMIT_GENERAL_MAX        || (isProd ? '100': '300'), 10);
 
 function createLimitHandler(message) {
@@ -113,6 +115,26 @@ const googleAuthLimiter = rateLimit({
   skip: shouldSkip,
 });
 
+/** Payment order creation limiter */
+const paymentOrderLimiter = rateLimit({
+  windowMs: WINDOW_MS,
+  max: () => (process.env.RATE_LIMIT_PAYMENT_ORDER_MAX ? parseInt(process.env.RATE_LIMIT_PAYMENT_ORDER_MAX, 10) : PAYMENT_ORDER_MAX),
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: createLimitHandler('Too many payment order requests. Please try again later.'),
+  skip: shouldSkip,
+});
+
+/** Payment verify limiter */
+const paymentVerifyLimiter = rateLimit({
+  windowMs: WINDOW_MS,
+  max: () => (process.env.RATE_LIMIT_PAYMENT_VERIFY_MAX ? parseInt(process.env.RATE_LIMIT_PAYMENT_VERIFY_MAX, 10) : PAYMENT_VERIFY_MAX),
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: createLimitHandler('Too many payment verification attempts. Please try again later.'),
+  skip: shouldSkip,
+});
+
 /** General application limiter */
 const generalLimiter = rateLimit({
   windowMs: WINDOW_MS,
@@ -132,6 +154,8 @@ module.exports = {
   publicFormLimiter,
   readOnlyAuthLimiter,
   googleAuthLimiter,
+  paymentOrderLimiter,
+  paymentVerifyLimiter,
   generalLimiter,
   CONFIG: {
     WINDOW_MS,
@@ -143,6 +167,8 @@ module.exports = {
     FORM_MAX,
     READONLY_MAX,
     GOOGLE_AUTH_MAX,
+    PAYMENT_ORDER_MAX,
+    PAYMENT_VERIFY_MAX,
     GENERAL_MAX,
   },
 };

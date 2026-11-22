@@ -2,6 +2,7 @@
 require('dotenv').config();
 const app = require('./app');
 const { reportGoogleAuthConfig, validateGoogleOAuthConfig } = require('./services/googleAuth.service');
+const { reportPaymentGatewayConfig, validatePaymentGatewayConfig } = require('./services/payment');
 
 function validateEnvironment() {
   const isProd = process.env.NODE_ENV === 'production';
@@ -38,6 +39,10 @@ function validateEnvironment() {
   // Report and validate Google OAuth environment variables
   reportGoogleAuthConfig();
   validateGoogleOAuthConfig();
+
+  // Report and validate Payment Gateway configuration
+  reportPaymentGatewayConfig();
+  validatePaymentGatewayConfig();
 
   if (errors.length > 0) {
     console.error('\n============================================================');

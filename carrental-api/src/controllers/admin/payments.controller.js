@@ -28,6 +28,16 @@ class AdminPaymentsController {
       next(err);
     }
   }
+
+  async reconcile(req, res, next) {
+    try {
+      const paymentId = req.params.paymentId || req.params.id;
+      const result = await paymentsService.adminReconcile(paymentId);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new AdminPaymentsController();

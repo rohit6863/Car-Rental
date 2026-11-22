@@ -16,7 +16,7 @@ export default function ReceiptPage() {
         const res = await client.get(`/api/payments/receipt/${bookingId}`);
         setReceipt(res.data);
       } catch (err) {
-        setError(err.response?.data?.message || 'Invalid booking ID or payment not confirmed.');
+        setError(err.response?.data?.error || err.response?.data?.message || 'Invalid booking ID or payment not confirmed.');
       } finally {
         setLoading(false);
       }

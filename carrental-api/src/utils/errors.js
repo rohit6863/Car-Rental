@@ -53,6 +53,12 @@ class LockoutError extends AppError {
   }
 }
 
+class ServiceUnavailableError extends AppError {
+  constructor(message = 'Online payments are currently unavailable') {
+    super(message, 503);
+  }
+}
+
 module.exports = {
   AppError,
   ValidationError,
@@ -61,4 +67,5 @@ module.exports = {
   NotFoundError,
   ConflictError,
   LockoutError,
+  ServiceUnavailableError,
 };

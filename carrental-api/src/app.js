@@ -42,15 +42,32 @@ app.disable('x-powered-by');
 
 // ─── Security headers ──────────────────────────────────────────────────────────
 const isProd = process.env.NODE_ENV === 'production';
+const isRazorpayActive = (process.env.PAYMENT_GATEWAY || '').toLowerCase().trim() === 'razorpay';
+
+// Build CSP directives strictly:
+// When Razorpay is active:
+// - scriptSrc: 'https://checkout.razorpay.com' (loads official Razorpay modal checkout)
+// - frameSrc: 'https://api.razorpay.com' (hosts secure payment iframe)
+// - connectSrc: 'https://api.razorpay.com' (telemetry and payment polling)
+// When in mock mode or disabled, zero Razorpay domains are added.
+const scriptSrc = ["'self'", 'https://accounts.google.com'];
+const frameSrc = ["'self'"];
+const connectSrc = ["'self'", 'https://accounts.google.com'];
+
+if (isRazorpayActive) {
+  scriptSrc.push('https://checkout.razorpay.com');
+  frameSrc.push('https://api.razorpay.com');
+  connectSrc.push('https://api.razorpay.com');
+}
 
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc:  ["'self'", 'https://checkout.razorpay.com', 'https://accounts.google.com'],
-      frameSrc:   ["'self'", 'https://api.razorpay.com'],
+      scriptSrc,
+      frameSrc,
       imgSrc:     ["'self'", 'data:', 'https:'],
-      connectSrc: ["'self'", 'https://api.razorpay.com', 'https://accounts.google.com'],
+      connectSrc,
       styleSrc:   ["'self'", "'unsafe-inline'"],
       objectSrc:  ["'none'"],
       upgradeInsecureRequests: isProd ? [] : null,
@@ -71,10 +88,13 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'X-CSRF-Token'],
+  allowedHeaders: ['Content-Type', 'X-CSRF-Token', 'X-Razorpay-Signature', 'X-Razorpay-Event-Id', 'X-Mock-Signature', 'X-Mock-Event-Id'],
 }));
 
 // ─── Body parsing & Parameter pollution prevention ────────────────────────────
+// Raw body parser for webhook endpoints mounted BEFORE json parser
+app.use('/api/payments/webhook', express.raw({ type: '*/*', limit: '1mb' }));
+
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(hpp());
@@ -93,10 +113,9 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads', 'vehicl
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // ─── CSRF (double-submit cookie) ──────────────────────────────────────────────
-// Webhook endpoints must read raw body; they skip CSRF and body-parser.
+// Webhook endpoints must read raw body; they skip CSRF and cookie auth.
 app.use((req, _res, next) => {
-  // Razorpay webhook uses raw body – handled in its own router before json().
-  if (req.path === '/api/payments/razorpay/webhook') return next();
+  if (req.path === '/api/payments/webhook') return next();
   csrfMiddleware(req, _res, next);
 });
 

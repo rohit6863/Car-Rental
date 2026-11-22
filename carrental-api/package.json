@@ -13,7 +13,8 @@
     "test:watch": "jest --watch --runInBand",
     "test:coverage": "jest --coverage --runInBand --forceExit",
     "security": "jest tests/security-hardening.test.js --runInBand --forceExit",
-    "dev:reset-limits": "node scripts/reset-limits.js"
+    "dev:reset-limits": "node scripts/reset-limits.js",
+    "dev:fire-webhook": "node scripts/fire-webhook.js"
   },
   "dependencies": {
     "argon2": "^0.40.3",

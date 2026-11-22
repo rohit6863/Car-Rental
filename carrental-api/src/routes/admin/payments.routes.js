@@ -13,4 +13,8 @@ router.get('/', adminPaymentsController.getAll);
 router.patch('/:id/confirm', validate({ params: paymentIdParamSchema }), adminPaymentsController.confirm);
 router.patch('/:id/reject', validate({ params: paymentIdParamSchema }), adminPaymentsController.reject);
 
+// Online payment reconciliation
+router.post('/reconcile/:paymentId', validate({ params: paymentIdParamSchema }), adminPaymentsController.reconcile);
+router.post('/:id/reconcile', validate({ params: paymentIdParamSchema }), adminPaymentsController.reconcile);
+
 module.exports = router;

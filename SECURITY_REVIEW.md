@@ -379,14 +379,80 @@ upgradeInsecureRequests: isProd ? [] : null,
 
 ---
 
-### 4. Verification Test Results
+---
+
+## Phase 5: Online Payment Gateway & Security Hardening Review
+
+### 1. Payment Security Findings & Remediation Register
+
+#### SEC-012 (Critical): Client-Side Payment Amount Tampering Prevention
+- **Threat:** Malicious clients altering payment payload amounts (e.g. attempting to pay Rs. 1 for a Rs. 10,000 car rental).
+- **Remediation:** Client-supplied amounts are completely ignored. `POST /api/payments/order` loads booking dates and price per day from `tblbooking` and `tblvehicles`, computing the exact inclusive duration and total in paise (`Math.round(days * PricePerDay * 100)`). The gateway order is created with this server-calculated value.
+
+#### SEC-013 (Critical): Cryptographic Signature Verification & Constant-Time Comparison
+- **Threat:** Forged checkout signatures or timing attacks on HMAC comparison.
+- **Remediation:** Implemented `PaymentGateway.constantTimeCompare` using Node.js `crypto.timingSafeEqual` over pre-hashed buffers. Both `RazorpayGateway` and `MockGateway` verify HMAC-SHA256 signatures over `order_id|payment_id` before accepting payment details.
+
+#### SEC-014 (Critical): Server-Side Gateway Payment Fetch & Status Verification
+- **Threat:** Signature replay or checkout hijacking using valid signatures for mismatched amounts or orders.
+- **Remediation:** After signature verification, `verifyPayment` calls `gateway.fetchPayment(paymentId)` server-side. It cryptographically asserts:
+  1. `fetched.order_id === orderId`
+  2. `fetched.amount === expectedAmountInPaise`
+  3. `fetched.currency === 'INR'`
+  4. `fetched.status === 'captured'` (or `'authorized'`)
+
+#### SEC-015 (High): Concurrency, Race Conditions & Double-Spend Protection
+- **Threat:** Simultaneous verification requests or webhook race conditions confirming or charging an order multiple times.
+- **Remediation:**
+  1. Database transaction with pessimistic locking: `SELECT ... FROM tblpayments WHERE booking_id = ? FOR UPDATE`.
+  2. Idempotent short-circuit: if `payment_status === 'confirmed'`, returns success without re-executing updates.
+  3. Database schema unique indexes on `gateway_order_id` and `gateway_payment_id` prevent duplicate payment records at the storage level.
+
+#### SEC-016 (High): Webhook Forgery & Replay Protection
+- **Threat:** Attackers forging webhook requests or replaying captured webhook events.
+- **Remediation:**
+  1. Mounted `express.raw({ type: '*/*', limit: '1mb' })` specifically on `/api/payments/webhook` ahead of JSON parsing to preserve exact raw byte buffers for HMAC verification.
+  2. Verification requires `X-Razorpay-Signature` (or `X-Mock-Signature`).
+  3. Webhook event deduplication via `tbl_payment_events` with a `UNIQUE KEY uq_payment_event_id (event_id)`. Replayed events return `{ received: true, duplicate: true }`.
+
+#### SEC-017 (High): Webhook Out-of-Order Delivery & State Protection
+- **Threat:** Delayed or out-of-order `payment.failed` webhooks arriving after an order was successfully captured and confirmed.
+- **Remediation:** In `handleWebhook`, `payment.failed` strictly checks if the payment is in `'pending'` status. It **NEVER** downgrades an already confirmed payment (`payment_status === 'confirmed'`) to failed.
+
+#### SEC-018 (Critical): Mock Gateway Production Safety Isolation
+- **Threat:** Accidental activation of mock payment simulation in production environments or with production databases.
+- **Remediation:** `MockGateway` constructor throws a fatal error if `NODE_ENV === 'production'` or `DB_NAME !== 'carrental_test'`. Mock methods are prefixed with `mock_` and gateway name is tagged as `'mock'`. The frontend mock checkout simulator is guarded by `import.meta.env.PROD` and dead-code eliminated in production builds.
+
+#### SEC-019 (Medium): Dedicated Rate-Limiting Buckets
+- **Remediation:** Created dedicated rate limiters:
+  - `paymentOrderLimiter` (Production: 20/15min, Dev: 60/15min)
+  - `paymentVerifyLimiter` (Production: 30/15min, Dev: 90/15min)
+  - Prevents payment order creation from impacting general API browsing or login rate limits.
+
+---
+
+### 2. Payment Gateway Authorization & Access Matrix
+
+| Method | Endpoint | Anonymous | Customer (`user`) | Admin (`admin`) | Security Enforcement |
+|:---|:---|:---:|:---:|:---:|:---|
+| `GET` | `/api/payments/config` | 200 | 200 | 200 | Returns `{ available, gateway, keyId }` without secrets |
+| `POST` | `/api/payments/order` | 401 | 200 | 403 | Customer auth + CSRF; enforces ownership (`userEmail`); enforces `Status=1` (Confirmed); server calculates amount; reuses active pending order; rate limited (`paymentOrderLimiter`) |
+| `POST` | `/api/payments/verify` | 401 | 200 | 403 | Customer auth + CSRF; verifies signature + server-side gateway payment fetch; row-level lock; rate limited (`paymentVerifyLimiter`) |
+| `POST` | `/api/payments/webhook` | 200 / 422 | 200 / 422 | 200 / 422 | Raw body HMAC verification; skips CSRF; event deduplication via `tbl_payment_events`; non-downgrading |
+| `GET` | `/api/payments/status/:bookingId` | 401 | 200 / 403 | 200 | Polling support; strict ownership check (IDOR protected: owner or admin) |
+| `GET` | `/api/payments/receipt/:bookingId` | 401 | 200 / 403 | 200 | Strict IDOR check: customers only view their own receipts; admin can view all |
+| `POST` | `/api/admin/payments/reconcile/:id`| 401 | 403 | 200 | Admin only; queries gateway for status of pending payments |
+
+---
+
+### 3. Verification Test Results (Phase 5)
 
 - **Automated Unit & Integration Tests (`carrental-api`):**
-  - `tests/google-auth.test.js`: 18 tests passing (100%).
-  - Full Jest suite: 8 suites, 77 tests passing (100%).
-- **Automated Playwright Real-Browser Tests (`test-google-playwright.cjs`):**
-  - **Case A:** Real click on "Login / Register", assert "Continue with Google" visible, click button, verify redirection to `https://accounts.google.com/o/oauth2/v2/auth` with exact parameters (`client_id`, `redirect_uri`, `response_type=code`, `scope`, `state`, `code_challenge`, `nonce`, `prompt=select_account`). **PASS (100%)**
-  - **Case B:** Full browser flow against local mock OIDC server (port 9099). Token exchange, verification, customer creation in `tblusers`, redirection to `/profile?notice=missing_contact`, notice banner verification, and rendered customer name in header navbar. **PASS (100%)**
-  - **Case C:** Provider cancellation (`error=access_denied`). Real click, simulation of provider cancellation, redirection to `/?error=cancelled`, and automatic reopening of `#loginform` modal with cancellation error banner. **PASS (100%)**
+  - `tests/payment-gateway.test.js`: 23 tests passing (100%).
+  - Full Jest suite: 9 suites, 102 tests passing (100%).
+- **Playwright Real-Browser Tests (`test-payment-playwright.cjs`):**
+  - Real clicks only (`no force: true`, `no setChecked`, zero direct DOM manipulations).
+  - Validated full mock checkout flow, failure simulation, retry, success, receipt generation, cross-user IDOR protection, and admin manage payments display. **PASS (100%)**
+
 
 

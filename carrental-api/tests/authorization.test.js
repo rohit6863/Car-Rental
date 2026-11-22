@@ -63,6 +63,32 @@ describe('Authorization, IDOR, CSRF & Server-Side Calculation', () => {
       expect(res.body.error).toMatch(/admin access required/i);
     });
 
+    it('blocks regular users from admin payment reconciliation with 403 Forbidden', async () => {
+      const res = await request(app)
+        .post('/api/admin/payments/reconcile/999')
+        .set('Cookie', [`access_token=${user1Token}`, `csrf_nonce=${csrfNonce}`])
+        .set('x-csrf-token', csrfToken);
+
+      expect(res.status).toBe(403);
+      expect(res.body.error).toMatch(/admin access required/i);
+    });
+
+    it('blocks unauthenticated requests to online payment endpoints with 401', async () => {
+      const resOrder = await request(app)
+        .post('/api/payments/order')
+        .set('Cookie', [`csrf_nonce=${csrfNonce}`])
+        .set('x-csrf-token', csrfToken)
+        .send({ bookingId: 1 });
+      expect(resOrder.status).toBe(401);
+
+      const resVerify = await request(app)
+        .post('/api/payments/verify')
+        .set('Cookie', [`csrf_nonce=${csrfNonce}`])
+        .set('x-csrf-token', csrfToken)
+        .send({ bookingId: 1, orderId: 'ord', paymentId: 'pay', signature: 'sig' });
+      expect(resVerify.status).toBe(401);
+    });
+
     it('allows admin to access admin routes', async () => {
       const res = await request(app)
         .get('/api/admin/bookings')

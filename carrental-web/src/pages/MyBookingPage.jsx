@@ -5,16 +5,13 @@ import Footer from '../components/Footer';
 import Sidebar from '../components/Sidebar';
 import { useAuth } from '../context/AuthContext';
 import client, { getVehicleImageUrl } from '../api/client';
+import PaymentModal from '../components/PaymentModal';
 
 export default function MyBookingPage() {
   const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedBookingForUpi, setSelectedBookingForUpi] = useState(null);
-  const [paymentForms, setPaymentForms] = useState({});
-  const [paymentSubmitting, setPaymentSubmitting] = useState({});
-  const [paymentError, setPaymentError] = useState({});
-  const [paymentSuccess, setPaymentSuccess] = useState({});
+  const [selectedBookingForPayment, setSelectedBookingForPayment] = useState(null);
 
   const loadBookings = async () => {
     try {
@@ -30,63 +27,6 @@ export default function MyBookingPage() {
   useEffect(() => {
     loadBookings();
   }, []);
-
-  const handleMethodChange = (bookingId, method, totalAmount) => {
-    setPaymentForms(prev => ({
-      ...prev,
-      [bookingId]: {
-        ...prev[bookingId],
-        payment_method: method
-      }
-    }));
-
-    if (method === 'UPI') {
-      setSelectedBookingForUpi({ id: bookingId, amount: totalAmount });
-      if (window.$) {
-        window.$('#upiModal').modal('show');
-      }
-    }
-  };
-
-  const handleTransactionChange = (bookingId, txId) => {
-    setPaymentForms(prev => ({
-      ...prev,
-      [bookingId]: {
-        ...prev[bookingId],
-        transaction_id: txId
-      }
-    }));
-  };
-
-  const handlePaymentSubmit = async (e, bookingId) => {
-    e.preventDefault();
-    const form = paymentForms[bookingId];
-    if (!form || !form.payment_method || !form.transaction_id) {
-      setPaymentError(prev => ({ ...prev, [bookingId]: 'Please select a method and enter transaction ID' }));
-      return;
-    }
-
-    setPaymentSubmitting(prev => ({ ...prev, [bookingId]: true }));
-    setPaymentError(prev => ({ ...prev, [bookingId]: '' }));
-    setPaymentSuccess(prev => ({ ...prev, [bookingId]: '' }));
-
-    try {
-      await client.post('/api/payments', {
-        booking_id: bookingId,
-        payment_method: form.payment_method,
-        transaction_id: form.transaction_id
-      });
-      setPaymentSuccess(prev => ({ ...prev, [bookingId]: 'Payment submitted successfully! Waiting for admin confirmation.' }));
-      await loadBookings();
-    } catch (err) {
-      setPaymentError(prev => ({
-        ...prev,
-        [bookingId]: err.response?.data?.message || err.response?.data?.error || 'Failed to submit payment'
-      }));
-    } finally {
-      setPaymentSubmitting(prev => ({ ...prev, [bookingId]: false }));
-    }
-  };
 
   return (
     <>
@@ -141,11 +81,11 @@ export default function MyBookingPage() {
                     ) : (
                       bookings.map((booking) => {
                         const bookingId = booking.id || booking.bookingId;
-                        const currentForm = paymentForms[bookingId] || {};
-                        const showTxFields = !!currentForm.payment_method;
+                        const isConfirmedBooking = booking.Status === 1;
+                        const isPaymentConfirmed = booking.payment_status === 'confirmed';
 
                         return (
-                          <li key={bookingId}>
+                          <li key={bookingId} data-booking-id={bookingId}>
                             <div className="vehicle_img">
                               <Link to={`/vehical-details/${booking.vid}`}>
                                 <img src={getVehicleImageUrl(booking.Vimage1)} alt="image" />
@@ -164,78 +104,52 @@ export default function MyBookingPage() {
                               </p>
                             </div>
                             <div className="vehicle_status">
-                              {booking.Status === 1 ? (
+                              {isConfirmedBooking ? (
                                 <>
-                                  <a href="#" onClick={(e) => e.preventDefault()} className="btn outline btn-xs active-btn">Confirmed</a>
+                                  <a href="#" onClick={(e) => e.preventDefault()} className="btn outline btn-xs active-btn">
+                                    Confirmed
+                                  </a>
                                   <div className="payment_status" style={{ marginTop: '10px' }}>
-                                    {(!booking.payment_status || booking.payment_status === 'unpaid') ? (
-                                      <form onSubmit={(e) => handlePaymentSubmit(e, bookingId)}>
-                                        {paymentError[bookingId] && (
-                                          <div className="alert alert-danger" style={{ padding: '6px 10px', fontSize: '12px' }}>
-                                            {paymentError[bookingId]}
-                                          </div>
-                                        )}
-                                        {paymentSuccess[bookingId] && (
-                                          <div className="alert alert-success" style={{ padding: '6px 10px', fontSize: '12px' }}>
-                                            {paymentSuccess[bookingId]}
-                                          </div>
-                                        )}
-                                        <div className="form-group" style={{ marginBottom: '10px' }}>
-                                          <select
-                                            name="payment_method"
-                                            className="form-control"
-                                            value={currentForm.payment_method || ''}
-                                            onChange={(e) => handleMethodChange(bookingId, e.target.value, booking.totalAmount)}
-                                            required
-                                          >
-                                            <option value="">Select Payment Method</option>
-                                            <option value="Credit Card">Credit Card</option>
-                                            <option value="Debit Card">Debit Card</option>
-                                            <option value="Bank Transfer">Bank Transfer</option>
-                                            <option value="UPI">UPI Payment</option>
-                                          </select>
-                                        </div>
-                                        {showTxFields && (
-                                          <div>
-                                            <div className="form-group">
-                                              <input
-                                                type="text"
-                                                name="transaction_id"
-                                                className="form-control"
-                                                placeholder="Enter Transaction/Reference ID"
-                                                value={currentForm.transaction_id || ''}
-                                                onChange={(e) => handleTransactionChange(bookingId, e.target.value)}
-                                                required
-                                              />
-                                            </div>
-                                            <button
-                                              type="submit"
-                                              className="btn btn-primary btn-block"
-                                              disabled={paymentSubmitting[bookingId]}
-                                            >
-                                              {paymentSubmitting[bookingId] ? 'Submitting...' : 'Submit Payment'}
-                                            </button>
-                                          </div>
-                                        )}
-                                      </form>
+                                    {isPaymentConfirmed ? (
+                                      <>
+                                        <p style={{ margin: '4px 0', fontSize: '13px' }}>
+                                          <b>Payment Status:</b> <span style={{ color: '#5cb85c', fontWeight: 'bold' }}>Confirmed</span>
+                                        </p>
+                                        <p style={{ margin: '4px 0', fontSize: '12px' }}>
+                                          <b>Method:</b> {booking.payment_method || 'Online'}
+                                        </p>
+                                        <p style={{ margin: '4px 0', fontSize: '12px' }}>
+                                          <b>Ref ID:</b> {booking.gateway_payment_id || booking.transaction_id || 'N/A'}
+                                        </p>
+                                        <Link
+                                          to={`/receipt/${bookingId}`}
+                                          className="btn btn-xs btn-success"
+                                          target="_blank"
+                                          style={{ marginTop: '6px' }}
+                                        >
+                                          Download Receipt
+                                        </Link>
+                                      </>
                                     ) : (
                                       <>
-                                        <p>
-                                          <b>Payment Status:</b> {booking.payment_status.charAt(0).toUpperCase() + booking.payment_status.slice(1)}
-                                        </p>
-                                        {booking.payment_status === 'confirmed' && (
-                                          <>
-                                            <p><b>Payment Method:</b> {booking.payment_method}</p>
-                                            <p><b>Transaction ID:</b> {booking.transaction_id}</p>
-                                            <Link
-                                              to={`/receipt/${bookingId}`}
-                                              className="btn btn-xs btn-success"
-                                              target="_blank"
-                                            >
-                                              Download Receipt
-                                            </Link>
-                                          </>
+                                        {booking.payment_status === 'failed' && (
+                                          <div className="alert alert-danger" style={{ padding: '4px 8px', fontSize: '11px', marginBottom: '6px' }}>
+                                            Payment failed. You can try again.
+                                          </div>
                                         )}
+                                        {booking.payment_status === 'pending' && (
+                                          <p style={{ fontSize: '12px', color: '#8a6d3b', margin: '4px 0' }}>
+                                            <b>Status:</b> Pending payment
+                                          </p>
+                                        )}
+                                        <button
+                                          type="button"
+                                          className="btn btn-primary btn-xs"
+                                          onClick={() => setSelectedBookingForPayment(booking)}
+                                          style={{ marginTop: '4px' }}
+                                        >
+                                          {booking.payment_status === 'failed' ? 'Retry Payment' : 'Pay now'}
+                                        </button>
                                       </>
                                     )}
                                   </div>
@@ -247,7 +161,7 @@ export default function MyBookingPage() {
                               )}
                               <div className="clearfix"></div>
                             </div>
-                            <div style={{ float: 'left' }}>
+                            <div style={{ float: 'left', marginTop: '6px' }}>
                               <p><b>Message:</b> {booking.message}</p>
                             </div>
                           </li>
@@ -262,39 +176,16 @@ export default function MyBookingPage() {
         </div>
       </section>
 
-      {/* UPI Payment Instructions Modal */}
-      <div className="modal fade" id="upiModal" tabIndex="-1" role="dialog" aria-labelledby="upiModalLabel" aria-hidden="true">
-        <div className="modal-dialog" role="document">
-          <div className="modal-content">
-            <div className="modal-header">
-              <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-              <h4 className="modal-title" id="upiModalLabel">UPI Payment Instructions</h4>
-            </div>
-            <div className="modal-body">
-              <div className="text-center" style={{ marginBottom: '20px' }}>
-                <h5>Amount to Pay: Rs. {selectedBookingForUpi?.amount || 0}</h5>
-                <div style={{ marginTop: '15px' }}>
-                  <h5>UPI ID:</h5>
-                  <div style={{ fontSize: '24px', fontWeight: 'bold' }}>carrental@upi</div>
-                </div>
-              </div>
-              <ol>
-                <li>Open your UPI app (Google Pay/PhonePe/BHIM/Paytm)</li>
-                <li>Select &apos;Pay by UPI ID/VPA&apos;</li>
-                <li>Enter our UPI ID: carrental@upi</li>
-                <li>Enter amount: Rs. {selectedBookingForUpi?.amount || 0}</li>
-                <li>Complete the payment</li>
-                <li>Enter the UPI Transaction ID below to confirm your payment</li>
-              </ol>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Online Payment Modal */}
+      {selectedBookingForPayment && (
+        <PaymentModal
+          booking={selectedBookingForPayment}
+          onClose={() => setSelectedBookingForPayment(null)}
+          onSuccess={() => {
+            loadBookings();
+          }}
+        />
+      )}
 
       <Footer />
     </>
