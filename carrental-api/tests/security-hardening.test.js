@@ -1,4 +1,5 @@
 'use strict';
+const crypto = require('crypto');
 const request = require('supertest');
 const path = require('path');
 const fs = require('fs');
@@ -26,7 +27,8 @@ describe('Security Hardening Test Suite', () => {
 
   beforeAll(async () => {
     // Seed test users if needed
-    const passHash = await hashPassword('Password123!');
+    const dynamicPass = `SecPass!${crypto.randomBytes(6).toString('hex')}A1`;
+    const passHash = await hashPassword(dynamicPass);
     await query(`
       INSERT IGNORE INTO tblusers (FullName, EmailId, ContactNo, Password, password_hash, auth_provider)
       VALUES 

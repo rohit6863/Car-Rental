@@ -1,4 +1,5 @@
 'use strict';
+const crypto = require('crypto');
 const request = require('supertest');
 const app = require('../src/app');
 const { generateCsrfToken } = require('../src/middleware/csrf');
@@ -9,15 +10,26 @@ describe('Cookie Isolation: Customer vs Admin Authentication', () => {
   const csrfNonce = 'test_nonce_cookie_isolation';
   const csrfToken = generateCsrfToken(csrfNonce);
 
+  const testAdminPassword = `AdminIso!${crypto.randomBytes(6).toString('hex')}A1`;
+  const testCustomerPassword = `CustIso!${crypto.randomBytes(6).toString('hex')}A1`;
+
   let adminAccessTokenCookie = '';
   let customerAccessTokenCookie = '';
 
   beforeAll(async () => {
-    const hash = await argon2.hash('AdminPassword123!');
-    await pool.query('UPDATE admin SET password_hash = ?, must_change_password = 0 WHERE UserName = ?', [hash, 'admin']);
+    const adminHash = await argon2.hash(testAdminPassword);
+    await pool.query('UPDATE admin SET password_hash = ?, must_change_password = 0 WHERE UserName = ?', [adminHash, 'admin']);
+    const custHash = await argon2.hash(testCustomerPassword);
+    await pool.query(
+      `INSERT INTO tblusers (FullName, EmailId, ContactNo, Password, password_hash, auth_provider)
+       VALUES ('Cookie Isolation Test User', 'test@example.com', '9876543210', '', ?, 'local')
+       ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash)`,
+      [custHash]
+    );
   });
 
   afterAll(async () => {
+    await pool.query('DELETE FROM tblusers WHERE EmailId = ?', ['test@example.com']);
     await pool.end();
   });
 
@@ -26,7 +38,7 @@ describe('Cookie Isolation: Customer vs Admin Authentication', () => {
       .post('/api/admin/auth/login')
       .set('Cookie', [`csrf_nonce=${csrfNonce}`])
       .set('x-csrf-token', csrfToken)
-      .send({ username: 'admin', password: 'AdminPassword123!' });
+      .send({ username: 'admin', password: testAdminPassword });
 
     expect(res.status).toBe(200);
     expect(res.body.admin).toBeDefined();
@@ -47,7 +59,7 @@ describe('Cookie Isolation: Customer vs Admin Authentication', () => {
       .post('/api/auth/login')
       .set('Cookie', [`csrf_nonce=${csrfNonce}`])
       .set('x-csrf-token', csrfToken)
-      .send({ email: 'test@example.com', password: 'Password123!' });
+      .send({ email: 'test@example.com', password: testCustomerPassword });
 
     expect(res.status).toBe(200);
     expect(res.body.user).toBeDefined();

@@ -5,15 +5,15 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const { hashPassword } = require('../utils/crypto');
+const { assertSafeTestDatabase } = require('./dbGuard');
 
 function generateRandomPassword(prefix = 'Wander') {
   return `${prefix}!${crypto.randomBytes(6).toString('hex')}A1`;
 }
 
 async function seed() {
-  const dbName = (process.env.DB_NAME || 'carrental_test').trim();
-  const isAllowedDb = dbName === 'carrental_test' || dbName.endsWith('_test') || process.env.NODE_ENV === 'development';
-  if (!isAllowedDb && process.env.NODE_ENV === 'production') {
+  const dbName = assertSafeTestDatabase(process.env.DB_NAME || 'wanderwheels_demo_test');
+  if (process.env.NODE_ENV === 'production') {
     throw new Error(`Refusing to seed database "${dbName}" in production.`);
   }
 
@@ -216,7 +216,7 @@ async function seed() {
 
   // 4. Seed test admin (configurable via env, generated dynamically if missing)
   const adminUsername = process.env.SEED_ADMIN_USERNAME || 'admin';
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'AdminPassword123!';
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || generateRandomPassword('Admin');
   const adminHash = await hashPassword(adminPassword);
 
   const [existingAdmin] = await conn.execute('SELECT id FROM admin WHERE UserName = ?', [adminUsername]);

@@ -1,4 +1,5 @@
 'use strict';
+const crypto = require('crypto');
 const request = require('supertest');
 const app = require('../src/app');
 const { pool } = require('../src/db/pool');
@@ -9,12 +10,14 @@ describe('Auth Endpoints & Argon2id Migration', () => {
   const csrfNonce = 'test_nonce_1234567890';
   const csrfToken = generateCsrfToken(csrfNonce);
 
+  const dynamicTestPassword = `AuthTest!${crypto.randomBytes(6).toString('hex')}A1`;
+
   const testUser = {
     fullname: 'Test User',
     emailid: `test_${Date.now()}@example.com`,
     mobileno: '9876543210',
-    password: 'Password123!',
-    confirmpassword: 'Password123!',
+    password: dynamicTestPassword,
+    confirmpassword: dynamicTestPassword,
   };
 
   afterAll(async () => {
@@ -97,7 +100,7 @@ describe('Auth Endpoints & Argon2id Migration', () => {
 
     it('should lazy-upgrade a legacy MD5 hash to Argon2id on successful login', async () => {
       const legacyEmail = `legacy_${Date.now()}@example.com`;
-      const legacyPassword = 'LegacyPassword123';
+      const legacyPassword = `LegacyUpgrade!${crypto.randomBytes(6).toString('hex')}A1`;
       const legacyMd5 = md5Legacy(legacyPassword);
 
       // Seed user with MD5 hash only

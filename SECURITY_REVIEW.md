@@ -274,7 +274,7 @@ upgradeInsecureRequests: isProd ? [] : null,
 - **Threat Model / Attack Vector:**
   An attacker registers an account locally using a victim's email address (e.g. `victim@gmail.com`) before the victim joins the platform. When the real victim later clicks "Continue with Google", a naive OAuth implementation might associate the Google ID to the existing account without revoking credentials. The attacker could retain access using their known password or retain active session tokens created prior to the OAuth link.
 - **How to Exploit:**
-  1. Attacker registers `victim@example.com` with password `AttackerPassword123!`.
+  1. Attacker registers `victim@example.com` with password `AttackerGeneratedSecret!99`.
   2. Attacker logs in and maintains an active refresh token.
   3. Victim logs in with Google OAuth using verified email `victim@example.com`.
   4. If passwords or active sessions are not invalidated, attacker retains full persistent access through their previous credentials and refresh tokens.

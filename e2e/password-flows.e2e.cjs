@@ -44,7 +44,7 @@ async function startServers() {
       cwd: path.join(__dirname, '..', 'carrental-api'),
       stdio: 'pipe',
       shell: true,
-      env: { ...process.env, PAYMENT_GATEWAY: 'mock', NODE_ENV: 'development', DB_NAME: process.env.DB_NAME || 'carrental_e2e_test' },
+      env: { ...process.env, PAYMENT_GATEWAY: 'mock', NODE_ENV: 'development', DB_NAME: process.env.DB_NAME || 'wanderwheels_e2e_test' },
     });
     apiProcess.stderr.on('data', (d) => console.error('[API ERR]:', d.toString()));
     const ok = await waitForPort(API_PORT);
@@ -90,7 +90,7 @@ async function runPasswordFlows() {
     port: 3306,
     user: 'root',
     password: '',
-    database: process.env.DB_NAME || 'carrental_e2e_test',
+    database: process.env.DB_NAME || 'wanderwheels_e2e_test',
     waitForConnections: true,
     connectionLimit: 5,
   });
@@ -323,7 +323,7 @@ async function runPasswordFlows() {
     console.log('  -> Testing password mismatch...');
     await adminPage.locator('#password').fill(adminInitialPw);
     await adminPage.locator('#newpassword').fill(adminNewPw);
-    await adminPage.locator('#confirmpassword').fill('DifferentPassword123!');
+    await adminPage.locator('#confirmpassword').fill(`${adminNewPw}_mismatch`);
     await adminPage.locator('button[type="submit"]:has-text("Save changes")').click();
 
     const mismatchBanner = adminPage.locator('.errorWrap');

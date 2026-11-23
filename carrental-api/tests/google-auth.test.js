@@ -478,11 +478,12 @@ describe('Customer Google OAuth Authentication & Pre-Hijacking Defense', () => {
       const csrfToken = generateCsrfToken(csrfNonce);
 
       const startTime = Date.now();
+      const attemptPass = `AttemptPass!${crypto.randomBytes(6).toString('hex')}A1`;
       const res = await request(app)
         .post('/api/auth/login')
         .set('Cookie', [`csrf_nonce=${csrfNonce}`])
         .set('X-CSRF-Token', csrfToken)
-        .send({ email, password: 'AttemptedPassword123!' });
+        .send({ email, password: attemptPass });
       const duration = Date.now() - startTime;
 
       expect(res.status).toBe(401);

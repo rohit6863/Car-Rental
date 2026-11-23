@@ -1,17 +1,26 @@
 'use strict';
 
+const crypto = require('crypto');
 const request = require('supertest');
 const app = require('../src/app');
 const { pool } = require('../src/db/pool');
 const { hashPassword } = require('../src/utils/crypto');
 const { generateCsrfToken } = require('../src/middleware/csrf');
 
+function genTestPassword(prefix = 'TestPass') {
+  return `${prefix}!${crypto.randomBytes(6).toString('hex')}A1`;
+}
+
 describe('Password Flows Payload & Form Field Names Verification', () => {
   const csrfNonce = 'test_nonce_1234567890';
   const csrfToken = generateCsrfToken(csrfNonce);
 
   const testUserEmail = 'form_user_test@example.com';
-  const initialPassword = 'Password123!';
+  const initialPassword = genTestPassword('UserInit');
+  const initialAdminPassword = genTestPassword('AdminInit');
+  const updatedUserPassword = genTestPassword('UserUpdated');
+  const brandNewPassword = genTestPassword('BrandNew');
+
   let userId;
   let adminId;
   let userCookie = [];
@@ -31,7 +40,7 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
     userId = uRows[0].id;
 
     // Seed test admin
-    const adminHash = await hashPassword('AdminPassword123!');
+    const adminHash = await hashPassword(initialAdminPassword);
     await pool.query('UPDATE admin SET password_hash = ?, Password = NULL, must_change_password = 0 WHERE UserName = "admin"', [adminHash]);
     const [aRows] = await pool.query('SELECT id FROM admin WHERE UserName = "admin"');
     adminId = aRows[0].id;
@@ -49,13 +58,13 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
       .post('/api/admin/login')
       .set('Cookie', [`csrf_nonce=${csrfNonce}`])
       .set('x-csrf-token', csrfToken)
-      .send({ username: 'admin', password: 'AdminPassword123!' });
+      .send({ username: 'admin', password: initialAdminPassword });
     adminCookie = adminLoginRes.headers['set-cookie'] || [];
   });
 
   afterAll(async () => {
-    // Restore admin password to default AdminPassword123!
-    const defaultAdminHash = await hashPassword('AdminPassword123!');
+    // Restore admin password
+    const defaultAdminHash = await hashPassword(initialAdminPassword);
     await pool.query('UPDATE admin SET password_hash = ?, Password = NULL, must_change_password = 0 WHERE UserName = "admin"', [defaultAdminHash]);
     await pool.query('DELETE FROM tbl_password_resets WHERE email = ?', [testUserEmail]);
     await pool.query('DELETE FROM tblusers WHERE EmailId = ?', [testUserEmail]);
@@ -63,10 +72,11 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
   });
 
   test('1. Admin change-password: sends exactly { password, newpassword, confirmpassword } and succeeds', async () => {
+    const newAdminPass = genTestPassword('AdminNext');
     const payload = {
-      password: 'AdminPassword123!',
-      newpassword: 'NewAdminPassword456!',
-      confirmpassword: 'NewAdminPassword456!',
+      password: initialAdminPassword,
+      newpassword: newAdminPass,
+      confirmpassword: newAdminPass,
     };
 
     console.log('[API TEST LOG] Admin change-password request body keys sent:', Object.keys(payload));
@@ -82,12 +92,13 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
     expect(res.body.success).toBe(true);
 
     // Restore admin password
-    const restoreHash = await hashPassword('AdminPassword123!');
+    const restoreHash = await hashPassword(initialAdminPassword);
     await pool.query('UPDATE admin SET password_hash = ?, Password = NULL, must_change_password = 0 WHERE id = ?', [restoreHash, adminId]);
   });
 
   test('1b. Admin change-password: returns human-readable errors when fields are missing (no raw Zod text)', async () => {
     const emptyPayload = {};
+
     const res = await request(app)
       .post('/api/admin/change-password')
       .set('Cookie', [...adminCookie, `csrf_nonce=${csrfNonce}`])
@@ -111,7 +122,7 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
       .set('Cookie', [...adminCookie, `csrf_nonce=${csrfNonce}`])
       .set('x-csrf-token', csrfToken)
       .send({
-        password: 'AdminPassword123!',
+        password: initialAdminPassword,
         newpassword: 'ShortPwd99!',
         confirmpassword: 'ShortPwd99!',
       });
@@ -124,7 +135,7 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
       .set('Cookie', [...adminCookie, `csrf_nonce=${csrfNonce}`])
       .set('x-csrf-token', csrfToken)
       .send({
-        password: 'AdminPassword123!',
+        password: initialAdminPassword,
         newpassword: 'administrator',
         confirmpassword: 'administrator',
       });
@@ -138,7 +149,7 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
       .set('Cookie', [...adminCookie, `csrf_nonce=${csrfNonce}`])
       .set('x-csrf-token', csrfToken)
       .send({
-        password: 'AdminPassword123!',
+        password: initialAdminPassword,
         newpassword: longPwd,
         confirmpassword: longPwd,
       });
@@ -149,8 +160,8 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
   test('2. Customer update-password: sends exactly { password, newpassword, confirmpassword } and succeeds', async () => {
     const payload = {
       password: initialPassword,
-      newpassword: 'UpdatedUserPassword123!',
-      confirmpassword: 'UpdatedUserPassword123!',
+      newpassword: updatedUserPassword,
+      confirmpassword: updatedUserPassword,
     };
 
     console.log('[API TEST LOG] Customer update-password request body keys sent:', Object.keys(payload));
@@ -166,14 +177,15 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
     expect(res.body.success).toBe(true);
 
     // Verify wrong current password produces human-readable error
+    const anotherPwd = genTestPassword('AnotherPwd');
     const wrongRes = await request(app)
       .put('/api/users/password')
       .set('Cookie', [...userCookie, `csrf_nonce=${csrfNonce}`])
       .set('x-csrf-token', csrfToken)
       .send({
         password: 'TotallyWrongPassword999!',
-        newpassword: 'AnotherPassword123!',
-        confirmpassword: 'AnotherPassword123!',
+        newpassword: anotherPwd,
+        confirmpassword: anotherPwd,
       });
 
     expect(wrongRes.status).toBe(422);
@@ -186,7 +198,7 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
       .set('Cookie', [...userCookie, `csrf_nonce=${csrfNonce}`])
       .set('x-csrf-token', csrfToken)
       .send({
-        password: 'UpdatedUserPassword123!',
+        password: updatedUserPassword,
         newpassword: 'abc',
         confirmpassword: 'abc',
       });
@@ -198,7 +210,7 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
       .set('Cookie', [...userCookie, `csrf_nonce=${csrfNonce}`])
       .set('x-csrf-token', csrfToken)
       .send({
-        password: 'UpdatedUserPassword123!',
+        password: updatedUserPassword,
         newpassword: '12345678',
         confirmpassword: '12345678',
       });
@@ -214,8 +226,8 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
       .set('Cookie', [...userCookie, `csrf_nonce=${csrfNonce}`])
       .set('x-csrf-token', csrfToken)
       .send({
-        current_password: 'UpdatedUserPassword123!',
-        new_password: 'ValidPassword123!',
+        current_password: updatedUserPassword,
+        new_password: genTestPassword('ValidNewPass'),
       });
 
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('[DEPRECATION WARNING]'));
@@ -244,8 +256,8 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
       .set('x-csrf-token', csrfToken)
       .send({
         token: 'invalid_non_existent_token_hex_string',
-        newpassword: 'BrandNewPassword123!',
-        confirmpassword: 'BrandNewPassword123!',
+        newpassword: brandNewPassword,
+        confirmpassword: brandNewPassword,
       });
 
     expect(invalidTokenRes.status).toBe(422);
@@ -258,8 +270,8 @@ describe('Password Flows Payload & Form Field Names Verification', () => {
       .set('x-csrf-token', csrfToken)
       .send({
         token: 'anytoken',
-        newpassword: 'BrandNewPassword123!',
-        confirmpassword: 'MismatchPassword123!',
+        newpassword: brandNewPassword,
+        confirmpassword: genTestPassword('MismatchPass'),
       });
 
     expect(mismatchRes.status).toBe(422);
