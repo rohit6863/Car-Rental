@@ -19,7 +19,7 @@ The WanderWheels brand name, logos, and identity assets were authored for this p
 | :--- | :--- | :--- | :--- | :--- |
 | `carrental-web/public/assets/images/logo.JPG` | Brand Logo (Primary) | 91 × 60 px | 3,026 B | User-created via AI image tool.<br>**Tool Name:** `[USER TO FILL IN]`<br>**Generation Date:** `[USER TO FILL IN]` |
 | `carrental-web/public/assets/images/logo.png` | Brand Logo (Optimized PNG) | 91 × 60 px | 13,620 B | Lossless raster generated alongside `logo.JPG` to eliminate JPEG compression artifacts without layout change. |
-| `carrental-web/public/assets/images/logg.png` | Brand Wordmark Emblem | 153 × 43 px | 7,407 B | User-created project branding graphic.<br>**Tool Name:** `[USER TO FILL IN]`<br>**Generation Date:** `[USER TO FILL IN]` |
+| `carrental-web/public/assets/images/logg.png` | Graphic Banner ("ONLINE CAR RENTAL") | 153 × 43 px | 7,407 B | Visually depicts a red sports car alongside bold text reading "ONLINE CAR RENTAL". Retained per user instruction without unverified origin claims. |
 | `carrental-web/public/assets/images/favicon-icon/favicon.png` | Site Favicon | 24 × 24 px | 3,402 B | User-created project favicon.<br>**Tool Name:** `[USER TO FILL IN]`<br>**Generation Date:** `[USER TO FILL IN]` |
 
 ### Generated Icons, Placeholders & Content
