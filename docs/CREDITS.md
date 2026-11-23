@@ -21,9 +21,6 @@ The WanderWheels brand name, logos, and identity assets were authored for this p
 | `carrental-web/public/assets/images/logo.png` | Brand Logo (Optimized PNG) | 91 × 60 px | 13,620 B | Lossless raster generated alongside `logo.JPG` to eliminate JPEG compression artifacts without layout change. |
 | `carrental-web/public/assets/images/logg.png` | Brand Wordmark Emblem | 153 × 43 px | 7,407 B | User-created project branding graphic.<br>**Tool Name:** `[USER TO FILL IN]`<br>**Generation Date:** `[USER TO FILL IN]` |
 | `carrental-web/public/assets/images/favicon-icon/favicon.png` | Site Favicon | 24 × 24 px | 3,402 B | User-created project favicon.<br>**Tool Name:** `[USER TO FILL IN]`<br>**Generation Date:** `[USER TO FILL IN]` |
-| `carrental-web/public/assets/images/favicon-icon/apple-touch-icon-144-precomposed.png` | App Icon | 114 × 114 px | 4,868 B | Brand icon asset. |
-| `carrental-web/public/assets/images/favicon-icon/apple-touch-icon-72-precomposed.png` | App Icon | 72 × 72 px | 4,309 B | Brand icon asset. |
-| `carrental-web/public/assets/images/favicon-icon/apple-touch-icon-57-precomposed.png` | App Icon | 57 × 57 px | 3,888 B | Brand icon asset. |
 
 ### Generated Icons, Placeholders & Content
 
@@ -126,10 +123,14 @@ All variants and legacy occurrences of the portal name were audited and standard
 - `carrental-admin/src/components/AdminHeader.jsx`: `WanderWheels | Admin Panel`
 - E2E test suites updated to assert consistent WanderWheels branding.
 
-### 3. Removal of Replaced Class-C Images
+### 3. Removal of Replaced Class-C Images and Legacy Assets
 A total of **48 legacy Class-C raster images** of unverified origin were removed via `git rm`:
 - 22 CSS background/banner images replaced by modern CSS linear/radial gradients.
 - 2 legacy avatars (`dealer-logo.jpg`, `ts-avatar.jpg`) replaced by project SVG vectors (`user-avatar.svg`, `admin-avatar.svg`).
 - 1 legacy vehicle fallback (`recent-car-1.jpg`) replaced by `vehicle-placeholder.svg`.
 - 23 unreferenced template sample images (`listing_img1-5`, `recent-blog-1-3`, `post_200x200_1-4`, `our_services_1-2`, `trending-car-img-1-3`, `recent-car-2-6`, `looking-new-car.png`, `addmore_img.png`, `change_logo.png`).
 - 0 stock photos remain in the codebase.
+
+Additionally, **7 unreferenced legacy scripts and unused icons** were removed:
+- 4 legacy template JS files: `booking-calc.js`, `countdown_date.js`, `jquery.countdown.min.js`, `jquery.min.js` (0 references).
+- 3 unreferenced precomposed touch icons: `apple-touch-icon-57-precomposed.png`, `apple-touch-icon-72-precomposed.png`, `apple-touch-icon-144-precomposed.png`.
