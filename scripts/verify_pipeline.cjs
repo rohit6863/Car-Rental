@@ -139,9 +139,9 @@ async function runVerification(stepLabel) {
     stopServers();
   }
 
-  console.log(`\n================================================================`);
+  console.log('\n================================================================');
   console.log(`  VERIFICATION PASSED 100% FOR: ${stepLabel}`);
-  console.log(`================================================================\n`);
+  console.log('================================================================\n');
 }
 
 if (require.main === module) {

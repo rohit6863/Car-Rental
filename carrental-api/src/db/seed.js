@@ -50,9 +50,9 @@ async function seed() {
   // 1. Ensure required Brands exist
   const initialBrands = ['Toyota', 'BMW', 'Lamborghini', 'Audi', 'Nissan', 'Mercedes'];
   for (const bName of initialBrands) {
-    const [bRows] = await conn.execute("SELECT id FROM tblbrands WHERE BrandName = ?", [bName]);
+    const [bRows] = await conn.execute('SELECT id FROM tblbrands WHERE BrandName = ?', [bName]);
     if (bRows.length === 0) {
-      await conn.execute("INSERT INTO tblbrands (BrandName) VALUES (?)", [bName]);
+      await conn.execute('INSERT INTO tblbrands (BrandName) VALUES (?)', [bName]);
     }
   }
 

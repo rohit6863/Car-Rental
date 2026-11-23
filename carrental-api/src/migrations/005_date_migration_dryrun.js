@@ -54,9 +54,9 @@ async function run() {
     database: process.env.DB_NAME || 'carrental',
   });
 
-  console.log(`\n============================================================`);
+  console.log('\n============================================================');
   console.log(`[005_date_migration] Mode: ${isApply ? '*** LIVE APPLY ***' : 'DRY RUN (Safe preview)'}`);
-  console.log(`============================================================\n`);
+  console.log('============================================================\n');
 
   const [rows] = await conn.execute('SELECT id, userEmail, VehicleId, FromDate, ToDate, Status, PostingDate FROM tblbooking ORDER BY id ASC');
 

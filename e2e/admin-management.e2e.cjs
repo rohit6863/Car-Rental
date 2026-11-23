@@ -284,7 +284,7 @@ async function runE2ETests() {
     console.log('  -> Edit vehicle response:', editVehSucc);
     assert(editVehSucc.includes('Data updated successfully'), 'Must show Data updated successfully');
     // screenshot removed
-    testedInteractions.push(`Manage & Edit Vehicle: verified vehicle in list, edited overview, clicked Save changes`);
+    testedInteractions.push('Manage & Edit Vehicle: verified vehicle in list, edited overview, clicked Save changes');
 
     // -------------------------------------------------------------------------
     // 7. CHANGE VEHICLE IMAGE INTERACTION

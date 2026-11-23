@@ -57,52 +57,52 @@ for (const [name, p] of pkgs.entries()) {
 }
 
 // Public vendor CSS and webfonts
-md += `## Font Awesome (v4.7.0)\n\n` +
-  `- **Asset Path:** \`carrental-web/public/assets/fonts/fontawesome-webfont*\`, \`carrental-admin/public/fonts/fontawesome-webfont*\`\n` +
-  `- **Author:** Dave Gandy (http://fontawesome.io)\n` +
-  `- **License:** SIL OFL 1.1 (Fonts) / MIT License (CSS)\n\n` +
+md += '## Font Awesome (v4.7.0)\n\n' +
+  '- **Asset Path:** `carrental-web/public/assets/fonts/fontawesome-webfont*`, `carrental-admin/public/fonts/fontawesome-webfont*`\n' +
+  '- **Author:** Dave Gandy (http://fontawesome.io)\n' +
+  '- **License:** SIL OFL 1.1 (Fonts) / MIT License (CSS)\n\n' +
   '```text\n' +
   'Font Awesome 4.7.0 by @davegandy - http://fontawesome.io - @fontawesome\n' +
   'License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)\n' +
   '```\n\n---\n\n';
 
-md += `## Bootstrap (v3.3.7 / Bootswatch)\n\n` +
-  `- **Asset Path:** \`carrental-web/public/assets/css/bootstrap.min.css\`, \`carrental-admin/public/css/bootstrap.min.css\`, Glyphicons\n` +
-  `- **Authors:** Twitter, Inc. / Thomas Park\n` +
-  `- **License:** MIT License\n\n` +
+md += '## Bootstrap (v3.3.7 / Bootswatch)\n\n' +
+  '- **Asset Path:** `carrental-web/public/assets/css/bootstrap.min.css`, `carrental-admin/public/css/bootstrap.min.css`, Glyphicons\n' +
+  '- **Authors:** Twitter, Inc. / Thomas Park\n' +
+  '- **License:** MIT License\n\n' +
   '```text\n' +
   'Copyright 2011-2016 Twitter, Inc.\n' +
   'Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n' +
   '```\n\n---\n\n';
 
-md += `## Bootstrap-select (v1.7.2)\n\n` +
-  `- **Asset Path:** \`carrental-admin/public/css/bootstrap-select.css\`\n` +
-  `- **License:** MIT License\n\n` +
+md += '## Bootstrap-select (v1.7.2)\n\n' +
+  '- **Asset Path:** `carrental-admin/public/css/bootstrap-select.css`\n' +
+  '- **License:** MIT License\n\n' +
   '```text\n' +
   'Bootstrap-select v1.7.2 (http://silviomoreto.github.io/bootstrap-select)\n' +
   'Copyright 2013-2015 bootstrap-select\n' +
   'Licensed under MIT (https://github.com/silviomoreto/bootstrap-select/blob/master/LICENSE)\n' +
   '```\n\n---\n\n';
 
-md += `## Social Buttons for Bootstrap\n\n` +
-  `- **Asset Path:** \`carrental-admin/public/css/bootstrap-social.css\`\n` +
-  `- **License:** MIT License\n\n` +
+md += '## Social Buttons for Bootstrap\n\n' +
+  '- **Asset Path:** `carrental-admin/public/css/bootstrap-social.css`\n' +
+  '- **License:** MIT License\n\n' +
   '```text\n' +
   'Copyright 2013-2015 Panayiotis Lipiridis\n' +
   'Licensed under the MIT License (https://github.com/lipis/bootstrap-social)\n' +
   '```\n\n---\n\n';
 
-md += `## Owl Carousel (v1.3.3)\n\n` +
-  `- **Asset Path:** \`carrental-web/public/assets/css/owl.carousel.css\`, \`owl.transitions.css\`\n` +
-  `- **License:** MIT License\n\n` +
+md += '## Owl Carousel (v1.3.3)\n\n' +
+  '- **Asset Path:** `carrental-web/public/assets/css/owl.carousel.css`, `owl.transitions.css`\n' +
+  '- **License:** MIT License\n\n' +
   '```text\n' +
   'Owl Carousel v1.3.3 / Owl Transitions v1.3.2\n' +
   'Licensed under MIT License\n' +
   '```\n\n---\n\n';
 
-md += `## Slick Carousel\n\n` +
-  `- **Asset Path:** \`carrental-web/public/assets/css/slick.css\`\n` +
-  `- **License:** MIT License\n\n` +
+md += '## Slick Carousel\n\n' +
+  '- **Asset Path:** `carrental-web/public/assets/css/slick.css`\n' +
+  '- **License:** MIT License\n\n' +
   '```text\n' +
   'Copyright (c) 2013-2016 Ken Wheeler\n' +
   'Licensed under the MIT License\n' +

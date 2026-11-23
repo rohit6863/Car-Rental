@@ -192,7 +192,7 @@ async function runTestFlow() {
     // 6. Admin confirms Booking 1 (expect SUCCESS)
     console.log(`\n[STEP 4] Admin confirms Booking 1 (ID #${bookingId1})...`);
     // Find row for Booking 1 and click Confirm
-    const booking1Row = page.locator(`tr:has-text("Customer 1 Booking Flow")`);
+    const booking1Row = page.locator('tr:has-text("Customer 1 Booking Flow")');
     const confirmBtn1 = booking1Row.locator('a:has-text("Confirm")');
     await confirmBtn1.click();
 
@@ -204,14 +204,14 @@ async function runTestFlow() {
 
     // Verify Booking 1 status changed to Confirmed
     await page.waitForTimeout(1000);
-    const updatedRow1 = page.locator(`tr:has-text("Customer 1 Booking Flow")`);
+    const updatedRow1 = page.locator('tr:has-text("Customer 1 Booking Flow")');
     const statusText1 = await updatedRow1.innerText();
     assert(statusText1.includes('Confirmed'), 'Booking 1 status must now be Confirmed');
     console.log('  -> Booking 1 status in UI: Confirmed.');
 
     // 7. Admin attempts to confirm Booking 2 (overlapping dates) (expect CONFLICT ERROR BANNER)
     console.log(`\n[STEP 5] Admin confirms overlapping Booking 2 (ID #${bookingId2})...`);
-    const booking2Row = page.locator(`tr:has-text("Customer 2 Booking Flow Overlap")`);
+    const booking2Row = page.locator('tr:has-text("Customer 2 Booking Flow Overlap")');
     const confirmBtn2 = booking2Row.locator('a:has-text("Confirm")');
     await confirmBtn2.click();
 
@@ -238,7 +238,7 @@ async function runTestFlow() {
 
     // 8. Assert that Booking 2 remained unconfirmed (Pending / Not Confirmed)
     console.log('\n[STEP 6] Verifying Booking 2 status remained Pending in UI and DB...');
-    const updatedRow2 = page.locator(`tr:has-text("Customer 2 Booking Flow Overlap")`);
+    const updatedRow2 = page.locator('tr:has-text("Customer 2 Booking Flow Overlap")');
     const statusText2 = await updatedRow2.innerText();
     assert(statusText2.includes('Not Confirmed'), 'Booking 2 status must remain Not Confirmed (Pending)');
     console.log('  -> PASS: UI shows Booking 2 remained Not Confirmed!');

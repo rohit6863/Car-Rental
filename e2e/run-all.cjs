@@ -77,9 +77,9 @@ for (const testFile of testFiles) {
 
   ensurePortsFree();
 
-  console.log(`\n----------------------------------------------------------------`);
+  console.log('\n----------------------------------------------------------------');
   console.log(`RUNNING: ${testFile}`);
-  console.log(`----------------------------------------------------------------`);
+  console.log('----------------------------------------------------------------');
 
   const tStart = Date.now();
   const proc = spawnSync(process.execPath, [testPath], {
