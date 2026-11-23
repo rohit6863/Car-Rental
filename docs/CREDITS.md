@@ -8,7 +8,52 @@ All visual assets and software dependencies distributed in the WanderWheels repo
 - **License:** MIT License (Copyright © WanderWheels Contributors). Free for personal, educational, and commercial development use.
 - **Specification:** 800x500 valid PNG raster graphics generated using Node.js standard libraries (`zlib`, `buffer`), featuring geometric luxury fleet styling and custom colorways.
 
-## 2. Icons & Typography
-- **Font Awesome:** Font Awesome Free icons (SIL OFL 1.1 / MIT License).
-- **Lato Font:** Google Fonts / `@fontsource/lato` (SIL Open Font License 1.1).
-- **Bootstrap Glyphic Icons:** Apache License 2.0 / MIT.
+## 2. Retained Third-Party Assets
+
+The following table catalogs every third-party visual asset, banner, background, font, and brand emblem retained in the repository:
+
+| Asset Path | Type | Source | License |
+| :--- | :--- | :--- | :--- |
+| `carrental-admin/public/fonts/fontawesome-webfont.*` | Font / Icons | Font Awesome 4.7.0 | SIL OFL 1.1 / MIT |
+| `carrental-admin/public/fonts/glyphicons-halflings-regular.*` | Font / Icons | Bootstrap 3.x Glyphicons | Apache 2.0 / MIT |
+| `carrental-web/public/assets/fonts/fontawesome-webfont*` | Font / Icons | Font Awesome 4.7.0 | SIL OFL 1.1 / MIT |
+| `carrental-web/public/assets/fonts/glyphicons-halflings-regular*` | Font / Icons | Bootstrap 3.x Glyphicons | Apache 2.0 / MIT |
+| `@fontsource/lato` (bundled in Vite build) | Web Font | Google Fonts (Lukasz Dziedzic) | SIL OFL 1.1 |
+| `carrental-admin/public/img/adminlogin.jpg` | Background Image | Legacy Car Rental Admin Template | unknown |
+| `carrental-admin/public/img/ts-avatar.jpg` | Avatar Image | Legacy Car Rental Admin Template | unknown |
+| `carrental-web/public/assets/images/about_services_faq_bg.jpg` | Background Image | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/aboutus-page-header-img.jpg` | Header Banner | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/addmore_img.png` | UI Graphic | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/banner-image.jpg` | Hero Banner | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/blog-page-header-img.jpg` | Header Banner | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/change_logo.png` | UI Graphic | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/coming_soon_bg.jpg` | Background Image | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/compare-page-header-img.jpg` | Header Banner | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/contact-page-header-img.jpg` | Header Banner | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/dealer-logo.jpg` | Badge / Logo | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/error404-page-header-img.jpg` | Header Banner | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/facts_bg.jpg` | Background Image | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/favicon-icon/apple-touch-icon-144-precomposed.png` | Favicon | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/favicon-icon/apple-touch-icon-57-precomposed.png` | Favicon | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/favicon-icon/apple-touch-icon-72-precomposed.png` | Favicon | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/favicon-icon/favicon.png` | Favicon | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/fun-facts-bg.jpg` | Background Image | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/help_bg.jpg` | Background Image | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/img_390x390.jpg` | Background Pattern | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/knowledge_base_bg.jpg` | Background Image | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/listing-detail-header-img.jpg` | Header Banner | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/listing-page-header-img.jpg` | Header Banner | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/listing_img1.jpg` through `listing_img5.jpg` | Template Sample Images | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/logg.png` | Graphic | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/logo.JPG` | Brand Logo | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/looking-new-car.png` | Graphic | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/our_services_1.jpg`, `our_services_2.jpg` | Template Sample Images | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/post_200x200_1.jpg` through `post_200x200_4.jpg` | Template Sample Images | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/profile-page-header-img.jpg` | Header Banner | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/recent-blog-1.jpg` through `recent-blog-3.jpg` | Template Sample Images | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/recent-car-1.jpg` (Fallback Placeholder) | Image | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/recent-car-2.jpg` through `recent-car-6.jpg` | Template Sample Images | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/services-page-header-img.jpg` | Header Banner | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/support_faq_bg.jpg` | Background Image | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/testimonial-bg.jpg` | Background Image | Legacy Car Rental HTML Template | unknown |
+| `carrental-web/public/assets/images/trending-car-img-1.jpg` through `trending-car-img-3.jpg` | Template Sample Images | Legacy Car Rental HTML Template | unknown |
