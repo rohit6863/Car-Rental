@@ -105,7 +105,7 @@ export default function ProfilePage() {
         <div className="container">
           <div className="user_profile_info gray-bg padding_4x4_40">
             <div className="upload_user_logo">
-              <img src="/assets/images/dealer-logo.jpg" alt="image" />
+              <img src="/assets/images/user-avatar.svg" alt="image" />
             </div>
             <div className="dealer_info">
               <h5>{profile ? profile.FullName : user?.fullname}</h5>

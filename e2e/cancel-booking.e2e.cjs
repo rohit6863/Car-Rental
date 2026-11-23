@@ -107,7 +107,7 @@ async function runCancelBookingPlaywrightTests() {
     await page.locator('#loginform input[name="email"]').fill(custAEmail);
     await page.locator('#loginform input[name="password"]').fill(password);
     await page.locator('#loginform input[type="submit"]').click();
-    await page.waitForSelector('text=Welcome To Car rental portal', { timeout: 10000 });
+    await page.waitForSelector('text=Welcome To WanderWheels', { timeout: 10000 });
     console.log('  -> Customer A logged in successfully.');
 
     // ─── Step 2: Customer A cancels Pending Booking #pendingBookingId ─────────
@@ -274,7 +274,7 @@ async function runCancelBookingPlaywrightTests() {
     await bPage.locator('#loginform input[name="email"]').fill(custBEmail);
     await bPage.locator('#loginform input[name="password"]').fill(password);
     await bPage.locator('#loginform input[type="submit"]').click();
-    await bPage.waitForSelector('text=Welcome To Car rental portal', { timeout: 10000 });
+    await bPage.waitForSelector('text=Welcome To WanderWheels', { timeout: 10000 });
 
     // Customer B attempts to cancel Customer A's paid booking
     const idorRes = await bPage.evaluate(async (targetId) => {

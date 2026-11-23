@@ -43,7 +43,7 @@ export default function AdminLoginPage() {
     <div
       className="login-page bk-img"
       style={{
-        backgroundImage: 'url(/img/adminlogin.jpg)',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
         minHeight: '100vh',
         backgroundSize: 'cover',
         backgroundPosition: 'center',

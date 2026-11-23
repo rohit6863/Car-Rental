@@ -71,7 +71,7 @@ async function runMobilePaymentPlaywrightTest() {
     await page.locator('#loginform input[name="email"]').fill(testEmail);
     await page.locator('#loginform input[name="password"]').fill(password);
     await page.locator('#loginform input[type="submit"]').click();
-    await page.waitForSelector('text=Welcome To Car rental portal', { timeout: 10000 });
+    await page.waitForSelector('text=Welcome To WanderWheels', { timeout: 10000 });
     console.log('  -> Logged in successfully.');
 
     // Switch to 375px mobile viewport for payment modal tests

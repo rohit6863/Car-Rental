@@ -190,7 +190,7 @@ async function runPaymentPlaywrightTests() {
     await loginSubmitBtn.click();
 
     // Wait for login to complete (greeting appears in header)
-    await page.waitForSelector('text=Welcome To Car rental portal', { timeout: 10000 });
+    await page.waitForSelector('text=Welcome To WanderWheels', { timeout: 10000 });
     console.log('  -> Customer A successfully logged in.');
 
     // ─── Step 4: Visit My Bookings & verify unconfirmed vs confirmed ───────────
@@ -290,7 +290,7 @@ async function runPaymentPlaywrightTests() {
     console.log('\n[STEP 7] Verifying Receipt page details...');
     await page.goto(`http://localhost:5173/receipt/${confirmedBookingId}`, { waitUntil: 'networkidle' });
 
-    const receiptHeading = page.locator('h1:has-text("Car Rental Receipt")');
+    const receiptHeading = page.locator('h1:has-text("WanderWheels Rental Receipt")');
     await receiptHeading.waitFor({ state: 'visible', timeout: 5000 });
 
     const receiptCustomer = page.locator('text=Customer Pay A');
@@ -314,7 +314,7 @@ async function runPaymentPlaywrightTests() {
     await pageB.locator('#loginform input[name="email"]').fill(custBEmail);
     await pageB.locator('#loginform input[name="password"]').fill(rawPassword);
     await pageB.locator('#loginform input[type="submit"]').click();
-    await pageB.waitForSelector('text=Welcome To Car rental portal', { timeout: 10000 });
+    await pageB.waitForSelector('text=Welcome To WanderWheels', { timeout: 10000 });
 
     // Attempt to access Customer A's receipt directly
     await pageB.goto(`http://localhost:5173/receipt/${confirmedBookingId}`, { waitUntil: 'networkidle' });

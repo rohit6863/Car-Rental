@@ -16,7 +16,7 @@ export default function AdminHeader({ onToggleSidebar }) {
   return (
     <div className="brand clearfix">
       <Link to="/dashboard" style={{ fontSize: '20px' }}>
-        Car Rental Portal | Admin Panel
+        WanderWheels | Admin Panel
       </Link>
       <span className="menu-btn" onClick={onToggleSidebar} style={{ cursor: 'pointer' }}>
         <i className="fa fa-bars"></i>
@@ -28,7 +28,7 @@ export default function AdminHeader({ onToggleSidebar }) {
           style={{ cursor: 'pointer' }}
         >
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <img src="/img/ts-avatar.jpg" className="ts-avatar hidden-side" alt="" />
+            <img src="/img/admin-avatar.svg" className="ts-avatar hidden-side" alt="" />
             &nbsp;Account <i className="fa fa-angle-down hidden-side"></i>
           </a>
           {accountOpen && (

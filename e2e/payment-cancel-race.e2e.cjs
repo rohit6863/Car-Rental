@@ -72,7 +72,7 @@ async function runPaymentCancelRacePlaywright() {
       await page1.locator('#loginform input[name="email"]').fill(custEmail);
       await page1.locator('#loginform input[name="password"]').fill(password);
       await page1.locator('#loginform input[type="submit"]').click();
-      await page1.waitForSelector('text=Welcome To Car rental portal', { timeout: 10000 });
+      await page1.waitForSelector('text=Welcome To WanderWheels', { timeout: 10000 });
 
       // Navigate to My Bookings
       await page1.goto('http://localhost:5173/my-booking', { waitUntil: 'networkidle' });
@@ -120,7 +120,7 @@ async function runPaymentCancelRacePlaywright() {
       await page2.locator('#loginform input[name="email"]').fill(custEmail);
       await page2.locator('#loginform input[name="password"]').fill(password);
       await page2.locator('#loginform input[type="submit"]').click();
-      await page2.waitForSelector('text=Welcome To Car rental portal', { timeout: 10000 });
+      await page2.waitForSelector('text=Welcome To WanderWheels', { timeout: 10000 });
 
       // Cancel the booking in Context 2
       await page2.goto('http://localhost:5173/my-booking', { waitUntil: 'networkidle' });

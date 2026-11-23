@@ -196,7 +196,7 @@ async function runPasswordFlows() {
     await page.locator('#loginform input[name="password"]').fill(resetNewPw);
     await page.locator('#loginform input[type="submit"]').click();
 
-    await page.waitForSelector('text=Welcome To Car rental portal', { timeout: 10000 });
+    await page.waitForSelector('text=Welcome To WanderWheels', { timeout: 10000 });
     console.log('  -> Customer successfully logged in with the NEW password!');
 
     // ═════════════════════════════════════════════════════════════════════════

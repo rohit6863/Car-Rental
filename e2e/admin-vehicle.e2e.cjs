@@ -82,14 +82,19 @@ async function run() {
   const tempDir = path.join(__dirname, 'temp_test_assets');
   if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
-  // Create test assets
-  const sourceJpg1 = 'c:\\xampp\\htdocs\\carrental\\admin\\img\\vehicleimages\\about_us_img1.jpg';
-  const sourceJpg2 = 'c:\\xampp\\htdocs\\carrental\\admin\\img\\vehicleimages\\about_services_faq_bg.jpg';
+  // Create test assets from repo-local placeholders
+  const placeholderDir = path.join(__dirname, '..', 'carrental-api', 'src', 'db', 'placeholders');
+  const source1 = fs.existsSync(path.join(placeholderDir, 'toyota-fortuner-1.png'))
+    ? path.join(placeholderDir, 'toyota-fortuner-1.png')
+    : path.join(uploadsDir, 'toyota-fortuner-1.png');
+  const source2 = fs.existsSync(path.join(placeholderDir, 'toyota-fortuner-2.png'))
+    ? path.join(placeholderDir, 'toyota-fortuner-2.png')
+    : path.join(uploadsDir, 'toyota-fortuner-2.png');
 
-  const realImg1 = path.join(tempDir, 'real_1.jpg');
-  const realImg2 = path.join(tempDir, 'real_2.jpg');
-  fs.copyFileSync(sourceJpg1, realImg1);
-  fs.copyFileSync(sourceJpg2, realImg2);
+  const realImg1 = path.join(tempDir, 'real_1.png');
+  const realImg2 = path.join(tempDir, 'real_2.png');
+  fs.copyFileSync(source1, realImg1);
+  fs.copyFileSync(source2, realImg2);
 
   // Fake image: text file renamed to .jpg
   const fakeImg = path.join(tempDir, 'fake_text_renamed.jpg');

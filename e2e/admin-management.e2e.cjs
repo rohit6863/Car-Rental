@@ -158,7 +158,7 @@ async function runE2ETests() {
     await page.waitForURL('**/dashboard', { timeout: 10000 });
     const headerTitle = await page.locator('.brand > a').innerText();
     console.log('  -> Header brand text:', headerTitle);
-    assert(headerTitle.includes('Car Rental Portal'), 'Header title match');
+    assert(headerTitle.includes('WanderWheels'), 'Header title match');
 
     // Assert 6 stat titles
     const statTitles = await page.locator('.stat-panel-title').allInnerTexts();

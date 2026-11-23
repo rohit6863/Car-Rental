@@ -13,7 +13,7 @@ function getTestCustomerCredentials() {
 
 function getTestAdminCredentials() {
   const username = process.env.TEST_ADMIN_USERNAME || process.env.SEED_ADMIN_USERNAME || 'admin';
-  const password = process.env.TEST_ADMIN_PASSWORD || process.env.SEED_ADMIN_PASSWORD || generateSecureRandomPassword('AdmTest');
+  const password = process.env.TEST_ADMIN_PASSWORD || process.env.SEED_ADMIN_PASSWORD || 'AdminPassword123!';
   return { username, password };
 }
 

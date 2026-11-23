@@ -91,7 +91,7 @@ export default function ReceiptPage() {
 
       <div className="receipt-container">
         <div className="receipt-header">
-          <h1 style={{ margin: '0 0 10px 0' }}>Car Rental Receipt</h1>
+          <h1 style={{ margin: '0 0 10px 0' }}>WanderWheels Rental Receipt</h1>
           <p style={{ margin: '5px 0' }}>Receipt #: {receipt.receiptNumber}</p>
           <p style={{ margin: '5px 0' }}>Date: {receipt.date}</p>
         </div>

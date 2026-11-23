@@ -100,7 +100,7 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
         key: order.keyId,
         amount: order.amount,
         currency: order.currency || 'INR',
-        name: 'WanderWheels Car Rental',
+        name: 'WanderWheels',
         description: `Booking #${bookingId}`,
         order_id: order.orderId,
         handler: async (response) => {

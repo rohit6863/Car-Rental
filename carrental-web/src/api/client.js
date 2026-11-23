@@ -62,7 +62,7 @@ api.interceptors.response.use(
 );
 
 export function getVehicleImageUrl(filename) {
-  if (!filename) return '/assets/images/recent-car-1.jpg';
+  if (!filename) return '/assets/images/vehicle-placeholder.svg';
   if (filename.startsWith('http://') || filename.startsWith('https://')) return filename;
   // If stored as relative or plain filename, serve from /uploads/
   return `/uploads/${filename}`;

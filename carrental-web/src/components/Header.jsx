@@ -99,7 +99,7 @@ export default function Header() {
                     </a>
                   </div>
                 ) : (
-                  <span>Welcome To Car rental portal</span>
+                  <span>Welcome To WanderWheels</span>
                 )}
               </div>
             </div>
