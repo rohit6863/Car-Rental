@@ -1,15 +1,20 @@
 'use strict';
 require('dotenv').config();
-const fs = require('fs');
-const path = require('path');
 const mysql = require('mysql2/promise');
+const path = require('path');
+const fs = require('fs');
+const crypto = require('crypto');
 const { hashPassword } = require('../utils/crypto');
 
+function generateRandomPassword(prefix = 'Wander') {
+  return `${prefix}!${crypto.randomBytes(6).toString('hex')}A1`;
+}
+
 async function seed() {
-  const dbName = process.env.DB_NAME || '';
-  if (dbName !== 'carrental_test') {
-    console.error(`[SEED ERROR] Refusing to run seed: DB_NAME must be 'carrental_test', currently '${dbName}'`);
-    process.exit(1);
+  const dbName = (process.env.DB_NAME || 'carrental_test').trim();
+  const isAllowedDb = dbName === 'carrental_test' || dbName.endsWith('_test') || process.env.NODE_ENV === 'development';
+  if (!isAllowedDb && process.env.NODE_ENV === 'production') {
+    throw new Error(`Refusing to seed database "${dbName}" in production.`);
   }
 
   const conn = await mysql.createConnection({
@@ -29,27 +34,26 @@ async function seed() {
     fs.mkdirSync(targetUploadsDir, { recursive: true });
   }
 
-  // Source directory for legacy images
-  const legacyImgDir = path.resolve('C:\\xampp\\htdocs\\carrental\\admin\\img\\vehicleimages');
+  // Source directory for repo-local license-clean placeholder images
+  const seedAssetsDir = path.join(__dirname, '..', '..', 'seed-assets', 'vehicles');
 
   // Copy images helper
   const copyImage = (filename) => {
     if (!filename) return;
-    const src = path.join(legacyImgDir, filename);
+    const src = path.join(seedAssetsDir, filename);
     const dest = path.join(targetUploadsDir, filename);
     if (fs.existsSync(src)) {
       fs.copyFileSync(src, dest);
     }
   };
 
-  // 1. Ensure Brand 'Lamborghini' exists
-  const [lambo] = await conn.execute("SELECT id FROM tblbrands WHERE BrandName = 'Lamborghini'");
-  let lamboId;
-  if (lambo.length === 0) {
-    const [res] = await conn.execute("INSERT INTO tblbrands (BrandName) VALUES ('Lamborghini')");
-    lamboId = res.insertId;
-  } else {
-    lamboId = lambo[0].id;
+  // 1. Ensure required Brands exist
+  const initialBrands = ['Toyota', 'BMW', 'Lamborghini', 'Audi', 'Nissan', 'Mercedes'];
+  for (const bName of initialBrands) {
+    const [bRows] = await conn.execute("SELECT id FROM tblbrands WHERE BrandName = ?", [bName]);
+    if (bRows.length === 0) {
+      await conn.execute("INSERT INTO tblbrands (BrandName) VALUES (?)", [bName]);
+    }
   }
 
   // Get brand IDs
@@ -57,7 +61,7 @@ async function seed() {
   const brandMap = {};
   brands.forEach(b => { brandMap[b.BrandName] = b.id; });
 
-  // 2. Define 6 sample vehicles using actual legacy image filenames
+  // 2. Define 6 sample vehicles using repo-local license-clean placeholder images
   const sampleVehicles = [
     {
       title: 'Supra',
@@ -67,9 +71,9 @@ async function seed() {
       fuel: 'Petrol',
       year: 2020,
       seats: 2,
-      img1: 'OIP (1).jpeg',
-      img2: 'OIP (2).jpeg',
-      img3: 'OIP (3).jpeg',
+      img1: 'toyota-fortuner-1.png',
+      img2: 'toyota-fortuner-2.png',
+      img3: 'toyota-fortuner-3.png',
       img4: '',
       img5: '',
       vehicle_status: 'Available',
@@ -82,9 +86,9 @@ async function seed() {
       fuel: 'Petrol',
       year: 2022,
       seats: 5,
-      img1: 'OIP (4).jpeg',
-      img2: 'OIP (5).jpeg',
-      img3: 'OIP (6).jpeg',
+      img1: 'bmw-5-series-1.png',
+      img2: 'bmw-5-series-2.png',
+      img3: 'bmw-5-series-3.png',
       img4: '',
       img5: '',
       vehicle_status: 'Available',
@@ -92,14 +96,14 @@ async function seed() {
     {
       title: 'Urus',
       brand: brandMap['Lamborghini'] || lamboId,
-      overview: 'The Lamborghini Urus is the worlds first Super Sport Utility Vehicle, fusing the soul of a super sports car with the practical functionality of an SUV.',
+      overview: 'The Lamborghini Urus is the world first Super Sport Utility Vehicle, fusing the soul of a super sports car with the practical functionality of an SUV.',
       price: 25000,
       fuel: 'Petrol',
       year: 2024,
       seats: 4,
-      img1: 'OIP (7).jpeg',
-      img2: 'OIP (8).jpeg',
-      img3: 'OIP (9).jpeg',
+      img1: 'mercedes-c-class-1.png',
+      img2: 'mercedes-c-class-2.png',
+      img3: 'mercedes-c-class-3.png',
       img4: '',
       img5: '',
       vehicle_status: 'Available',
@@ -112,9 +116,9 @@ async function seed() {
       fuel: 'Petrol',
       year: 2018,
       seats: 2,
-      img1: 'download (1).jpeg',
-      img2: 'download (2).jpeg',
-      img3: 'download (3).jpeg',
+      img1: 'audi-a4-1.png',
+      img2: 'audi-a4-2.png',
+      img3: 'audi-a4-3.png',
       img4: '',
       img5: '',
       vehicle_status: 'Available',
@@ -127,9 +131,9 @@ async function seed() {
       fuel: 'Petrol',
       year: 2020,
       seats: 5,
-      img1: 'th (1).jpeg',
-      img2: 'th (2).jpeg',
-      img3: 'th.jpeg',
+      img1: 'toyota-fortuner-1.png',
+      img2: 'toyota-fortuner-2.png',
+      img3: 'toyota-fortuner-3.png',
       img4: '',
       img5: '',
       vehicle_status: 'Available',
@@ -142,9 +146,9 @@ async function seed() {
       fuel: 'Diesel',
       year: 2017,
       seats: 2,
-      img1: 'featured-img-1.jpg',
-      img2: 'featured-img-3.jpg',
-      img3: 'featured-img-3.jpg',
+      img1: 'honda-city-1.png',
+      img2: 'honda-city-2.png',
+      img3: 'honda-city-3.png',
       img4: '',
       img5: '',
       vehicle_status: 'Available',
@@ -152,7 +156,7 @@ async function seed() {
   ];
 
   for (const v of sampleVehicles) {
-    // Copy images
+    // Copy images from repo-local seed assets
     [v.img1, v.img2, v.img3, v.img4, v.img5].forEach(copyImage);
 
     // Check if vehicle title exists
@@ -168,13 +172,13 @@ async function seed() {
           ModelYear, SeatingCapacity, Vimage1, Vimage2, Vimage3, Vimage4, Vimage5,
           AirConditioner, PowerDoorLocks, AntiLockBrakingSystem, BrakeAssist,
           PowerSteering, DriverAirbag, PassengerAirbag, PowerWindows, CDPlayer,
-          CentralLocking, CrashSensor, LeatherSeats, Status, vehicle_status
+          CentralLocking, CrashSensor, LeatherSeats, vehicle_status
         ) VALUES (
           ?, ?, ?, ?, ?,
           ?, ?, ?, ?, ?, ?, ?,
           1, 1, 1, 1,
           1, 1, 1, 1, 1,
-          1, 1, 1, 1, ?
+          1, 1, 1, ?
         )
       `, [
         v.title, v.brand, v.overview, v.price, v.fuel,
@@ -184,23 +188,25 @@ async function seed() {
       console.log(`  + Seeded vehicle: ${v.title}`);
     } else {
       await conn.execute(`
-        UPDATE tblvehicles SET Vimage1 = ?, Vimage2 = ?, Vimage3 = ?, Vimage4 = ?, Vimage5 = ?, PricePerDay = ?, FuelType = ?, ModelYear = ?, SeatingCapacity = ?
+        UPDATE tblvehicles SET
+          Vimage1 = ?, Vimage2 = ?, Vimage3 = ?, Vimage4 = ?, Vimage5 = ?,
+          PricePerDay = ?, FuelType = ?, ModelYear = ?, SeatingCapacity = ?
         WHERE id = ?
       `, [v.img1, v.img2, v.img3, v.img4, v.img5, v.price, v.fuel, v.year, v.seats, existing[0].id]);
       console.log(`  ~ Updated vehicle images & specs: ${v.title}`);
     }
   }
 
-  // 3. Seed test customer
-  const customerEmail = 'test@example.com';
-  const customerPassword = 'Password123!';
+  // 3. Seed test customer (configurable via env, generated dynamically if missing)
+  const customerEmail = process.env.SEED_CUSTOMER_EMAIL || 'customer@example.com';
+  const customerPassword = process.env.SEED_CUSTOMER_PASSWORD || generateRandomPassword('Customer');
   const customerHash = await hashPassword(customerPassword);
 
   const [existingUser] = await conn.execute('SELECT id FROM tblusers WHERE EmailId = ?', [customerEmail]);
   if (existingUser.length === 0) {
     await conn.execute(`
       INSERT INTO tblusers (FullName, EmailId, ContactNo, Password, password_hash, Address, City, Country, auth_provider, email_verified)
-      VALUES ('Test Customer', ?, '9876543210', '', ?, '123 Test Street', 'Pune', 'India', 'local', 0)
+      VALUES ('Test Customer', ?, '9999900000', '', ?, '123 Test Street', 'Pune', 'India', 'local', 0)
     `, [customerEmail, customerHash]);
     console.log(`  + Seeded test customer: ${customerEmail}`);
   } else {
@@ -208,9 +214,9 @@ async function seed() {
     console.log(`  - Updated test customer password hash: ${customerEmail}`);
   }
 
-  // 4. Seed test admin
-  const adminUsername = 'admin';
-  const adminPassword = 'AdminPassword123!';
+  // 4. Seed test admin (configurable via env, generated dynamically if missing)
+  const adminUsername = process.env.SEED_ADMIN_USERNAME || 'admin';
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || generateRandomPassword('Admin');
   const adminHash = await hashPassword(adminPassword);
 
   const [existingAdmin] = await conn.execute('SELECT id FROM admin WHERE UserName = ?', [adminUsername]);
@@ -225,13 +231,20 @@ async function seed() {
     console.log(`  - Updated test admin password hash: ${adminUsername}`);
   }
 
-  // 5. Ensure contact info exists
+  // 5. Ensure contact info exists with support@example.com and safe placeholder phone
+  const supportEmail = process.env.SEED_SUPPORT_EMAIL || 'support@example.com';
+  const supportPhone = process.env.SEED_SUPPORT_PHONE || '+91 99999 00000';
+
   const [contactRows] = await conn.execute('SELECT id FROM tblcontactusinfo LIMIT 1');
   if (contactRows.length === 0) {
     await conn.execute(`
       INSERT INTO tblcontactusinfo (Address, EmailId, ContactNo)
-      VALUES ('Hadapsar, Pune, Maharashtra, India', 'Wheelsechiles@gmail.com', '+91-9876543210')
-    `);
+      VALUES ('100 Business Park, Suite 400, Pune, Maharashtra, India', ?, ?)
+    `, [supportEmail, supportPhone]);
+  } else {
+    await conn.execute(`
+      UPDATE tblcontactusinfo SET EmailId = ?, ContactNo = ? WHERE id = ?
+    `, [supportEmail, supportPhone, contactRows[0].id]);
   }
 
   // 6. Ensure default CMS pages exist
@@ -253,6 +266,7 @@ async function seed() {
   console.log('SEED COMPLETED SUCCESSFULLY (LOCAL DEVELOPMENT CREDENTIALS):');
   console.log(`Customer: Email="${customerEmail}", Password="${customerPassword}"`);
   console.log(`Admin:    Username="${adminUsername}", Password="${adminPassword}"`);
+  console.log(`Support:  Email="${supportEmail}", Phone="${supportPhone}"`);
   console.log('============================================================\n');
 
   await conn.end();

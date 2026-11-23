@@ -15,9 +15,9 @@ export default function ContactUsPage() {
     message: '',
   });
   const [contactInfo, setContactInfo] = useState({
-    Address: 'Hadapsar, Pune, Maharashtra, India',
-    EmailId: 'Wheelsechiles@gmail.com',
-    ContactNo: '+91-9876543210',
+    Address: '100 Business Park, Suite 400, Pune, Maharashtra, India',
+    EmailId: 'support@example.com',
+    ContactNo: '+91 99999 00000',
   });
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');

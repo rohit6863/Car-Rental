@@ -15,7 +15,7 @@ SET @preparedStatement = (SELECT IF(
       AND (column_name = @columnname)
   ) > 0,
   "SELECT 1",
-  "ALTER TABLE tblvehicles ADD COLUMN vehicle_status VARCHAR(50) DEFAULT 'Available' AFTER Status"
+  "ALTER TABLE tblvehicles ADD COLUMN vehicle_status VARCHAR(50) DEFAULT 'Available'"
 ));
 PREPARE alterIfNotExists FROM @preparedStatement;
 EXECUTE alterIfNotExists;

@@ -41,7 +41,7 @@ class RazorpayGateway extends PaymentGateway {
     const headers = {
       'Authorization': this._getAuthHeader(),
       'Content-Type': 'application/json',
-      'User-Agent': 'WandarWheels-CarRental/1.0',
+      'User-Agent': 'WanderWheels-CarRental/1.0',
     };
 
     const res = await fetch(url, {

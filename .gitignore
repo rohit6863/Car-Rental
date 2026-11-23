@@ -34,6 +34,19 @@ coverage/
 Thumbs.db
 desktop.ini
 
+# IDE & Editor artifacts
+.vscode/
+.idea/
+.cursor/
+*.swp
+*.swo
+
+# AI & Agent artifacts
+.gemini/
+.agent/
+.agents/
+GEMINI.md
+
 # Parity and database dumps
 parity/
 *.sql

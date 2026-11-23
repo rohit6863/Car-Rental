@@ -11,7 +11,7 @@ const authService = require('../src/services/auth.service');
 const { isAllowedImageMagicBytes } = require('../src/utils/upload');
 const { sanitizeHtml } = require('../src/utils/sanitizeHtml');
 
-describe('Phase 3 Security Hardening Review Test Suite', () => {
+describe('Security Hardening Test Suite', () => {
   const csrfNonce = 'sec_audit_nonce_12345';
   const csrfToken = generateCsrfToken(csrfNonce);
 

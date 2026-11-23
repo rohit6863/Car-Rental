@@ -13,10 +13,10 @@ Only the current modern release branch (`main`) receives active security updates
 
 ## Reporting a Vulnerability
 
-We take the security of WandarWheels Car Rental System seriously. If you identify a security vulnerability, please do NOT create a public GitHub issue.
+We take the security of WanderWheels Car Rental System seriously. If you identify a security vulnerability, please do NOT create a public GitHub issue.
 
 Instead, please report the vulnerability privately via:
-- **Email:** `security@wandarwheels.com` (or contact project maintainer: `rohit2024tens@gmail.com`)
+- **Email:** `security@example.com` (or contact project maintainer: `rohit2024tens@gmail.com`)
 - Include:
   - Description of the vulnerability and attack vector.
   - Proof-of-concept steps or payload.

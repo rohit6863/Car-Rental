@@ -1,0 +1,16 @@
+{
+  "name": "wanderwheels",
+  "version": "2.0.0",
+  "private": true,
+  "description": "WanderWheels Car Rental — Modern Full-Stack System",
+  "scripts": {
+    "dev": "npm --prefix carrental-api run dev & npm --prefix carrental-web run dev & npm --prefix carrental-admin run dev",
+    "db:setup": "npm --prefix carrental-api run db:setup",
+    "test": "npm --prefix carrental-api test",
+    "test:e2e": "node e2e/run-all.cjs",
+    "build": "npm --prefix carrental-web run build && npm --prefix carrental-admin run build"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1"
+  }
+}

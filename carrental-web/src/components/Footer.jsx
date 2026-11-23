@@ -99,7 +99,7 @@ export default function Footer() {
               </div>
             </div>
             <div className="col-md-6 col-md-pull-6">
-              <p className="copy-right">WandarWheels &copy; {new Date().getFullYear()} - All Rights Reserved</p>
+              <p className="copy-right">WanderWheels &copy; {new Date().getFullYear()} - All Rights Reserved</p>
             </div>
           </div>
         </div>

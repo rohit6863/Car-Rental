@@ -3,6 +3,7 @@ const request = require('supertest');
 const app = require('../src/app');
 const { generateCsrfToken } = require('../src/middleware/csrf');
 const { pool } = require('../src/db/pool');
+const argon2 = require('argon2');
 
 describe('Cookie Isolation: Customer vs Admin Authentication', () => {
   const csrfNonce = 'test_nonce_cookie_isolation';
@@ -10,6 +11,11 @@ describe('Cookie Isolation: Customer vs Admin Authentication', () => {
 
   let adminAccessTokenCookie = '';
   let customerAccessTokenCookie = '';
+
+  beforeAll(async () => {
+    const hash = await argon2.hash('AdminPassword123!');
+    await pool.query('UPDATE admin SET password_hash = ?, must_change_password = 0 WHERE UserName = ?', [hash, 'admin']);
+  });
 
   afterAll(async () => {
     await pool.end();

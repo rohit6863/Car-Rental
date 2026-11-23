@@ -1,11 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import api from '../api/client';
 
 export default function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [contactInfo, setContactInfo] = useState({
+    EmailId: 'support@example.com',
+    ContactNo: '+91 99999 00000',
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    api.get('/api/contact/info').then((res) => {
+      if (isMounted && res.data) {
+        setContactInfo({
+          EmailId: res.data.EmailId || 'support@example.com',
+          ContactNo: res.data.ContactNo || '+91 99999 00000',
+        });
+      }
+    }).catch(() => {});
+    return () => { isMounted = false; };
+  }, []);
 
   const handleLogout = async (e) => {
     e.preventDefault();
@@ -41,14 +59,14 @@ export default function Header() {
                     <i className="fa fa-envelope" aria-hidden="true"></i>
                   </div>
                   <p className="uppercase_text">For Support Mail us : </p>
-                  <a href="mailto:Wheelsechiles@gmail.com">Wheelsechiles@gmail.com</a>
+                  <a href={`mailto:${contactInfo.EmailId}`}>{contactInfo.EmailId}</a>
                 </div>
                 <div className="header_widgets">
                   <div className="circle_icon">
                     <i className="fa fa-phone" aria-hidden="true"></i>
                   </div>
                   <p className="uppercase_text">Service Helpline Call Us: </p>
-                  <a href="tel:+91-9876543210">+91-9876543210</a>
+                  <a href={`tel:${contactInfo.ContactNo}`}>{contactInfo.ContactNo}</a>
                 </div>
                 <div className="social-follow">
                   <ul>

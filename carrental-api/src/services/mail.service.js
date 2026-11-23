@@ -44,15 +44,15 @@ async function sendPasswordResetEmail(recipientEmail, rawToken) {
   const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${rawToken}`;
 
   const mailOptions = {
-    from: process.env.MAIL_FROM || 'noreply@wandarwheels.com',
+    from: process.env.MAIL_FROM || 'noreply@example.com',
     to: recipientEmail,
-    subject: 'WandarWheels - Password Reset Request',
-    text: `Hello,\n\nYou requested a password reset for your WandarWheels account.\nPlease click the link below to reset your password (valid for 1 hour):\n\n${resetUrl}\n\nIf you did not make this request, you can safely ignore this email.\n`,
+    subject: 'WanderWheels - Password Reset Request',
+    text: `Hello,\n\nYou requested a password reset for your WanderWheels account.\nPlease click the link below to reset your password (valid for 1 hour):\n\n${resetUrl}\n\nIf you did not make this request, you can safely ignore this email.\n`,
     html: `
       <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
         <h2>Password Reset Request</h2>
         <p>Hello,</p>
-        <p>You requested a password reset for your WandarWheels account.</p>
+        <p>You requested a password reset for your WanderWheels account.</p>
         <p>Click the link below to reset your password (valid for 1 hour):</p>
         <p><a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background-color: #fa2837; color: #fff; text-decoration: none; border-radius: 4px;">Reset Password</a></p>
         <p>Or paste this link into your browser: <br/><code>${resetUrl}</code></p>

@@ -100,7 +100,7 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
         key: order.keyId,
         amount: order.amount,
         currency: order.currency || 'INR',
-        name: 'WandarWheels Car Rental',
+        name: 'WanderWheels Car Rental',
         description: `Booking #${bookingId}`,
         order_id: order.orderId,
         handler: async (response) => {
@@ -576,7 +576,7 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
                         type="text"
                         className="form-control input-sm"
                         readOnly
-                        value="customer@wandarwheels"
+                        value="customer@wanderwheels"
                       />
                     </div>
                   )}
@@ -598,7 +598,7 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
                         type="text"
                         className="form-control input-sm"
                         readOnly
-                        value="State Bank of WandarWheels"
+                        value="State Bank of WanderWheels"
                       />
                     </div>
                   )}

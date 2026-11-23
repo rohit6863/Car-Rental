@@ -12,7 +12,7 @@ const {
   resetGatewayForTesting,
 } = require('../src/services/payment');
 
-describe('Phase 5: Online Payment Gateway & Security Hardening', () => {
+describe('Online Payment Gateway & Security Hardening', () => {
   const csrfNonce = 'test_nonce_payment_gateway';
   const csrfToken = generateCsrfToken(csrfNonce);
 

@@ -7,7 +7,7 @@ const { generateCsrfToken } = require('../src/middleware/csrf');
 const googleAuthService = require('../src/services/googleAuth.service');
 const { verifyAccessToken } = require('../src/utils/jwt');
 
-describe('Phase 4: Customer Google OAuth Authentication & Pre-Hijacking Defense', () => {
+describe('Customer Google OAuth Authentication & Pre-Hijacking Defense', () => {
   const originalEnv = { ...process.env };
   const TEST_CLIENT_ID = 'test-google-client-id.apps.googleusercontent.com';
   const TEST_CLIENT_SECRET = 'test-google-client-secret-xyz';

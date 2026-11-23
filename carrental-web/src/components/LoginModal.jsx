@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import googleLogo from '../assets/google-logo.svg';
 
 export default function LoginModal() {
   const { login, providers } = useAuth();
@@ -133,7 +134,7 @@ export default function LoginModal() {
                             padding: '10px 16px',
                           }}
                         >
-                          <img src="/assets/images/google-logo.svg" alt="Google" width="18" height="18" style={{ display: 'inline-block' }} />
+                          <img src={googleLogo} alt="Google" width="18" height="18" style={{ display: 'inline-block' }} />
                           <span>Continue with Google</span>
                         </a>
                       </div>

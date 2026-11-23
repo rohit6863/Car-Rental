@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import googleLogo from '../assets/google-logo.svg';
 
 const COMMON_PASSWORDS = new Set([
   'password',
@@ -221,7 +222,7 @@ export default function SignupModal() {
                             padding: '10px 16px',
                           }}
                         >
-                          <img src="/assets/images/google-logo.svg" alt="Google" width="18" height="18" style={{ display: 'inline-block' }} />
+                          <img src={googleLogo} alt="Google" width="18" height="18" style={{ display: 'inline-block' }} />
                           <span>Continue with Google</span>
                         </a>
                       </div>
