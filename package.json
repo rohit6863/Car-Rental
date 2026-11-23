@@ -8,9 +8,14 @@
     "db:setup": "npm --prefix carrental-api run db:setup",
     "test": "npm --prefix carrental-api test",
     "test:e2e": "node e2e/run-all.cjs",
-    "build": "npm --prefix carrental-web run build && npm --prefix carrental-admin run build"
+    "build": "npm --prefix carrental-web run build && npm --prefix carrental-admin run build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write ."
   },
   "devDependencies": {
-    "@playwright/test": "^1.49.1"
+    "@playwright/test": "^1.49.1",
+    "eslint": "^10.15.0",
+    "prettier": "^3.10.1"
   }
 }

@@ -1,0 +1,66 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, cleanup]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Lint, Test & Build
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: carrental_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm --prefix carrental-api install
+          npm --prefix carrental-web install
+          npm --prefix carrental-admin install
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Initialize Test Database
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USER: root
+          DB_PASSWORD: ''
+          DB_NAME: carrental_test
+        run: npm run db:setup
+
+      - name: Run API Jest Test Suite
+        env:
+          NODE_ENV: test
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USER: root
+          DB_PASSWORD: ''
+          DB_NAME: carrental_test
+          JWT_ACCESS_SECRET: test_jwt_access_secret_ci_32bytes_long!
+          JWT_REFRESH_SECRET: test_jwt_refresh_secret_ci_32bytes_long!
+        run: npm test
+
+      - name: Build Web & Admin Frontends
+        run: npm run build
