@@ -20,7 +20,7 @@ async function runCancelBookingPlaywrightTests() {
     port: 3306,
     user: 'root',
     password: '',
-    database: process.env.DB_NAME || 'carrental_e2e_test',
+    database: process.env.DB_NAME || 'wanderwheels_e2e_test',
     waitForConnections: true,
     connectionLimit: 5,
   });

@@ -42,7 +42,7 @@ async function testDatePicker() {
     port: 3306,
     user: 'root',
     password: '',
-    database: process.env.DB_NAME || 'carrental_e2e_test',
+    database: process.env.DB_NAME || 'wanderwheels_e2e_test',
   });
   const [vehicles] = await pool.query('SELECT id, PricePerDay FROM tblvehicles WHERE PricePerDay = 22000 ORDER BY id ASC LIMIT 1');
   const targetVehicleId = vehicles[0]?.id || 6;

@@ -143,11 +143,18 @@ describe('Online Payment Gateway & Security Hardening', () => {
       }
     });
 
-    it('enforces mock safety: refuses to initialize when DB_NAME is not carrental_test', () => {
+    it('enforces mock safety: refuses to initialize when DB_NAME does not end with _test or is carrental', () => {
       const oldDb = process.env.DB_NAME;
-      process.env.DB_NAME = 'carrental_live_production';
+      process.env.DB_NAME = 'carrental';
       try {
-        expect(() => new MockGateway()).toThrow(/requires DB_NAME to be 'carrental_test'/i);
+        expect(() => new MockGateway()).toThrow(/requires DB_NAME to end with '_test'/i);
+      } finally {
+        process.env.DB_NAME = oldDb;
+      }
+
+      process.env.DB_NAME = 'wanderwheels_live_prod';
+      try {
+        expect(() => new MockGateway()).toThrow(/requires DB_NAME to end with '_test'/i);
       } finally {
         process.env.DB_NAME = oldDb;
       }

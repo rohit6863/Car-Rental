@@ -25,7 +25,7 @@ async function runVerification(stepLabel) {
   const jestRes = spawnSync('cmd.exe', ['/c', 'npm.cmd test'], {
     cwd: path.join(ROOT, 'carrental-api'),
     stdio: 'inherit',
-    env: { ...process.env, NODE_ENV: 'test', DB_NAME: 'carrental_test' }
+    env: { ...process.env, NODE_ENV: 'test', DB_NAME: 'wanderwheels_jest_test' }
   });
   if (jestRes.status !== 0) {
     throw new Error(`[FAIL] Jest tests failed in ${stepLabel}`);
@@ -37,7 +37,7 @@ async function runVerification(stepLabel) {
   const e2eRes = spawnSync(process.execPath, [path.join(ROOT, 'e2e', 'run-all.cjs')], {
     cwd: ROOT,
     stdio: 'inherit',
-    env: { ...process.env, DB_NAME: 'carrental_test' }
+    env: { ...process.env, DB_NAME: 'wanderwheels_e2e_test' }
   });
   if (e2eRes.status !== 0) {
     throw new Error(`[FAIL] E2E suite failed in ${stepLabel}`);
@@ -114,7 +114,7 @@ async function runVerification(stepLabel) {
     // Admin table test
     const mysql = require(path.join(ROOT, 'carrental-api', 'node_modules', 'mysql2', 'promise'));
     const argon2 = require(path.join(ROOT, 'carrental-api', 'node_modules', 'argon2'));
-    const conn = await mysql.createConnection({ host: '127.0.0.1', user: 'root', database: 'carrental_test', port: 3306 });
+    const conn = await mysql.createConnection({ host: '127.0.0.1', user: 'root', database: 'wanderwheels_e2e_test', port: 3306 });
     const hash = await argon2.hash('admin');
     await conn.query('UPDATE admin SET password_hash = ?, must_change_password = 0 WHERE UserName = ?', [hash, 'admin']);
     await conn.end();

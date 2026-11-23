@@ -4,13 +4,14 @@ const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2/promise');
 const { execSync } = require('child_process');
+const { assertSafeTestDatabase } = require('../src/db/dbGuard');
 
 async function resetDemo() {
   if (process.env.NODE_ENV === 'production') {
     throw new Error('Refusing to run reset-demo in production environment.');
   }
 
-  const demoDbName = (process.env.DEMO_DB_NAME || (process.env.DB_NAME && !process.env.DB_NAME.endsWith('_test') ? process.env.DB_NAME : 'carrental')).trim();
+  const demoDbName = assertSafeTestDatabase(process.env.DEMO_DB_NAME || process.env.DB_NAME || 'wanderwheels_demo_test');
   console.log(`[RESET DEMO] Preparing to reset demonstration database "${demoDbName}"...`);
 
   // 1. Connect without database to ensure DB exists

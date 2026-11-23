@@ -6,11 +6,9 @@ const { spawn } = require('child_process');
 const API_PORT = 4000;
 const WEB_PORT = 5173;
 const ADMIN_PORT = 5175;
+const { assertSafeTestDatabase } = require('../carrental-api/src/db/dbGuard');
 
-const E2E_DB_NAME = (process.env.E2E_DB_NAME || process.env.DB_NAME || 'carrental_e2e_test').trim();
-if (!E2E_DB_NAME.endsWith('_test')) {
-  throw new Error(`Refusing to run E2E tests: target database "${E2E_DB_NAME}" must end in "_test" to protect non-test databases.`);
-}
+const E2E_DB_NAME = assertSafeTestDatabase(process.env.E2E_DB_NAME || process.env.DB_NAME || 'wanderwheels_e2e_test');
 
 let spawnedApi = null;
 let spawnedWeb = null;

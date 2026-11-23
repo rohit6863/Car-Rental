@@ -3,13 +3,21 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }
 const crypto = require('crypto');
 const http = require('http');
 
+const { assertSafeTestDatabase } = require('../src/db/dbGuard');
+
 const nodeEnv = process.env.NODE_ENV || 'development';
-const dbName = process.env.DB_NAME || '';
+const dbName = (process.env.DB_NAME || '').trim();
 
 // Mock safety guards
-if (nodeEnv === 'production' || dbName !== 'carrental_test') {
-  console.error('[FATAL] dev:fire-webhook may ONLY be run in development or test with DB_NAME=carrental_test.');
-  console.error(`Current NODE_ENV=${nodeEnv}, DB_NAME=${dbName}`);
+if (nodeEnv === 'production') {
+  console.error('[FATAL] dev:fire-webhook may not be run in production.');
+  process.exit(1);
+}
+
+try {
+  assertSafeTestDatabase(dbName);
+} catch (err) {
+  console.error('[FATAL] dev:fire-webhook may ONLY be run with DB_NAME ending in "_test".', err.message);
   process.exit(1);
 }
 
@@ -26,7 +34,7 @@ let eventType = 'payment.captured';
 if (eventTypeArg === 'failed') eventType = 'payment.failed';
 else if (eventTypeArg === 'refunded') eventType = 'refund.processed';
 
-const secret = process.env.MOCK_GATEWAY_SECRET || 'carrental_mock_gateway_secret_2026';
+const secret = process.env.MOCK_GATEWAY_SECRET || 'wanderwheels_mock_gateway_secret_2026';
 const eventId = `mock_evt_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 const paymentId = `mock_pay_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 

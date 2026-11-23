@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `admin` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `UserName` varchar(100) NOT NULL,
   `Password` varchar(255) NOT NULL,
-  `upddate` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `updationDate` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_admin_username` (`UserName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -123,6 +123,7 @@ CREATE TABLE IF NOT EXISTS `tblpayments` (
   `payment_method` varchar(50) NOT NULL,
   `transaction_id` varchar(255) NOT NULL,
   `payment_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `confirmation_date` timestamp NULL DEFAULT NULL,
   `payment_status` varchar(50) NOT NULL DEFAULT 'pending',
   `notes` text DEFAULT NULL,
   PRIMARY KEY (`id`),

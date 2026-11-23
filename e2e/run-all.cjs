@@ -13,10 +13,13 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync, execSync } = require('child_process');
+const { assertSafeTestDatabase } = require('../carrental-api/src/db/dbGuard');
 
-const e2eDbName = (process.env.E2E_DB_NAME || process.env.DB_NAME || 'carrental_e2e_test').trim();
-if (!e2eDbName.endsWith('_test')) {
-  console.error(`[FATAL] Refusing to run E2E test suite: target database "${e2eDbName}" must end in "_test" to protect non-test databases.`);
+let e2eDbName;
+try {
+  e2eDbName = assertSafeTestDatabase(process.env.E2E_DB_NAME || process.env.DB_NAME || 'wanderwheels_e2e_test');
+} catch (err) {
+  console.error(`[FATAL] Refusing to run E2E test suite: ${err.message}`);
   process.exit(1);
 }
 

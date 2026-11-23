@@ -29,8 +29,8 @@ class PaymentsService {
    */
   async mockSimulate({ orderId, action, method, reason }) {
     const isProd = process.env.NODE_ENV === 'production';
-    const dbName = process.env.DB_NAME || '';
-    if (isProd || dbName !== 'carrental_test') {
+    const dbName = (process.env.DB_NAME || '').trim().toLowerCase();
+    if (isProd || !dbName.endsWith('_test') || dbName === 'carrental') {
       throw new ForbiddenError('Mock simulation is disabled in this environment');
     }
     const gateway = requirePaymentGateway();

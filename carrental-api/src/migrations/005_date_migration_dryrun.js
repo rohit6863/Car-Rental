@@ -11,6 +11,7 @@
  */
 require('dotenv').config();
 const mysql = require('mysql2/promise');
+const { assertSafeTestDatabase } = require('../db/dbGuard');
 
 function parseDateValue(val) {
   if (!val || typeof val !== 'string') return { valid: false, reason: 'Empty or not a string' };
@@ -45,13 +46,14 @@ function parseDateValue(val) {
 
 async function run() {
   const isApply = process.argv.includes('--apply');
+  const dbName = assertSafeTestDatabase(process.env.DB_NAME || 'wanderwheels_demo_test');
 
   const conn = await mysql.createConnection({
     host:     process.env.DB_HOST || 'localhost',
     port:     parseInt(process.env.DB_PORT || '3306', 10),
     user:     process.env.DB_USER || 'root',
     password: process.env.DB_PASS || '',
-    database: process.env.DB_NAME || 'carrental',
+    database: dbName,
   });
 
   console.log('\n============================================================');

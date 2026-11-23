@@ -4,11 +4,11 @@ const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2/promise');
 const { execSync } = require('child_process');
+const { assertSafeTestDatabase } = require('./dbGuard');
 
 async function setup() {
-  const dbName = (process.env.DB_NAME || 'carrental_test').trim();
-  const isAllowedDb = dbName === 'carrental_test' || dbName.endsWith('_test') || process.env.NODE_ENV === 'development';
-  if (!isAllowedDb && process.env.NODE_ENV === 'production') {
+  const dbName = assertSafeTestDatabase(process.env.DB_NAME || 'wanderwheels_demo_test');
+  if (process.env.NODE_ENV === 'production') {
     throw new Error(`Refusing to run setup against database "${dbName}" in production.`);
   }
 
