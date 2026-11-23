@@ -216,7 +216,7 @@ async function seed() {
 
   // 4. Seed test admin (configurable via env, generated dynamically if missing)
   const adminUsername = process.env.SEED_ADMIN_USERNAME || 'admin';
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD || generateRandomPassword('Admin');
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'AdminPassword123!';
   const adminHash = await hashPassword(adminPassword);
 
   const [existingAdmin] = await conn.execute('SELECT id FROM admin WHERE UserName = ?', [adminUsername]);
@@ -247,18 +247,36 @@ async function seed() {
     `, [supportEmail, supportPhone, contactRows[0].id]);
   }
 
-  // 6. Ensure default CMS pages exist
+  // 6. Ensure default CMS pages exist with clean demonstration copy
   const cmsPages = [
-    { name: 'About Us', type: 'aboutus', detail: 'At WanderWheels, we believe every adventure deserves the perfect ride. Whether you are exploring a new city, embarking on a road trip, or just need a reliable set of wheels, we have got you covered.' },
-    { name: 'FAQs', type: 'faqs', detail: 'Find answers to frequently asked questions about booking, cancellations, insurance, and vehicle pick-up.' },
-    { name: 'Privacy Policy', type: 'privacy', detail: 'Your privacy is of utmost importance to us. We protect your personal information and transaction data.' },
-    { name: 'Terms and Conditions', type: 'terms', detail: 'Please read our terms and conditions carefully before booking any vehicle with WanderWheels.' },
+    {
+      name: 'About Us',
+      type: 'aboutus',
+      detail: '<p>Welcome to <strong>WanderWheels</strong>, an educational demonstration vehicle rental web application engineered with modern React frontends and a secure Node.js/Express REST API backend.</p><p><strong>Notice:</strong> This web portal is strictly a software demonstration and testing platform. No real-world vehicles are available for booking or rental, and no commercial transactions are processed through this portal.</p><h4>Project Highlights</h4><ul><li>Full-featured customer vehicle catalog, search, and date-range availability calculation.</li><li>Role-based access control with Argon2id password hashing and CSRF protection.</li><li>Simulated mock payment gateway integration for test booking workflows.</li><li>Comprehensive administration portal for fleet management, booking approvals, and customer communication.</li></ul><p>Whether exploring code architecture or trying out test bookings, WanderWheels showcases a modern, robust, and clean development pattern.</p>',
+    },
+    {
+      name: 'FAQs',
+      type: 'faqs',
+      detail: '<p>Below are frequently asked questions regarding the WanderWheels demonstration platform.</p><h4>Is this a real vehicle rental service?</h4><p>No. WanderWheels is an educational software showcase and test environment. All vehicles, bookings, invoices, and payments displayed are entirely simulated.</p><h4>Can I book a real car on this website?</h4><p>No real vehicles can be reserved, rented, or collected through this website. Any booking created in the system is stored only as a test database record.</p><h4>Are real credit cards or bank accounts charged?</h4><p>No. WanderWheels runs in simulated test mode. The payment interface is an interactive mock gateway for evaluation purposes. Never enter real financial or banking credentials.</p><h4>How do I log in or test administrative features?</h4><p>You can register a test customer account or use the seed credentials generated during database initialization. The admin dashboard is accessible at the dedicated admin portal URL.</p>',
+    },
+    {
+      name: 'Privacy Policy',
+      type: 'privacy',
+      detail: '<p><strong>Demonstration Privacy Notice</strong></p><p>This privacy notice explains how test data is handled within the WanderWheels demonstration system.</p><h4>Data Collection and Scope</h4><p>WanderWheels is a demonstration application. Any names, email addresses, phone numbers, or passwords entered into registration or contact forms are stored locally in the development test database solely for verifying software features (such as user authentication, profile editing, and email simulation).</p><h4>No Commercial Use or Sharing</h4><p>We do not sell, license, rent, or distribute any user information submitted to this demonstration application. Do not submit sensitive real-world personal information or production passwords.</p><h4>Account Security</h4><p>Passwords are hashed using industry-standard Argon2id cryptographic hashing before storage, and session authentication utilizes httpOnly security cookies. However, because this is an active demonstration sandbox, databases may be purged or reset periodically.</p><p><em>Disclaimer: This statement describes test environment data handling practices and does not constitute formal legal counsel.</em></p>',
+    },
+    {
+      name: 'Terms and Conditions',
+      type: 'terms',
+      detail: '<p><strong>Demonstration Terms of Use</strong></p><p>Please read these terms carefully before exploring or testing the WanderWheels application. By accessing or using this portal, you acknowledge and agree that:</p><ol><li><strong>Educational Demonstration Only:</strong> WanderWheels is created and maintained solely for educational, portfolio, and technical demonstration purposes. It does not provide commercial vehicle rental services.</li><li><strong>Simulated Transactions:</strong> Any booking, cancellation, fee, invoice, or receipt created within this application is purely simulated and holds no legal, financial, or contractual validity.</li><li><strong>No Warranties or Liability:</strong> The software is provided "as is" without warranties of any kind. The authors and contributors bear no liability for misuse or assumptions of commercial availability.</li><li><strong>Test Data:</strong> All sample data, user profiles, vehicle records, and mock reviews may be reset, altered, or deleted at any time during development or testing cycles.</li></ol><p><em>Disclaimer: This document is provided for demonstrative software purposes only and does not constitute formal legal advice.</em></p>',
+    },
   ];
 
   for (const page of cmsPages) {
     const [p] = await conn.execute('SELECT id FROM tblpages WHERE type = ?', [page.type]);
     if (p.length === 0) {
       await conn.execute('INSERT INTO tblpages (PageName, type, detail) VALUES (?, ?, ?)', [page.name, page.type, page.detail]);
+    } else {
+      await conn.execute('UPDATE tblpages SET PageName = ?, detail = ? WHERE id = ?', [page.name, page.detail, p[0].id]);
     }
   }
 
