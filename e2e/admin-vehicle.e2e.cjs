@@ -40,7 +40,7 @@ async function startServers() {
       cwd: path.join(__dirname, '..', 'carrental-api'),
       stdio: 'pipe',
       shell: true,
-      env: { ...process.env, NODE_ENV: 'development', DB_NAME: 'carrental_test' },
+      env: { ...process.env, NODE_ENV: 'development', DB_NAME: process.env.DB_NAME || 'carrental_e2e_test' },
     });
     const ok = await waitForPort(API_PORT);
     if (!ok) throw new Error('API server failed to start on port 4000');
@@ -75,7 +75,7 @@ async function run() {
     port: 3306,
     user: 'root',
     password: '',
-    database: 'carrental_test',
+    database: process.env.DB_NAME || 'carrental_e2e_test',
   });
 
   const uploadsDir = path.join(__dirname, '..', 'carrental-api', 'uploads', 'vehicles');

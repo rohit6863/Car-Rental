@@ -82,7 +82,7 @@ async function run() {
     port: 3306,
     user: 'root',
     password: '',
-    database: 'carrental_test',
+    database: process.env.DB_NAME || 'carrental_e2e_test',
   });
 
   try {
@@ -169,7 +169,9 @@ async function run() {
     await page.waitForTimeout(1500);
 
     // Navigate to vehicle details
-    await page.goto('http://localhost:5173/vehical-details/14', { waitUntil: 'networkidle' });
+    const [vehicles] = await pool.query('SELECT id FROM tblvehicles ORDER BY id ASC LIMIT 1');
+    const targetVehicleId = vehicles[0]?.id || 1;
+    await page.goto(`http://localhost:5173/vehical-details/${targetVehicleId}`, { waitUntil: 'networkidle' });
 
     // Pick dates in the future
     await page.fill('input[name="fromdate"]', '2026-11-20');

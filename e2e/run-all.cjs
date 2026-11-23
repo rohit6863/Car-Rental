@@ -14,6 +14,12 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync, execSync } = require('child_process');
 
+const e2eDbName = (process.env.E2E_DB_NAME || process.env.DB_NAME || 'carrental_e2e_test').trim();
+if (!e2eDbName.endsWith('_test')) {
+  console.error(`[FATAL] Refusing to run E2E test suite: target database "${e2eDbName}" must end in "_test" to protect non-test databases.`);
+  process.exit(1);
+}
+
 function freePort(port) {
   try {
     if (process.platform === 'win32') {
@@ -78,7 +84,7 @@ for (const testFile of testFiles) {
   const tStart = Date.now();
   const proc = spawnSync(process.execPath, [testPath], {
     stdio: 'inherit',
-    env: { ...process.env, DB_NAME: process.env.DB_NAME || 'carrental_test' },
+    env: { ...process.env, DB_NAME: e2eDbName },
     cwd: path.resolve(__dirname, '..')
   });
 

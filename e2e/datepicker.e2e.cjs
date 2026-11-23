@@ -36,8 +36,20 @@ async function testDatePicker() {
     }
   });
 
-  console.log('[TEST] Navigating to http://localhost:5173/vehical-details/14...');
-  await page.goto('http://localhost:5173/vehical-details/14', { waitUntil: 'networkidle', timeout: 15000 });
+  const mysql = require(path.join(__dirname, '..', 'carrental-api', 'node_modules', 'mysql2', 'promise'));
+  const pool = mysql.createPool({
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: '',
+    database: process.env.DB_NAME || 'carrental_e2e_test',
+  });
+  const [vehicles] = await pool.query('SELECT id, PricePerDay FROM tblvehicles WHERE PricePerDay = 22000 ORDER BY id ASC LIMIT 1');
+  const targetVehicleId = vehicles[0]?.id || 6;
+  await pool.end();
+
+  console.log(`[TEST] Navigating to http://localhost:5173/vehical-details/${targetVehicleId}...`);
+  await page.goto(`http://localhost:5173/vehical-details/${targetVehicleId}`, { waitUntil: 'networkidle', timeout: 15000 });
 
   // 1. Verify NO third-party network requests occurred
   console.log('[TEST] Verifying zero third-party network requests...');

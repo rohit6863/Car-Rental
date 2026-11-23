@@ -49,6 +49,7 @@ GEMINI.md
 
 # Parity and database dumps
 parity/
+e2e/test_img*.png
 *.sql
 !carrental-api/src/migrations/*.sql
 !carrental-api/db/schema.sql

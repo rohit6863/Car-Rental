@@ -84,7 +84,7 @@ async function runTestFlow() {
     port: 3306,
     user: 'root',
     password: '',
-    database: 'carrental_test',
+    database: process.env.DB_NAME || 'carrental_e2e_test',
     waitForConnections: true,
     connectionLimit: 5,
   });

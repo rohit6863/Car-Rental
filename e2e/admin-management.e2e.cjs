@@ -123,7 +123,7 @@ async function runE2ETests() {
     testedInteractions.push('Login form: typed invalid credentials and verified error message');
 
     // Ensure admin user has known adminPw
-    const pool = mysql.createPool({ host: 'localhost', user: 'root', database: 'carrental_test', port: 3306 });
+    const pool = mysql.createPool({ host: 'localhost', user: 'root', database: process.env.DB_NAME || 'carrental_e2e_test', port: 3306 });
     const adminHash = await argon2.hash(adminPw);
     await pool.query('UPDATE admin SET password_hash = ?, must_change_password = 0 WHERE UserName = ?', [adminHash, adminUser]);
     await pool.end();

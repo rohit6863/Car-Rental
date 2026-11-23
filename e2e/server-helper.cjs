@@ -7,6 +7,11 @@ const API_PORT = 4000;
 const WEB_PORT = 5173;
 const ADMIN_PORT = 5175;
 
+const E2E_DB_NAME = (process.env.E2E_DB_NAME || process.env.DB_NAME || 'carrental_e2e_test').trim();
+if (!E2E_DB_NAME.endsWith('_test')) {
+  throw new Error(`Refusing to run E2E tests: target database "${E2E_DB_NAME}" must end in "_test" to protect non-test databases.`);
+}
+
 let spawnedApi = null;
 let spawnedWeb = null;
 let spawnedAdmin = null;
@@ -59,7 +64,7 @@ async function ensureServers(options = {}) {
         env: {
           ...process.env,
           NODE_ENV: 'development',
-          DB_NAME: process.env.DB_NAME || 'carrental_test',
+          DB_NAME: E2E_DB_NAME,
           PAYMENT_GATEWAY: 'mock'
         }
       });
@@ -153,5 +158,6 @@ module.exports = {
   killPid,
   API_PORT,
   WEB_PORT,
-  ADMIN_PORT
+  ADMIN_PORT,
+  E2E_DB_NAME
 };

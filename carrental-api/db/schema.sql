@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS `tblvehicles` (
   `LeatherSeats` int(11) DEFAULT NULL,
   `RegDate` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `Status` tinyint(1) DEFAULT 1,
   PRIMARY KEY (`id`),
   KEY `fk_vehicles_brand` (`VehiclesBrand`),
   CONSTRAINT `fk_vehicles_brand` FOREIGN KEY (`VehiclesBrand`) REFERENCES `tblbrands` (`id`) ON DELETE SET NULL

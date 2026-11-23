@@ -44,7 +44,7 @@ async function startServers() {
       cwd: path.join(__dirname, '..', 'carrental-api'),
       stdio: 'pipe',
       shell: true,
-      env: { ...process.env, PAYMENT_GATEWAY: 'mock', NODE_ENV: 'development', DB_NAME: 'carrental_test' },
+      env: { ...process.env, PAYMENT_GATEWAY: 'mock', NODE_ENV: 'development', DB_NAME: process.env.DB_NAME || 'carrental_e2e_test' },
     });
     apiProcess.stderr.on('data', (d) => console.error('[API ERR]:', d.toString()));
     const ok = await waitForPort(API_PORT);
@@ -97,7 +97,7 @@ async function runPaymentPlaywrightTests() {
     port: 3306,
     user: 'root',
     password: '',
-    database: 'carrental_test',
+    database: process.env.DB_NAME || 'carrental_e2e_test',
     waitForConnections: true,
     connectionLimit: 5,
   });

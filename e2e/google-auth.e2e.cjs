@@ -153,7 +153,7 @@ async function startServers() {
     env: {
       ...process.env,
       NODE_ENV: 'development',
-      DB_NAME: 'carrental_test',
+      DB_NAME: process.env.DB_NAME || 'carrental_e2e_test',
       GOOGLE_CLIENT_ID: TEST_CLIENT_ID,
       GOOGLE_CLIENT_SECRET: TEST_CLIENT_SECRET,
       GOOGLE_REDIRECT_URI: TEST_REDIRECT_URI,
@@ -194,7 +194,7 @@ async function run() {
     port: 3306,
     user: 'root',
     password: '',
-    database: 'carrental_test',
+    database: process.env.DB_NAME || 'carrental_e2e_test',
   });
 
   let browser;
