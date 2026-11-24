@@ -15,7 +15,7 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_ROOT_PASSWORD: ci_test_root_pass_123
           MYSQL_DATABASE: wanderwheels_jest_test
         ports:
           - 3306:3306
@@ -47,8 +47,8 @@ jobs:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
           DB_USER: root
-          DB_PASS: ''
-          DB_PASSWORD: ''
+          DB_PASS: ci_test_root_pass_123
+          DB_PASSWORD: ci_test_root_pass_123
           DB_NAME: wanderwheels_jest_test
           TEST_DB_NAME: wanderwheels_jest_test
           E2E_DB_NAME: wanderwheels_e2e_test
@@ -60,8 +60,8 @@ jobs:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
           DB_USER: root
-          DB_PASS: ''
-          DB_PASSWORD: ''
+          DB_PASS: ci_test_root_pass_123
+          DB_PASSWORD: ci_test_root_pass_123
           DB_NAME: wanderwheels_jest_test
           TEST_DB_NAME: wanderwheels_jest_test
           E2E_DB_NAME: wanderwheels_e2e_test
