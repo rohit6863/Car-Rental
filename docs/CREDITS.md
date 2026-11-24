@@ -18,8 +18,6 @@ The WanderWheels brand name, logos, and identity assets were authored for this p
 | Asset Path | Type | Dimensions | Byte Size | Provenance & Source |
 | :--- | :--- | :--- | :--- | :--- |
 | `carrental-web/public/assets/images/logo.JPG` | Brand Logo (Primary) | 91 × 60 px | 3,026 B | User-created via AI image tool.<br>**Tool Name:** `[USER TO FILL IN]`<br>**Generation Date:** `[USER TO FILL IN]` |
-| `carrental-web/public/assets/images/logo.png` | Brand Logo (Optimized PNG) | 91 × 60 px | 13,620 B | Lossless raster generated alongside `logo.JPG` to eliminate JPEG compression artifacts without layout change. |
-| `carrental-web/public/assets/images/logg.png` | Graphic Banner ("ONLINE CAR RENTAL") | 153 × 43 px | 7,407 B | Visually depicts a red sports car alongside bold text reading "ONLINE CAR RENTAL". Retained per user instruction without unverified origin claims. |
 | `carrental-web/public/assets/images/favicon-icon/favicon.png` | Site Favicon | 24 × 24 px | 3,402 B | User-created project favicon.<br>**Tool Name:** `[USER TO FILL IN]`<br>**Generation Date:** `[USER TO FILL IN]` |
 
 ### Generated Icons, Placeholders & Content
@@ -124,11 +122,12 @@ All variants and legacy occurrences of the portal name were audited and standard
 - E2E test suites updated to assert consistent WanderWheels branding.
 
 ### 3. Removal of Replaced Class-C Images and Legacy Assets
-A total of **48 legacy Class-C raster images** of unverified origin were removed via `git rm`:
+A total of **50 legacy and unreferenced raster images** were removed via `git rm`:
 - 22 CSS background/banner images replaced by modern CSS linear/radial gradients.
 - 2 legacy avatars (`dealer-logo.jpg`, `ts-avatar.jpg`) replaced by project SVG vectors (`user-avatar.svg`, `admin-avatar.svg`).
 - 1 legacy vehicle fallback (`recent-car-1.jpg`) replaced by `vehicle-placeholder.svg`.
 - 23 unreferenced template sample images (`listing_img1-5`, `recent-blog-1-3`, `post_200x200_1-4`, `our_services_1-2`, `trending-car-img-1-3`, `recent-car-2-6`, `looking-new-car.png`, `addmore_img.png`, `change_logo.png`).
+- 2 obsolete/unreferenced logo files (`logg.png` due to unverified provenance, and `logo.png` duplicate).
 - 0 stock photos remain in the codebase.
 
 Additionally, **7 unreferenced legacy scripts and unused icons** were removed:
