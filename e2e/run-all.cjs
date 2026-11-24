@@ -97,7 +97,7 @@ for (const testFile of testFiles) {
   });
 
   const durationSec = ((Date.now() - tStart) / 1000).toFixed(1);
-  const passed = proc.status === 0;
+  const passed = proc.status === 0 && proc.signal === null && !proc.error;
 
   if (passed) {
     passedCount++;
@@ -105,8 +105,11 @@ for (const testFile of testFiles) {
     console.log(`\n[PASS] ${testFile} (${durationSec}s)`);
   } else {
     failedCount++;
-    results.push({ file: testFile, status: 'FAILED', duration: `${durationSec}s`, code: proc.status });
-    console.error(`\n[FAIL] ${testFile} (Exit code: ${proc.status}, ${durationSec}s)`);
+    const failureDetail = proc.error
+      ? `Error: ${proc.error.message}`
+      : (proc.signal ? `Signal: ${proc.signal}` : `Exit code: ${proc.status}`);
+    results.push({ file: testFile, status: 'FAILED', duration: `${durationSec}s`, code: proc.status, signal: proc.signal, error: proc.error });
+    console.error(`\n[FAIL] ${testFile} (${failureDetail}, ${durationSec}s)`);
   }
 }
 
@@ -123,6 +126,8 @@ results.forEach(r => {
 console.log('================================================================');
 console.log(`Total: ${testFiles.length} | Passed: ${passedCount} | Failed: ${failedCount} | Time: ${totalDuration}s`);
 console.log('================================================================\n');
+
+ensurePortsFree();
 
 if (failedCount > 0) {
   process.exit(1);

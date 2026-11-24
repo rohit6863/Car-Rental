@@ -57,10 +57,12 @@ async function runMobilePaymentPlaywrightTest() {
 
   await ensureServers({ api: true, web: true });
 
-  // Test specifically at 375px viewport (as required: "Playwright check at a 375px viewport that all buttons are visible and clickable with real clicks")
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  let exitCode = 0;
+  let browser = null;
 
   try {
+    // Test specifically at 375px viewport (as required: "Playwright check at a 375px viewport that all buttons are visible and clickable with real clicks")
+    browser = await chromium.launch({ channel: 'msedge', headless: true });
     const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
     const page = await context.newPage();
 
@@ -208,20 +210,28 @@ async function runMobilePaymentPlaywrightTest() {
     console.log('\n================================================================');
     console.log('  MOBILE PAYMENT PLAYWRIGHT VERIFICATION PASSED SUCCESSFULLY!');
     console.log('================================================================\n');
+  } catch (err) {
+    exitCode = 1;
+    console.error('\n[PLAYWRIGHT TEST FAILURE]:', err);
   } finally {
-    if (browser) await browser.close();
-    stopServers();
-    await pool.query('DELETE FROM tblpayments WHERE booking_id = ?', [bookingId]);
-    await pool.query('DELETE FROM tblbooking WHERE id = ?', [bookingId]);
-    await pool.query('DELETE FROM tblvehicles WHERE id = ?', [vehicleId]);
-    await pool.query('DELETE FROM tblbrands WHERE id = ?', [bRes.insertId]);
-    await pool.query('DELETE FROM tblusers WHERE EmailId = ?', [testEmail]);
-    await pool.end();
-    process.exit(0);
+    if (browser) {
+      try { await browser.close(); } catch (e) { console.error('[CLEANUP ERR]:', e); }
+    }
+    try { stopServers(); } catch (e) { console.error('[CLEANUP ERR]:', e); }
+    if (pool) {
+      try { await pool.query('DELETE FROM tblpayments WHERE booking_id = ?', [bookingId]); } catch (e) {}
+      try { await pool.query('DELETE FROM tblbooking WHERE id = ?', [bookingId]); } catch (e) {}
+      try { await pool.query('DELETE FROM tblvehicles WHERE id = ?', [vehicleId]); } catch (e) {}
+      try { await pool.query('DELETE FROM tblbrands WHERE id = ?', [bRes.insertId]); } catch (e) {}
+      try { await pool.query('DELETE FROM tblusers WHERE EmailId = ?', [testEmail]); } catch (e) {}
+      try { await pool.end(); } catch (e) {}
+    }
   }
+
+  process.exit(exitCode);
 }
 
 runMobilePaymentPlaywrightTest().catch((err) => {
-  console.error('\n[FATAL MOBILE TEST ERROR]:', err);
+  console.error('[UNHANDLED E2E ERROR]:', err);
   process.exit(1);
 });

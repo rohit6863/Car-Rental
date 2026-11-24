@@ -110,6 +110,7 @@ async function runPaymentPlaywrightTests() {
   const { password: adminPw } = getTestAdminCredentials();
 
   let browser = null;
+  let exitCode = 0;
 
   try {
     await startServers();
@@ -391,26 +392,53 @@ async function runPaymentPlaywrightTests() {
     console.log('================================================================\n');
 
   } catch (err) {
+    exitCode = 1;
     console.error('\n[PLAYWRIGHT TEST FAILURE]:', err);
-    process.exitCode = 1;
   } finally {
-    if (browser) await browser.close();
-    // Clean up test data
-    if (confirmedBookingId || unconfirmedBookingId) {
-      await pool.query('DELETE FROM tblpayments WHERE booking_id IN (?, ?)', [confirmedBookingId, unconfirmedBookingId]);
-      await pool.query('DELETE FROM tblbooking WHERE id IN (?, ?)', [confirmedBookingId, unconfirmedBookingId]);
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (e) {
+        console.error('[CLEANUP ERR]:', e);
+      }
     }
-    if (testVehicleId) await pool.query('DELETE FROM tblvehicles WHERE id = ?', [testVehicleId]);
-    if (testBrandId) await pool.query('DELETE FROM tblbrands WHERE id = ?', [testBrandId]);
-    await pool.query('DELETE FROM tblusers WHERE EmailId IN (?, ?)', [custAEmail, custBEmail]);
-    await pool.end();
+    // Clean up test data defensively
+    if (pool) {
+      if (confirmedBookingId || unconfirmedBookingId) {
+        try {
+          await pool.query('DELETE FROM tblpayments WHERE booking_id IN (?, ?)', [confirmedBookingId, unconfirmedBookingId]);
+          await pool.query('DELETE FROM tblbooking WHERE id IN (?, ?)', [confirmedBookingId, unconfirmedBookingId]);
+        } catch (e) {}
+      }
+      if (testVehicleId) {
+        try { await pool.query('DELETE FROM tblvehicles WHERE id = ?', [testVehicleId]); } catch (e) {}
+      }
+      if (testBrandId) {
+        try { await pool.query('DELETE FROM tblbrands WHERE id = ?', [testBrandId]); } catch (e) {}
+      }
+      try {
+        await pool.query('DELETE FROM tblusers WHERE EmailId IN (?, ?)', [custAEmail, custBEmail]);
+      } catch (e) {}
+      try {
+        await pool.end();
+      } catch (e) {
+        console.error('[CLEANUP ERR]:', e);
+      }
+    }
 
     const { killPid } = require('./server-helper.cjs');
-    if (apiProcess) killPid(apiProcess.pid);
-    if (webProcess) killPid(webProcess.pid);
-    if (adminProcess) killPid(adminProcess.pid);
-    process.exit(0);
+    if (apiProcess) {
+      try { killPid(apiProcess.pid); } catch (e) { console.error('[CLEANUP ERR]:', e); }
+    }
+    if (webProcess) {
+      try { killPid(webProcess.pid); } catch (e) { console.error('[CLEANUP ERR]:', e); }
+    }
+    if (adminProcess) {
+      try { killPid(adminProcess.pid); } catch (e) { console.error('[CLEANUP ERR]:', e); }
+    }
   }
+
+  process.exit(exitCode);
 }
 
 runPaymentPlaywrightTests().catch((err) => {

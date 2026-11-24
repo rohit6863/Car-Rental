@@ -7,10 +7,14 @@ async function testDatePicker() {
   await ensureServers({ api: true, web: true });
   console.log('[TEST] Starting Flatpickr datepicker & zero-CDN test...');
 
-  const browser = await chromium.launch({
-    channel: 'msedge',
-    headless: true,
-  });
+  let browser = null;
+  let exitCode = 0;
+
+  try {
+    browser = await chromium.launch({
+      channel: 'msedge',
+      headless: true,
+    });
 
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const page = await context.newPage();
@@ -244,13 +248,29 @@ async function testDatePicker() {
   );
   console.log('  -> PASS: End date before start date correctly validated!');
 
-  stopServers();
-  await browser.close();
-  console.log('\n[TEST SUCCESS] ALL DATEPICKER, CALCULATION & ZERO-CDN TESTS PASSED 100%!');
-  process.exit(0);
+    console.log('\n[TEST SUCCESS] ALL DATEPICKER, CALCULATION & ZERO-CDN TESTS PASSED 100%!');
+  } catch (err) {
+    exitCode = 1;
+    console.error('\n[PLAYWRIGHT TEST FAILURE]:', err);
+  } finally {
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (e) {
+        console.error('[CLEANUP ERR]:', e);
+      }
+    }
+    try {
+      stopServers();
+    } catch (e) {
+      console.error('[CLEANUP ERR]:', e);
+    }
+  }
+
+  process.exit(exitCode);
 }
 
 testDatePicker().catch((err) => {
-  console.error('[TEST FAILURE]:', err);
+  console.error('[UNHANDLED E2E ERROR]:', err);
   process.exit(1);
 });

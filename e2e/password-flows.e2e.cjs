@@ -118,9 +118,11 @@ async function runPasswordFlows() {
     [adminHash]
   );
 
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  let exitCode = 0;
+  let browser = null;
 
   try {
+    browser = await chromium.launch({ channel: 'msedge', headless: true });
     // ═════════════════════════════════════════════════════════════════════════
     // TEST 1: Customer Forgot Password -> Reset Token -> Login with New Password
     // ═════════════════════════════════════════════════════════════════════════
@@ -405,22 +407,32 @@ async function runPasswordFlows() {
     console.log('\n================================================================');
     console.log('  ALL PASSWORD FLOW PLAYWRIGHT TESTS PASSED SUCCESSFULLY!');
     console.log('================================================================\n');
+  } catch (err) {
+    exitCode = 1;
+    console.error('\n[PLAYWRIGHT TEST FAILURE]:', err);
   } finally {
     const { killPid } = require('./server-helper.cjs');
-    if (apiProcess) killPid(apiProcess.pid);
-    if (webProcess) killPid(webProcess.pid);
-    if (adminProcess) killPid(adminProcess.pid);
-    if (browser) await browser.close();
-    const defaultHash = await argon2.hash(adminInitialPw);
-    await pool.query('UPDATE admin SET password_hash = ?, Password = NULL, must_change_password = 0 WHERE UserName = "admin"', [defaultHash]);
-    await pool.query('DELETE FROM tbl_password_resets WHERE email = ?', [testUserEmail]);
-    await pool.query('DELETE FROM tblusers WHERE EmailId = ?', [testUserEmail]);
-    await pool.end();
-    process.exit(0);
+    if (apiProcess) { try { killPid(apiProcess.pid); } catch (e) {} }
+    if (webProcess) { try { killPid(webProcess.pid); } catch (e) {} }
+    if (adminProcess) { try { killPid(adminProcess.pid); } catch (e) {} }
+    if (browser) {
+      try { await browser.close(); } catch (e) { console.error('[CLEANUP ERR]:', e); }
+    }
+    if (pool) {
+      try {
+        const defaultHash = await argon2.hash(adminInitialPw);
+        await pool.query('UPDATE admin SET password_hash = ?, Password = NULL, must_change_password = 0 WHERE UserName = "admin"', [defaultHash]);
+      } catch (e) {}
+      try { await pool.query('DELETE FROM tbl_password_resets WHERE email = ?', [testUserEmail]); } catch (e) {}
+      try { await pool.query('DELETE FROM tblusers WHERE EmailId = ?', [testUserEmail]); } catch (e) {}
+      try { await pool.end(); } catch (e) {}
+    }
   }
+
+  process.exit(exitCode);
 }
 
 runPasswordFlows().catch((err) => {
-  console.error('\n[FATAL TEST FAILURE]:', err);
+  console.error('[UNHANDLED E2E ERROR]:', err);
   process.exit(1);
 });

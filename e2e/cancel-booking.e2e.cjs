@@ -85,12 +85,14 @@ async function runCancelBookingPlaywrightTests() {
   console.log(`  -> Booking #${confirmedUnpaidBookingId} (Confirmed unpaid Status=1)`);
   console.log(`  -> Booking #${paidBookingId} (Confirmed PAID Status=1)`);
 
-  const { ensureServers, stopServers } = require('./server-helper.cjs');
-  await ensureServers({ api: true, web: true });
-
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  let exitCode = 0;
+  let browser = null;
 
   try {
+    const { ensureServers, stopServers: stopHelperServers } = require('./server-helper.cjs');
+    await ensureServers({ api: true, web: true });
+
+    browser = await chromium.launch({ channel: 'msedge', headless: true });
     const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
     const page = await context.newPage();
 
@@ -300,20 +302,49 @@ async function runCancelBookingPlaywrightTests() {
     console.log('\n================================================================');
     console.log('  ALL CUSTOMER CANCEL BOOKING PLAYWRIGHT TESTS PASSED!');
     console.log('================================================================\n');
+  } catch (err) {
+    exitCode = 1;
+    console.error('\n[PLAYWRIGHT TEST FAILURE]:', err);
   } finally {
-    stopServers();
-    await browser.close();
-    await pool.query('DELETE FROM tblpayments WHERE booking_id IN (?, ?, ?)', [pendingBookingId, confirmedUnpaidBookingId, paidBookingId]);
-    await pool.query('DELETE FROM tblbooking WHERE id IN (?, ?, ?)', [pendingBookingId, confirmedUnpaidBookingId, paidBookingId]);
-    await pool.query('DELETE FROM tblvehicles WHERE id = ?', [vehicleId]);
-    await pool.query('DELETE FROM tblbrands WHERE id = ?', [bRes.insertId]);
-    await pool.query('DELETE FROM tblusers WHERE EmailId IN (?, ?)', [custAEmail, custBEmail]);
-    await pool.end();
-    process.exit(0);
+    try {
+      const { stopServers: stopHelperServers } = require('./server-helper.cjs');
+      stopHelperServers();
+    } catch (e) {
+      console.error('[CLEANUP ERR]:', e);
+    }
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (e) {
+        console.error('[CLEANUP ERR]:', e);
+      }
+    }
+    if (pool) {
+      try {
+        await pool.query('DELETE FROM tblpayments WHERE booking_id IN (?, ?, ?)', [pendingBookingId, confirmedUnpaidBookingId, paidBookingId]);
+      } catch (e) {}
+      try {
+        await pool.query('DELETE FROM tblbooking WHERE id IN (?, ?, ?)', [pendingBookingId, confirmedUnpaidBookingId, paidBookingId]);
+      } catch (e) {}
+      try {
+        await pool.query('DELETE FROM tblvehicles WHERE id = ?', [vehicleId]);
+      } catch (e) {}
+      try {
+        await pool.query('DELETE FROM tblbrands WHERE id = ?', [bRes.insertId]);
+      } catch (e) {}
+      try {
+        await pool.query('DELETE FROM tblusers WHERE EmailId IN (?, ?)', [custAEmail, custBEmail]);
+      } catch (e) {}
+      try {
+        await pool.end();
+      } catch (e) {}
+    }
   }
+
+  process.exit(exitCode);
 }
 
 runCancelBookingPlaywrightTests().catch((err) => {
-  console.error('\n[FATAL CANCEL TEST ERROR]:', err);
+  console.error('[UNHANDLED E2E ERROR]:', err);
   process.exit(1);
 });

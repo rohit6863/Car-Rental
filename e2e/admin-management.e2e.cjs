@@ -88,21 +88,23 @@ async function runE2ETests() {
   console.log('  ADMIN MANAGEMENT REAL BROWSER E2E TEST SUITE');
   console.log('======================================================\n');
 
-  await startServers();
-
-  console.log('[BROWSER] Launching Edge browser (headless)...');
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
-  const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
-  const page = await context.newPage();
-
-  page.on('dialog', async (dialog) => {
-    console.log(`  [DIALOG ACCEPTED]: "${dialog.message()}"`);
-    await dialog.accept();
-  });
-
-  const testedInteractions = [];
+  let browser = null;
+  let exitCode = 0;
 
   try {
+    await startServers();
+
+    console.log('[BROWSER] Launching Edge browser (headless)...');
+    browser = await chromium.launch({ channel: 'msedge', headless: true });
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const page = await context.newPage();
+
+    page.on('dialog', async (dialog) => {
+      console.log(`  [DIALOG ACCEPTED]: "${dialog.message()}"`);
+      await dialog.accept();
+    });
+
+    const testedInteractions = [];
     // -------------------------------------------------------------------------
     // 1. ADMIN LOGIN PAGE & INVALID CREDENTIALS INTERACTION
     // -------------------------------------------------------------------------
@@ -432,29 +434,38 @@ async function runE2ETests() {
     console.log('\nTested UI Interactions:');
     testedInteractions.forEach((item, i) => console.log(`  ${i + 1}. ${item}`));
 
-    await browser.close();
-    process.exit(0);
   } catch (err) {
-    console.error('\n[TEST FAILED]:', err);
-    await page.screenshot({ path: path.join(PARITY_DIR, 'ERROR_SNAPSHOT.png') }).catch(() => {});
-    await browser.close().catch(() => {});
-    throw err;
+    exitCode = 1;
+    console.error('\n[PLAYWRIGHT TEST FAILURE]:', err);
   } finally {
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (e) {
+        console.error('[CLEANUP ERR]:', e);
+      }
+    }
     // Clean up temporary image files
-    if (fs.existsSync(TEST_IMG1)) fs.unlinkSync(TEST_IMG1);
-    if (fs.existsSync(TEST_IMG2)) fs.unlinkSync(TEST_IMG2);
+    try {
+      if (fs.existsSync(TEST_IMG1)) fs.unlinkSync(TEST_IMG1);
+    } catch (e) {}
+    try {
+      if (fs.existsSync(TEST_IMG2)) fs.unlinkSync(TEST_IMG2);
+    } catch (e) {}
 
     // Stop spawned processes
     const { killPid } = require('./server-helper.cjs');
     if (adminProcess) {
       console.log('[CLEANUP] Stopping admin dev server...');
-      killPid(adminProcess.pid);
+      try { killPid(adminProcess.pid); } catch (e) { console.error('[CLEANUP ERR]:', e); }
     }
     if (apiProcess) {
       console.log('[CLEANUP] Stopping api server...');
-      killPid(apiProcess.pid);
+      try { killPid(apiProcess.pid); } catch (e) { console.error('[CLEANUP ERR]:', e); }
     }
   }
+
+  process.exit(exitCode);
 }
 
 runE2ETests().catch((err) => {

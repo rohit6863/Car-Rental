@@ -90,6 +90,8 @@ async function runTestFlow() {
   });
 
   let testBrandId, testVehicleId, bookingId1, bookingId2;
+  let exitCode = 0;
+  let browser = null;
 
   try {
     await startServers();
@@ -143,7 +145,7 @@ async function runTestFlow() {
 
     // 4. Launch Playwright browser
     console.log('\n[STEP 2] Launching browser & logging in as Admin...');
-    const browser = await chromium.launch({ channel: 'msedge', headless: true });
+    browser = await chromium.launch({ channel: 'msedge', headless: true });
     const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
     const page = await context.newPage();
 
@@ -258,39 +260,50 @@ async function runTestFlow() {
     await page.screenshot({ path: screenshotPath });
     console.log(`  -> Screenshot saved: ${screenshotPath}`);
 
-    await browser.close();
-
     console.log('\n================================================================');
     console.log('  SUCCESS: ALL DOUBLE-BOOKING RACE SCENARIOS VERIFIED 100%!');
     console.log('================================================================\n');
+  } catch (err) {
+    exitCode = 1;
+    console.error('\n[PLAYWRIGHT TEST FAILURE]:', err);
   } finally {
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (e) {
+        console.error('[CLEANUP ERR]:', e);
+      }
+    }
+
     // Cleanup seeded data
     console.log('[CLEANUP] Cleaning up test bookings and vehicle...');
-    if (testVehicleId) {
-      await pool.query('DELETE FROM tblbooking WHERE VehicleId = ?', [testVehicleId]);
-      await pool.query('DELETE FROM tblvehicles WHERE id = ?', [testVehicleId]);
+    if (pool) {
+      if (testVehicleId) {
+        try { await pool.query('DELETE FROM tblbooking WHERE VehicleId = ?', [testVehicleId]); } catch (e) {}
+        try { await pool.query('DELETE FROM tblvehicles WHERE id = ?', [testVehicleId]); } catch (e) {}
+      }
+      if (testBrandId) {
+        try { await pool.query('DELETE FROM tblbrands WHERE id = ?', [testBrandId]); } catch (e) {}
+      }
+      try { await pool.query('DELETE FROM tblusers WHERE EmailId IN (?, ?)', ['cust1_race@example.com', 'cust2_race@example.com']); } catch (e) {}
+      try { await pool.end(); } catch (e) {}
     }
-    if (testBrandId) {
-      await pool.query('DELETE FROM tblbrands WHERE id = ?', [testBrandId]);
-    }
-    await pool.query('DELETE FROM tblusers WHERE EmailId IN (?, ?)', ['cust1_race@example.com', 'cust2_race@example.com']);
-    await pool.end();
 
+    const { killPid } = require('./server-helper.cjs');
     if (adminProcess) {
       console.log('[CLEANUP] Stopping admin dev server...');
-      const { killPid } = require('./server-helper.cjs');
-      killPid(adminProcess.pid);
+      try { killPid(adminProcess.pid); } catch (e) {}
     }
     if (apiProcess) {
       console.log('[CLEANUP] Stopping api server...');
-      const { killPid } = require('./server-helper.cjs');
-      killPid(apiProcess.pid);
+      try { killPid(apiProcess.pid); } catch (e) {}
     }
-    process.exit(0);
   }
+
+  process.exit(exitCode);
 }
 
 runTestFlow().catch((err) => {
-  console.error('\n[FLOW TEST FAILURE]:', err);
+  console.error('[UNHANDLED E2E ERROR]:', err);
   process.exit(1);
 });

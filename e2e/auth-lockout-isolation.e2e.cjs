@@ -77,15 +77,18 @@ async function run() {
   console.log('  PLAYWRIGHT REAL BROWSER TEST: AUTH LOCKOUT FLOWS');
   console.log('============================================================\n');
 
-  const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: process.env.DB_USER || '',
-    password: process.env.DB_PASS || '',
-    database: process.env.DB_NAME || 'wanderwheels_e2e_test',
-  });
+  let pool = null;
+  let browser = null;
+  let exitCode = 0;
 
   try {
+    pool = mysql.createPool({
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '3306', 10),
+      user: process.env.DB_USER || '',
+      password: process.env.DB_PASS || '',
+      database: process.env.DB_NAME || 'wanderwheels_e2e_test',
+    });
     await startServers();
 
     const { getTestAdminCredentials, getTestCustomerCredentials } = require('./test-credentials.cjs');
@@ -102,7 +105,7 @@ async function run() {
     // Reset login attempts before test
     await pool.query('DELETE FROM tbl_login_attempts');
 
-    const browser = await chromium.launch({ channel: 'msedge', headless: true });
+    browser = await chromium.launch({ channel: 'msedge', headless: true });
     const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
     const page = await context.newPage();
 
@@ -197,22 +200,43 @@ async function run() {
     assert(adminHtml.includes('Manage Bookings'), 'Admin manage bookings page must load');
     console.log('  -> Admin Manage Bookings page loaded successfully.');
 
-    await browser.close();
-    await pool.end();
     console.log('\n============================================================');
     console.log('  ALL PLAYWRIGHT TESTS PASSED SUCCESSFULLY!');
     console.log('============================================================\n');
   } catch (err) {
-    console.error('\n[PLAYWRIGHT TEST FAILED]:', err.message);
-    if (pool) await pool.end();
-    process.exitCode = 1;
+    exitCode = 1;
+    console.error('\n[PLAYWRIGHT TEST FAILED]:', err);
   } finally {
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (e) {
+        console.error('[CLEANUP ERR]:', e);
+      }
+    }
+    if (pool) {
+      try {
+        await pool.end();
+      } catch (e) {
+        console.error('[CLEANUP ERR]:', e);
+      }
+    }
     const { killPid } = require('./server-helper.cjs');
-    if (apiProcess) killPid(apiProcess.pid);
-    if (webProcess) killPid(webProcess.pid);
-    if (adminProcess) killPid(adminProcess.pid);
-    process.exit(process.exitCode || 0);
+    if (apiProcess) {
+      try { killPid(apiProcess.pid); } catch (e) { console.error('[CLEANUP ERR]:', e); }
+    }
+    if (webProcess) {
+      try { killPid(webProcess.pid); } catch (e) { console.error('[CLEANUP ERR]:', e); }
+    }
+    if (adminProcess) {
+      try { killPid(adminProcess.pid); } catch (e) { console.error('[CLEANUP ERR]:', e); }
+    }
   }
+
+  process.exit(exitCode);
 }
 
-run();
+run().catch((err) => {
+  console.error('\n[FATAL ERROR]:', err);
+  process.exit(1);
+});

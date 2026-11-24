@@ -70,17 +70,22 @@ async function run() {
   console.log('  Rule: REAL CLICKS ONLY (no force:true, no setChecked)');
   console.log('============================================================\n');
 
-  const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: process.env.DB_USER || '',
-    password: process.env.DB_PASS || '',
-    database: process.env.DB_NAME || 'wanderwheels_e2e_test',
-  });
-
-  const uploadsDir = path.join(__dirname, '..', 'carrental-api', 'uploads', 'vehicles');
+  let pool = null;
+  let browser = null;
+  let exitCode = 0;
   const tempDir = path.join(__dirname, 'temp_test_assets');
-  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+
+  try {
+    pool = mysql.createPool({
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '3306', 10),
+      user: process.env.DB_USER || '',
+      password: process.env.DB_PASS || '',
+      database: process.env.DB_NAME || 'wanderwheels_e2e_test',
+    });
+
+    const uploadsDir = path.join(__dirname, '..', 'carrental-api', 'uploads', 'vehicles');
+    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 
   // Create test assets from repo-local placeholders
   const placeholderDir = path.join(__dirname, '..', 'carrental-api', 'src', 'db', 'placeholders');
@@ -102,11 +107,9 @@ async function run() {
 
   // Oversized image: 5.5 MB file
   const oversizedImg = path.join(tempDir, 'oversized_image.jpg');
-  const largeBuffer = Buffer.alloc(5.5 * 1024 * 1024, 0x5a); // 5.5 MB
-  fs.writeFileSync(oversizedImg, largeBuffer);
+    const largeBuffer = Buffer.alloc(5.5 * 1024 * 1024, 0x5a); // 5.5 MB
+    fs.writeFileSync(oversizedImg, largeBuffer);
 
-  let browser;
-  try {
     await startServers();
 
     browser = await chromium.launch({ channel: 'msedge', headless: true });
@@ -315,38 +318,63 @@ async function run() {
 
     // ─── CLEANUP ──────────────────────────────────────────────────────────
     console.log('\n[CLEANUP] Cleaning up test vehicle records from database...');
-    await pool.query('DELETE FROM tblvehicles WHERE VehiclesTitle LIKE "PW Test Sedan %"');
-    console.log('  -> Cleaned up test vehicles.');
+    try {
+      await pool.query('DELETE FROM tblvehicles WHERE VehiclesTitle LIKE "PW Test Sedan %"');
+      console.log('  -> Cleaned up test vehicles.');
+    } catch (e) {}
 
     console.log('\n============================================================');
     console.log('  SUCCESS: ALL 4 POST-VEHICLE PLAYWRIGHT CASES PASSED 100%!');
     console.log('============================================================\n');
+  } catch (err) {
+    exitCode = 1;
+    console.error('\n[PLAYWRIGHT TEST FAILURE]:', err);
   } finally {
-    if (browser) await browser.close();
-    await pool.end();
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (e) {
+        console.error('[CLEANUP ERR]:', e);
+      }
+    }
+    if (pool) {
+      try {
+        await pool.query('DELETE FROM tblvehicles WHERE VehiclesTitle LIKE "PW Test Sedan %"');
+      } catch (e) {}
+      try {
+        await pool.end();
+      } catch (e) {
+        console.error('[CLEANUP ERR]:', e);
+      }
+    }
 
     // Clean up temp test assets
     try {
       fs.rmSync(tempDir, { recursive: true, force: true });
-    } catch {}
+    } catch (e) {}
 
     const { killPid } = require('./server-helper.cjs');
     if (adminProcess) {
       console.log('[CLEANUP] Stopping admin dev server...');
-      killPid(adminProcess.pid);
+      try { killPid(adminProcess.pid); } catch (e) { console.error('[CLEANUP ERR]:', e); }
     }
     if (apiProcess) {
       console.log('[CLEANUP] Stopping API server...');
-      killPid(apiProcess.pid);
+      try { killPid(apiProcess.pid); } catch (e) { console.error('[CLEANUP ERR]:', e); }
     }
-    process.exit(0);
   }
+
+  process.exit(exitCode);
 }
 
 run().catch((err) => {
   console.error('\n[FATAL ERROR]', err);
   const { killPid } = require('./server-helper.cjs');
-  if (adminProcess) killPid(adminProcess.pid);
-  if (apiProcess) killPid(apiProcess.pid);
+  if (adminProcess) {
+    try { killPid(adminProcess.pid); } catch (e) {}
+  }
+  if (apiProcess) {
+    try { killPid(apiProcess.pid); } catch (e) {}
+  }
   process.exit(1);
 });

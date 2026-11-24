@@ -27,6 +27,8 @@ async function runPaymentCancelRacePlaywright() {
   const { password } = require('./test-credentials.cjs').getTestCustomerCredentials();
   let vehicleId;
   let bookingId;
+  let browser = null;
+  let exitCode = 0;
 
   try {
     console.log('[SEED] Seeding test database...');
@@ -58,10 +60,9 @@ async function runPaymentCancelRacePlaywright() {
     console.log(`  -> Vehicle #${vehicleId}`);
     console.log(`  -> Booking #${bookingId} (Status=1 Confirmed)`);
 
-    const browser = await chromium.launch({ channel: 'msedge', headless: true });
+    browser = await chromium.launch({ channel: 'msedge', headless: true });
 
-    try {
-      // ── Context 1: Customer Window 1 (Opens payment popup) ─────────────────
+    // ── Context 1: Customer Window 1 (Opens payment popup) ─────────────────
       console.log('\n[CONTEXT 1] Customer logs in and opens payment popup...');
       const context1 = await browser.newContext({ viewport: { width: 1280, height: 800 } });
       const page1 = await context1.newPage();
@@ -185,22 +186,42 @@ async function runPaymentCancelRacePlaywright() {
       console.log('====================================================================\n');
 
       await context1.close();
-    } finally {
-      await browser.close();
-    }
+  } catch (err) {
+    exitCode = 1;
+    console.error('\n[PLAYWRIGHT TEST FAILURE]:', err);
   } finally {
-    stopServers();
-    if (bookingId) {
-      await pool.query('DELETE FROM tblpayments WHERE booking_id = ?', [bookingId]);
-      await pool.query('DELETE FROM tblbooking WHERE id = ?', [bookingId]);
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (e) {
+        console.error('[CLEANUP ERR]:', e);
+      }
     }
-    if (vehicleId) {
-      await pool.query('DELETE FROM tblvehicles WHERE id = ?', [vehicleId]);
+    try {
+      stopServers();
+    } catch (e) {
+      console.error('[CLEANUP ERR]:', e);
     }
-    await pool.query('DELETE FROM tblusers WHERE EmailId = ?', [custEmail]);
-    await pool.end();
-    process.exit(0);
+    if (pool) {
+      if (bookingId) {
+        try { await pool.query('DELETE FROM tblpayments WHERE booking_id = ?', [bookingId]); } catch (e) {}
+        try { await pool.query('DELETE FROM tblbooking WHERE id = ?', [bookingId]); } catch (e) {}
+      }
+      if (vehicleId) {
+        try { await pool.query('DELETE FROM tblvehicles WHERE id = ?', [vehicleId]); } catch (e) {}
+      }
+      if (custEmail) {
+        try { await pool.query('DELETE FROM tblusers WHERE EmailId = ?', [custEmail]); } catch (e) {}
+      }
+      try {
+        await pool.end();
+      } catch (e) {
+        console.error('[CLEANUP ERR]:', e);
+      }
+    }
   }
+
+  process.exit(exitCode);
 }
 
 runPaymentCancelRacePlaywright().catch((err) => {

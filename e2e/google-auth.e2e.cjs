@@ -198,6 +198,7 @@ async function run() {
   });
 
   let browser;
+  let exitCode = 0;
   try {
     await startServers();
 
@@ -434,22 +435,32 @@ async function run() {
     console.log('  ALL PLAYWRIGHT TESTS PASSED SUCCESSFULLY (3/3)');
     console.log('============================================================\n');
 
+  } catch (err) {
+    exitCode = 1;
+    console.error('\n[PLAYWRIGHT TEST FAILURE]:', err);
   } finally {
     const { killPid } = require('./server-helper.cjs');
-    if (browser) await browser.close();
-    if (mockOidcServer) mockOidcServer.close();
-    if (apiProcess) killPid(apiProcess.pid);
-    if (webProcess) killPid(webProcess.pid);
-    await pool.end();
-    process.exit(0);
+    if (browser) {
+      try { await browser.close(); } catch (e) { console.error('[CLEANUP ERR]:', e); }
+    }
+    if (mockOidcServer) {
+      try { mockOidcServer.close(); } catch (e) {}
+    }
+    if (apiProcess) {
+      try { killPid(apiProcess.pid); } catch (e) {}
+    }
+    if (webProcess) {
+      try { killPid(webProcess.pid); } catch (e) {}
+    }
+    if (pool) {
+      try { await pool.end(); } catch (e) {}
+    }
   }
+
+  process.exit(exitCode);
 }
 
 run().catch((err) => {
-  console.error('\n[FATAL ERROR IN PLAYWRIGHT SUITE]', err);
-  const { killPid } = require('./server-helper.cjs');
-  if (mockOidcServer) mockOidcServer.close();
-  if (apiProcess) killPid(apiProcess.pid);
-  if (webProcess) killPid(webProcess.pid);
+  console.error('[UNHANDLED E2E ERROR]:', err);
   process.exit(1);
 });
