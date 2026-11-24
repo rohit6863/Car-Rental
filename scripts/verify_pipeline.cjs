@@ -114,7 +114,13 @@ async function runVerification(stepLabel) {
     // Admin table test
     const mysql = require(path.join(ROOT, 'carrental-api', 'node_modules', 'mysql2', 'promise'));
     const argon2 = require(path.join(ROOT, 'carrental-api', 'node_modules', 'argon2'));
-    const conn = await mysql.createConnection({ host: '127.0.0.1', user: 'root', database: 'wanderwheels_e2e_test', port: 3306 });
+    const conn = await mysql.createConnection({
+      host: process.env.DB_HOST || '127.0.0.1',
+      port: parseInt(process.env.DB_PORT || '3306', 10),
+      user: process.env.DB_USER || '',
+      password: process.env.DB_PASS || '',
+      database: 'wanderwheels_e2e_test'
+    });
     const hash = await argon2.hash('admin');
     await conn.query('UPDATE admin SET password_hash = ?, must_change_password = 0 WHERE UserName = ?', [hash, 'admin']);
     await conn.end();

@@ -60,6 +60,7 @@ const PORT = process.env.PORT || 4000;
 
 const server = app.listen(PORT, () => {
   console.log(`[server] carrental-api listening on port ${PORT} (${process.env.NODE_ENV})`);
+  console.log(`[DB] Connected as user "${process.env.DB_USER || 'none'}" to database "${process.env.DB_NAME || 'wanderwheels_demo_test'}"`);
 });
 
 module.exports = { app, server, validateEnvironment };

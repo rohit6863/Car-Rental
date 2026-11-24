@@ -93,10 +93,10 @@ async function runPaymentPlaywrightTests() {
   console.log('================================================================\n');
 
   const pool = mysql.createPool({
-    host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: '',
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '3306', 10),
+    user: process.env.DB_USER || '',
+    password: process.env.DB_PASS || '',
     database: process.env.DB_NAME || 'wanderwheels_e2e_test',
     waitForConnections: true,
     connectionLimit: 5,

@@ -23,8 +23,21 @@ function getTestAdminCredentials() {
   return { username, password: cachedAdminPassword };
 }
 
+function getTestDbPoolConfig(database = process.env.E2E_DB_NAME || process.env.DB_NAME || 'wanderwheels_e2e_test') {
+  return {
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '3306', 10),
+    user: process.env.DB_USER || '',
+    password: process.env.DB_PASS || '',
+    database,
+    waitForConnections: true,
+    connectionLimit: 5,
+  };
+}
+
 module.exports = {
   generateSecureRandomPassword,
   getTestCustomerCredentials,
   getTestAdminCredentials,
+  getTestDbPoolConfig,
 };

@@ -103,10 +103,10 @@ async function run() {
   // 2. Database Preparation for Modals & Data Pages
   console.log('\n[2/4] Ensuring test database has vehicles with and without photos, and customer bookings...');
   const pool = mysql.createPool({
-    host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: '',
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '3306', 10),
+    user: process.env.DB_USER || '',
+    password: process.env.DB_PASS || '',
     database: E2E_DB_NAME
   });
 
@@ -223,9 +223,16 @@ async function run() {
       await p.waitForSelector('#loginform.in, #loginform.show', { timeout: 5000 });
       await p.fill('#loginform input[name="email"]', testCustomerEmail);
       // Get password from DB or fallback
-      const poolAuth = mysql.createPool({ host: 'localhost', port: 3306, user: 'root', password: '', database: E2E_DB_NAME });
+      const poolAuth = mysql.createPool({
+        host: process.env.DB_HOST || 'localhost',
+        port: parseInt(process.env.DB_PORT || '3306', 10),
+        user: process.env.DB_USER || '',
+        password: process.env.DB_PASS || '',
+        database: E2E_DB_NAME
+      });
       const argon2 = require(path.join(__dirname, '..', 'carrental-api', 'node_modules', 'argon2'));
-      const testPw = 'CustomerTestPass123!';
+      const crypto = require('crypto');
+      const testPw = `CustProof!${crypto.randomBytes(6).toString('hex')}A1`;
       const hash = await argon2.hash(testPw);
       await poolAuth.query('UPDATE tblusers SET password_hash = ? WHERE EmailId = ?', [hash, testCustomerEmail]);
       await poolAuth.end();

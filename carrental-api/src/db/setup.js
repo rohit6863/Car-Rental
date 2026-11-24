@@ -12,13 +12,13 @@ async function setup() {
     throw new Error(`Refusing to run setup against database "${dbName}" in production.`);
   }
 
-  console.log(`[DB SETUP] Initializing database "${dbName}"...`);
+  console.log(`[DB SETUP] Initializing database "${dbName}" with DB_USER="${process.env.DB_USER || 'none'}"...`);
 
   // 1. Connect without database to ensure DB exists
   const rootConn = await mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: process.env.DB_USER || 'root',
+    user: process.env.DB_USER || '',
     password: process.env.DB_PASS || '',
     multipleStatements: true
   });
@@ -31,7 +31,7 @@ async function setup() {
   const dbConn = await mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: process.env.DB_USER || 'root',
+    user: process.env.DB_USER || '',
     password: process.env.DB_PASS || '',
     database: dbName,
     multipleStatements: true

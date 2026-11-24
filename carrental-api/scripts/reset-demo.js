@@ -12,13 +12,13 @@ async function resetDemo() {
   }
 
   const demoDbName = assertSafeTestDatabase(process.env.DEMO_DB_NAME || process.env.DB_NAME || 'wanderwheels_demo_test');
-  console.log(`[RESET DEMO] Preparing to reset demonstration database "${demoDbName}"...`);
+  console.log(`[RESET DEMO] Preparing to reset demonstration database "${demoDbName}" with DB_USER="${process.env.DB_USER || 'none'}"...`);
 
   // 1. Connect without database to ensure DB exists
   const rootConn = await mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: process.env.DB_USER || 'root',
+    user: process.env.DB_USER || '',
     password: process.env.DB_PASS || '',
     multipleStatements: true
   });
@@ -31,7 +31,7 @@ async function resetDemo() {
   const dbConn = await mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: process.env.DB_USER || 'root',
+    user: process.env.DB_USER || '',
     password: process.env.DB_PASS || '',
     database: demoDbName,
     multipleStatements: true

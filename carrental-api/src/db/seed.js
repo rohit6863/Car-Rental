@@ -20,13 +20,13 @@ async function seed() {
   const conn = await mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: process.env.DB_USER || 'root',
+    user: process.env.DB_USER || '',
     password: process.env.DB_PASS || '',
     database: dbName,
     multipleStatements: true,
   });
 
-  console.log(`[SEED] Connected to ${dbName}. Seeding sample data...`);
+  console.log(`[SEED] Connected as user "${process.env.DB_USER || 'none'}" to ${dbName}. Seeding sample data...`);
 
   // Ensure uploads directory exists
   const targetUploadsDir = path.join(__dirname, '..', '..', 'uploads', 'vehicles');

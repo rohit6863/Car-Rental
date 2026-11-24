@@ -123,7 +123,13 @@ async function runE2ETests() {
     testedInteractions.push('Login form: typed invalid credentials and verified error message');
 
     // Ensure admin user has known adminPw
-    const pool = mysql.createPool({ host: 'localhost', user: 'root', database: process.env.DB_NAME || 'wanderwheels_e2e_test', port: 3306 });
+    const pool = mysql.createPool({
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '3306', 10),
+      user: process.env.DB_USER || '',
+      password: process.env.DB_PASS || '',
+      database: process.env.DB_NAME || 'wanderwheels_e2e_test',
+    });
     const adminHash = await argon2.hash(adminPw);
     await pool.query('UPDATE admin SET password_hash = ?, must_change_password = 0 WHERE UserName = ?', [adminHash, adminUser]);
     await pool.end();
