@@ -181,6 +181,18 @@ async function runProvisioning() {
       console.log(`  ✓ Database confirmed: ${db}`);
     }
 
+    // MariaDB / XAMPP includes a default public database named 'test' with wildcard grants to any user.
+    // If it exists and is empty, drop it so it does not breach the strict isolation wall.
+    try {
+      const [testTables] = await adminConn.query('SHOW TABLES FROM `test`');
+      if (Array.isArray(testTables) && testTables.length === 0) {
+        await adminConn.query('DROP DATABASE IF EXISTS `test`');
+        console.log('  ✓ Removed default empty MariaDB "test" database.');
+      }
+    } catch {
+      // Non-fatal if 'test' does not exist
+    }
+
     console.log('\n[2/4] Configuring restricted user ww_dev@localhost...');
     const devPassword = crypto.randomBytes(24).toString('hex');
 
@@ -198,8 +210,18 @@ async function runProvisioning() {
       console.log(`  ✓ Granted ALL on ${db}.* to ww_dev@localhost`);
     }
 
-    await adminConn.query('FLUSH PRIVILEGES');
-    console.log('  ✓ Privileges flushed.');
+    // FLUSH PRIVILEGES is a no-op in MariaDB 10.4+ when GRANT statements are
+    // used (grants write directly to InnoDB global_priv). Attempt it but treat
+    // failure as a non-fatal warning so Aria storage-engine corruption on the
+    // legacy mysql.db table does not block provisioning.
+    try {
+      await adminConn.query('FLUSH PRIVILEGES');
+      console.log('  ✓ Privileges flushed.');
+    } catch (flushErr) {
+      console.warn(`  ⚠  FLUSH PRIVILEGES failed (${flushErr.message})`);
+      console.warn('     This is non-fatal on MariaDB 10.4+ — GRANT already wrote to global_priv.');
+      console.warn('     Consider running: mysqlcheck -u root --repair mysql');
+    }
 
     await adminConn.end();
 
