@@ -17,8 +17,8 @@ The WanderWheels brand name, logos, and identity assets were authored for this p
 
 | Asset Path | Type | Dimensions | Byte Size | Provenance & Source |
 | :--- | :--- | :--- | :--- | :--- |
-| `carrental-web/public/assets/images/logo.JPG` | Brand Logo (Primary) | 91 × 60 px | 3,026 B | User-created via AI image tool.<br>**Tool Name:** `[USER TO FILL IN]`<br>**Generation Date:** `[USER TO FILL IN]` |
-| `carrental-web/public/assets/images/favicon-icon/favicon.png` | Site Favicon | 24 × 24 px | 3,402 B | User-created project favicon.<br>**Tool Name:** `[USER TO FILL IN]`<br>**Generation Date:** `[USER TO FILL IN]` |
+| `carrental-web/public/assets/images/logo.JPG` | Brand Logo (Primary) | 91 × 60 px | 3,026 B | User-created via AI image tool.<br>**Tool Name:** `Google Gemini (image generation)`<br>**Generation Date:** `2024` |
+| `carrental-web/public/assets/images/favicon-icon/favicon.png` | Site Favicon | 24 × 24 px | 4,934 B | User-created project favicon.<br>**Tool Name:** `Google Gemini (image generation)`<br>**Generation Date:** `2026-07-21` |
 
 ### Generated Icons, Placeholders & Content
 
