@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "npm --prefix carrental-api run dev & npm --prefix carrental-web run dev & npm --prefix carrental-admin run dev",
     "db:setup": "npm --prefix carrental-api run db:setup",
+    "db:provision": "npm --prefix carrental-api run db:provision",
     "db:reset-demo": "npm --prefix carrental-api run db:reset-demo",
     "test": "npm --prefix carrental-api test",
     "test:e2e": "node e2e/run-all.cjs",
