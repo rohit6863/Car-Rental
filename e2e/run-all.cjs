@@ -12,6 +12,11 @@
 
 const fs = require('fs');
 const path = require('path');
+try {
+  require(path.join(__dirname, '..', 'carrental-api', 'node_modules', 'dotenv')).config({
+    path: path.join(__dirname, '..', 'carrental-api', '.env')
+  });
+} catch {}
 const { spawnSync, execSync } = require('child_process');
 const { assertSafeTestDatabase } = require('../carrental-api/src/db/dbGuard');
 

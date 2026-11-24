@@ -1,6 +1,11 @@
 'use strict';
 const net = require('net');
 const path = require('path');
+try {
+  require(path.join(__dirname, '..', 'carrental-api', 'node_modules', 'dotenv')).config({
+    path: path.join(__dirname, '..', 'carrental-api', '.env')
+  });
+} catch {}
 const { spawn } = require('child_process');
 
 const API_PORT = 4000;
