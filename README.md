@@ -17,8 +17,24 @@ A modernized, secure car rental platform built with Node.js/Express, MySQL/Maria
 #### Homepage & Modern Fleet Discovery
 ![Customer Portal Homepage](docs/screenshots/customer-home.png)
 
-#### Vehicle Details, Technical Specifications & Booking Calendar
-![Vehicle Details & Booking](docs/screenshots/customer-vehicle-details.png)
+#### Featured Fleet & Vehicle Showcase
+![Customer Portal Featured Fleet](docs/screenshots/customer-home2.png)
+
+#### Fleet Inventory & Car Listing (Light & Dark Modes)
+![Customer Car Listing Light](docs/screenshots/customer-carlisting.png)
+
+![Customer Car Listing Dark](docs/screenshots/customer-carlisting-dark.png)
+
+#### Vehicle Details, Technical Specifications & Gallery
+![Vehicle Details Overview](docs/screenshots/customer-vehicle-details.png)
+
+![Vehicle Details & Modern Specifications](docs/screenshots/customer-vehicle-details2.png)
+
+#### Interactive Datepicker & Booking Flow
+![Interactive Vehicle Booking Flow](docs/screenshots/customer-car_booking.png)
+
+#### Customer Bookings & Trip History
+![Customer My Bookings](docs/screenshots/customer-mybooking.png)
 
 #### Customer Profile & Driver KYC Verification
 ![Customer KYC Profile](docs/screenshots/customer-kyc-profile.png)
