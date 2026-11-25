@@ -10,6 +10,40 @@ A modernized, secure car rental platform built with Node.js/Express, MySQL/Maria
 
 ---
 
+## Screenshots / Demo
+
+### Customer Portal (`carrental-web`)
+
+#### Homepage & Modern Fleet Discovery
+![Customer Portal Homepage](docs/screenshots/customer-home.png)
+
+#### Vehicle Details, Technical Specifications & Booking Calendar
+![Vehicle Details & Booking](docs/screenshots/customer-vehicle-details.png)
+
+#### Customer Profile & Driver KYC Verification
+![Customer KYC Profile](docs/screenshots/customer-kyc-profile.png)
+
+---
+
+### Admin Operations Portal (`carrental-admin`)
+
+#### Fleet Ops Bento Dashboard — Obsidian & Amber Carbon (Dark Mode)
+![Admin Dashboard Dark](docs/screenshots/admin-dashboard-dark.png)
+
+#### Fleet Ops Bento Dashboard — Light Mode
+![Admin Dashboard Light](docs/screenshots/admin-dashboard-light.png)
+
+#### Pune Metropolitan Geo-Fence Radar & Live Fleet Telematics
+![Admin Telematics Radar](docs/screenshots/admin-telematics-dark.png)
+
+#### Booking Management & Vehicle Return Tracking
+![Admin Manage Bookings & Return Tracking](docs/screenshots/admin-bookings-return.png)
+
+#### Driver KYC Inspection & Verification Modal
+![Admin Driver KYC Inspection Modal](docs/screenshots/admin-kyc-modal.png)
+
+---
+
 ## Online Payment Gateway Architecture
 
 The system replaces manual payment workflows with an automated payment gateway architecture behind a clean adapter interface:
