@@ -24,6 +24,8 @@ function getFocusableElements(container) {
  */
 export default function useModalFocusTrap(isOpen, dialogRef, onClose) {
   const openerRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -48,7 +50,7 @@ export default function useModalFocusTrap(isOpen, dialogRef, onClose) {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        onClose();
+        onCloseRef.current?.();
         return;
       }
       if (e.key !== 'Tab' || !dialogRef.current) return;
@@ -88,5 +90,5 @@ export default function useModalFocusTrap(isOpen, dialogRef, onClose) {
         });
       }
     };
-  }, [isOpen, dialogRef, onClose]);
+  }, [isOpen, dialogRef]);
 }

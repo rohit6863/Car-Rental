@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { getFocusableElements } from '../utils/modal';
 
 /**
@@ -6,6 +6,9 @@ import { getFocusableElements } from '../utils/modal';
  * closes on Escape, and moves initial focus inside the dialog.
  */
 export default function useModalFocusTrap(isOpen, dialogRef, onClose) {
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
     if (!isOpen) return undefined;
 
@@ -23,7 +26,7 @@ export default function useModalFocusTrap(isOpen, dialogRef, onClose) {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        onClose();
+        onCloseRef.current?.();
         return;
       }
 
@@ -55,5 +58,5 @@ export default function useModalFocusTrap(isOpen, dialogRef, onClose) {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, dialogRef, onClose]);
+  }, [isOpen, dialogRef]);
 }
