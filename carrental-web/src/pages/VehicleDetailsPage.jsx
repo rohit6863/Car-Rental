@@ -637,8 +637,8 @@ export default function VehicleDetailsPage() {
                   </div>
                 </div>
 
-                {/* 3 Core Specs Cards */}
-                <div className="grid grid-cols-3 gap-3">
+                {/* Core Specs Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   <div className="surface-muted bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 text-center">
                     <i className="fa-solid fa-calendar text-brand-red text-base mb-1 block"></i>
                     <p className="text-xs font-extrabold text-slate-900 dark:text-white">{vehicle.ModelYear}</p>
@@ -653,6 +653,16 @@ export default function VehicleDetailsPage() {
                     <i className="fa-solid fa-user-group text-blue-500 text-base mb-1 block"></i>
                     <p className="text-xs font-extrabold text-slate-900 dark:text-white">{vehicle.SeatingCapacity}</p>
                     <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Seats</p>
+                  </div>
+                  <div className="surface-muted bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 text-center">
+                    <i className="fa-solid fa-gears text-emerald-500 text-base mb-1 block"></i>
+                    <p className="text-xs font-extrabold text-slate-900 dark:text-white">{vehicle.Transmission || 'Automatic'}</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Transmission</p>
+                  </div>
+                  <div className="surface-muted bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 text-center col-span-2 sm:col-span-2">
+                    <i className="fa-solid fa-car-side text-indigo-500 text-base mb-1 block"></i>
+                    <p className="text-xs font-extrabold text-slate-900 dark:text-white">{vehicle.Category || 'Sedan'}</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Body Category</p>
                   </div>
                 </div>
 
@@ -715,13 +725,19 @@ export default function VehicleDetailsPage() {
                       <p>{vehicle.VehiclesOverview || 'No description available for this vehicle.'}</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-semibold text-slate-700">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-semibold text-slate-700 dark:text-slate-200">
                       {[
                         { label: 'Air Conditioner', val: vehicle.AirConditioner },
+                        { label: 'Sunroof / Panoramic Roof', val: vehicle.Sunroof },
+                        { label: 'Apple CarPlay / Android Auto', val: vehicle.AppleCarPlay },
+                        { label: 'Reverse Camera', val: vehicle.ReverseCamera },
+                        { label: 'Cruise Control', val: vehicle.CruiseControl },
+                        { label: 'Keyless Entry & Push Start', val: vehicle.KeylessEntry },
+                        { label: 'GPS Navigation', val: vehicle.GPSNavigation },
+                        { label: 'EV Fast Charging / Regen Braking', val: vehicle.FastCharging },
                         { label: 'AntiLock Braking System (ABS)', val: vehicle.AntiLockBrakingSystem },
                         { label: 'Power Steering', val: vehicle.PowerSteering },
                         { label: 'Power Windows', val: vehicle.PowerWindows },
-                        { label: 'CD / Multimedia Player', val: vehicle.CDPlayer },
                         { label: 'Leather Seats', val: vehicle.LeatherSeats },
                         { label: 'Central Locking', val: vehicle.CentralLocking },
                         { label: 'Power Door Locks', val: vehicle.PowerDoorLocks },
@@ -729,15 +745,16 @@ export default function VehicleDetailsPage() {
                         { label: 'Driver Airbag', val: vehicle.DriverAirbag },
                         { label: 'Passenger Airbag', val: vehicle.PassengerAirbag },
                         { label: 'Crash Sensor', val: vehicle.CrashSensor },
+                        { label: 'CD / Multimedia Player', val: vehicle.CDPlayer },
                       ].map((item, i) => (
-                        <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                        <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700">
                           <span>{item.label}</span>
                           {item.val === 1 ? (
-                            <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">
+                            <span className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs">
                               <i className="fa-solid fa-check"></i>
                             </span>
                           ) : (
-                            <span className="w-6 h-6 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-xs">
+                            <span className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 flex items-center justify-center text-xs">
                               <i className="fa-solid fa-xmark"></i>
                             </span>
                           )}
