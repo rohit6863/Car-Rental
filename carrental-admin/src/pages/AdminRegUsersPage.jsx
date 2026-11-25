@@ -23,6 +23,7 @@ export default function AdminRegUsersPage() {
   const [rejectionReason, setRejectionReason] = useState('');
   const [docPreviewUrl, setDocPreviewUrl] = useState('');
   const [docLoading, setDocLoading] = useState(false);
+  const [docError, setDocError] = useState('');
   const [saving, setSaving] = useState(false);
 
   const { searchQuery } = useSearch();
@@ -50,10 +51,12 @@ export default function AdminRegUsersPage() {
     async function loadDoc() {
       if (!selectedUser || !selectedUser.hasKycDocument) {
         setDocPreviewUrl('');
+        setDocError('');
         setDocLoading(false);
         return;
       }
       setDocLoading(true);
+      setDocError('');
       try {
         const res = await client.get(`/api/admin/users/${selectedUser.id}/kyc-document`, {
           responseType: 'blob',
@@ -62,7 +65,10 @@ export default function AdminRegUsersPage() {
         objectUrl = URL.createObjectURL(res.data);
         setDocPreviewUrl(objectUrl);
       } catch {
-        if (active) setDocPreviewUrl('');
+        if (active) {
+          setDocPreviewUrl('');
+          setDocError('Failed to load Driving License document preview.');
+        }
       } finally {
         if (active) setDocLoading(false);
       }
@@ -261,6 +267,10 @@ export default function AdminRegUsersPage() {
               {docLoading ? (
                 <div className="p-6 rounded-xl border border-dashed border-slate-200 dark:border-[#27272A] text-center text-slate-400 dark:text-zinc-500">
                   Loading document preview...
+                </div>
+              ) : docError ? (
+                <div className="p-5 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50/70 dark:bg-rose-500/10 text-center text-rose-700 dark:text-rose-300">
+                  {docError}
                 </div>
               ) : docPreviewUrl ? (
                 <div className="rounded-xl overflow-hidden border border-hairline dark:border-[#27272A] bg-slate-50 dark:bg-[#1C1C1F] p-2">

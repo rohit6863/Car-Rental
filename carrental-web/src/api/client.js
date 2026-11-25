@@ -26,6 +26,10 @@ export function setCsrfToken(token) {
 }
 
 api.interceptors.request.use(async (config) => {
+  if (config.data instanceof FormData) {
+    // Let the browser set multipart/form-data with the exact boundary
+    delete config.headers['Content-Type'];
+  }
   const method = config.method ? config.method.toUpperCase() : 'GET';
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
     if (!cachedCsrfToken) {

@@ -99,6 +99,20 @@ describe('Customer Driving License KYC Submission & Admin Verification', () => {
     expect(res.body.kyc.kycSubmittedAt).toBeTruthy();
     expect(res.body.kyc.hasKycDocument).toBe(true);
     expect(res.body.kyc.kycDocumentUrl).toBe('/api/users/kyc-document');
+
+    const [dbRows] = await pool.query(
+      'SELECT KycDocumentPath FROM tblusers WHERE id = ?',
+      [customerId]
+    );
+    expect(dbRows[0].KycDocumentPath).toBeTruthy();
+
+    const adminUsersRes = await request(app)
+      .get('/api/admin/users')
+      .set('Cookie', adminCookies());
+    expect(adminUsersRes.status).toBe(200);
+    const listedUser = adminUsersRes.body.find((u) => u.id === customerId);
+    expect(listedUser).toBeDefined();
+    expect(listedUser.hasKycDocument).toBe(true);
   });
 
   it('surfaces only submitted Pending KYC users in GET /api/admin/alerts', async () => {

@@ -135,14 +135,18 @@ class UsersService {
       SELECT
         u.id, u.FullName, u.EmailId, u.ContactNo, u.dob, u.Address, u.City, u.Country,
         u.RegDate, u.DrivingLicenseNo, u.KycStatus, u.KycSubmittedAt, u.KycRejectionReason,
-        CASE WHEN u.KycDocumentPath IS NOT NULL AND u.KycDocumentPath != '' THEN 1 ELSE 0 END AS hasKycDocument,
+        u.KycDocumentPath,
         COUNT(b.id) AS tripCount
       FROM tblusers u
       LEFT JOIN tblbooking b ON b.userEmail = u.EmailId AND b.Status = 1
       GROUP BY u.id
       ORDER BY u.id DESC
     `);
-    return rows;
+    return rows.map(({ KycDocumentPath, ...rest }) => ({
+      ...rest,
+      hasKycDocument: Boolean(KycDocumentPath),
+      kycDocumentUrl: KycDocumentPath ? `/api/admin/users/${rest.id}/kyc-document` : null,
+    }));
   }
 
   /**
