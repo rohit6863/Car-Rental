@@ -172,14 +172,14 @@ class VehiclesService {
     const sql = `
       INSERT INTO tblvehicles (
         VehiclesTitle, VehiclesBrand, VehiclesOverview, PricePerDay, FuelType,
-        Transmission, Category,
+        Transmission, Category, RegistrationPlate, HubLocation, OdometerKm, FuelChargePct,
         ModelYear, SeatingCapacity, Vimage1, Vimage2, Vimage3, Vimage4, Vimage5,
         AirConditioner, PowerDoorLocks, AntiLockBrakingSystem, BrakeAssist,
         PowerSteering, DriverAirbag, PassengerAirbag, PowerWindows, CDPlayer,
         CentralLocking, CrashSensor, LeatherSeats,
         Sunroof, AppleCarPlay, ReverseCamera, CruiseControl, KeylessEntry, GPSNavigation, FastCharging,
         Status, vehicle_status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'Available')
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
     `;
 
     const params = [
@@ -190,6 +190,10 @@ class VehiclesService {
       vehicleData.fueltype,
       vehicleData.transmission || 'Automatic',
       vehicleData.category || 'Sedan',
+      vehicleData.registrationplate || null,
+      vehicleData.hublocation || 'Pune Koregaon Park',
+      vehicleData.odometerkm ?? 0,
+      vehicleData.fuelchargepct ?? 100,
       vehicleData.modelyear,
       vehicleData.seatingcapacity,
       imageFilenames.vimage1 || '',
@@ -216,9 +220,16 @@ class VehiclesService {
       vehicleData.keylessentry || 0,
       vehicleData.gpsnavigation || 0,
       vehicleData.fastcharging || 0,
+      vehicleData.vehiclestatus || 'Available',
     ];
 
     const [result] = await query(sql, params);
+    if (!vehicleData.registrationplate) {
+      await query(
+        'UPDATE tblvehicles SET RegistrationPlate = ? WHERE id = ?',
+        [`MH 12 WW ${String(result.insertId).padStart(4, '0')}`, result.insertId]
+      );
+    }
     return { id: result.insertId };
   }
 
@@ -226,7 +237,10 @@ class VehiclesService {
     const sql = `
       UPDATE tblvehicles SET
         VehiclesTitle = ?, VehiclesBrand = ?, VehiclesOverview = ?, PricePerDay = ?,
-        FuelType = ?, Transmission = ?, Category = ?, ModelYear = ?, SeatingCapacity = ?,
+        FuelType = ?, Transmission = ?, Category = ?,
+        RegistrationPlate = COALESCE(?, RegistrationPlate),
+        HubLocation = ?, OdometerKm = ?, FuelChargePct = ?, vehicle_status = ?,
+        ModelYear = ?, SeatingCapacity = ?,
         AirConditioner = ?, PowerDoorLocks = ?, AntiLockBrakingSystem = ?, BrakeAssist = ?,
         PowerSteering = ?, DriverAirbag = ?, PassengerAirbag = ?, PowerWindows = ?,
         CDPlayer = ?, CentralLocking = ?, CrashSensor = ?, LeatherSeats = ?,
@@ -243,6 +257,11 @@ class VehiclesService {
       vehicleData.fueltype,
       vehicleData.transmission || 'Automatic',
       vehicleData.category || 'Sedan',
+      vehicleData.registrationplate || null,
+      vehicleData.hublocation || 'Pune Koregaon Park',
+      vehicleData.odometerkm ?? 0,
+      vehicleData.fuelchargepct ?? 100,
+      vehicleData.vehiclestatus || 'Available',
       vehicleData.modelyear,
       vehicleData.seatingcapacity,
       vehicleData.airconditioner || 0,
@@ -268,6 +287,26 @@ class VehiclesService {
     ];
 
     await query(sql, params);
+    return { success: true };
+  }
+
+  async adminUpdateStatus(id, status) {
+    const [result] = await query('UPDATE tblvehicles SET vehicle_status = ? WHERE id = ?', [status, id]);
+    if (result.affectedRows === 0) throw new NotFoundError('Vehicle');
+    return { success: true, status };
+  }
+
+  async adminUpdateTelematics(id, { registrationPlate, hubLocation, odometerKm, fuelChargePct }) {
+    const [result] = await query(
+      `UPDATE tblvehicles
+       SET RegistrationPlate = COALESCE(?, RegistrationPlate),
+           HubLocation = ?,
+           OdometerKm = ?,
+           FuelChargePct = ?
+       WHERE id = ?`,
+      [registrationPlate || null, hubLocation, odometerKm, fuelChargePct, id]
+    );
+    if (result.affectedRows === 0) throw new NotFoundError('Vehicle');
     return { success: true };
   }
 

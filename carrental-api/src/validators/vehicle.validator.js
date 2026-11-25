@@ -90,6 +90,29 @@ const checkboxField = z.preprocess((val) => {
   return 0;
 }, z.number().int().min(0).max(1));
 
+const ALLOWED_VEHICLE_STATUSES = ['Available', 'Rented', 'Maintenance'];
+
+const optionalString = (maxLen, defaultVal = undefined) => z.preprocess((val) => {
+  if (val === undefined || val === null || String(val).trim() === '') return defaultVal;
+  return String(val).trim();
+}, z.string().max(maxLen).nullable().optional());
+
+const optionalInt = (min, max, defaultVal) => z.preprocess((val) => {
+  if (val === undefined || val === null || val === '') return defaultVal;
+  const n = Number(val);
+  return isNaN(n) ? 'NOT_A_NUMBER' : n;
+}, z.union([
+  z.number().int().min(min).max(max),
+  z.literal('NOT_A_NUMBER').refine(() => false, { message: 'Must be a valid integer' }),
+]));
+
+const vehicleStatusField = z.preprocess((val) => {
+  if (val === undefined || val === null || String(val).trim() === '') return 'Available';
+  return String(val).trim();
+}, z.string().refine((v) => ALLOWED_VEHICLE_STATUSES.includes(v), {
+  message: 'Vehicle status must be Available, Rented, or Maintenance',
+}));
+
 const vehicleFormSchema = z.object({
   vehicletitle: vehicleTitleField,
   brandname: brandField,
@@ -98,6 +121,11 @@ const vehicleFormSchema = z.object({
   fueltype: fuelTypeField,
   transmission: transmissionField,
   category: categoryField,
+  registrationplate: optionalString(32, null),
+  hublocation: optionalString(120, 'Pune Koregaon Park'),
+  odometerkm: optionalInt(0, 2000000, 0),
+  fuelchargepct: optionalInt(0, 100, 100),
+  vehiclestatus: vehicleStatusField,
   modelyear: makeNumberField('Model year', 1990, 2050),
   seatingcapacity: makeNumberField('Seating capacity', 1, 20),
   airconditioner: checkboxField,
@@ -121,9 +149,22 @@ const vehicleFormSchema = z.object({
   fastcharging: checkboxField,
 });
 
+const vehicleStatusUpdateSchema = z.object({
+  status: z.enum(['Available', 'Rented', 'Maintenance']),
+});
+
+const vehicleTelematicsUpdateSchema = z.object({
+  registrationPlate: optionalString(32, null),
+  hubLocation: z.string().trim().min(2).max(120),
+  odometerKm: z.coerce.number().int().min(0).max(2000000),
+  fuelChargePct: z.coerce.number().int().min(0).max(100),
+});
+
 module.exports = {
   vehicleSearchSchema,
   vehicleIdParamSchema,
   vehicleImageNumParamSchema,
   vehicleFormSchema,
+  vehicleStatusUpdateSchema,
+  vehicleTelematicsUpdateSchema,
 };

@@ -71,6 +71,10 @@ async function seed() {
       fuel: 'Petrol',
       transmission: 'Automatic',
       category: 'Sports',
+      plate: 'MH 12 WW 3000',
+      hub: 'Hinjewadi IT Park Hub',
+      odometer: 11090,
+      fuelPct: 91,
       year: 2020,
       seats: 2,
       img1: 'toyota-fortuner-1.png',
@@ -89,6 +93,10 @@ async function seed() {
       fuel: 'Hybrid',
       transmission: 'Automatic',
       category: 'Luxury',
+      plate: 'MH 12 WW 5530',
+      hub: 'Koregaon Park Hub',
+      odometer: 18740,
+      fuelPct: 90,
       year: 2022,
       seats: 5,
       img1: 'bmw-5-series-1.png',
@@ -107,6 +115,10 @@ async function seed() {
       fuel: 'Petrol',
       transmission: 'Automatic',
       category: 'SUV',
+      plate: 'MH 01 WW 9999',
+      hub: 'Bandra Worli Hub',
+      odometer: 5120,
+      fuelPct: 95,
       year: 2024,
       seats: 4,
       img1: 'mercedes-c-class-1.png',
@@ -125,6 +137,10 @@ async function seed() {
       fuel: 'Electric',
       transmission: 'Automatic',
       category: 'EV',
+      plate: 'MH 12 WW 8808',
+      hub: 'Viman Nagar Lounge',
+      odometer: 19300,
+      fuelPct: 88,
       year: 2024,
       seats: 2,
       img1: 'audi-a4-1.png',
@@ -143,6 +159,10 @@ async function seed() {
       fuel: 'Petrol',
       transmission: 'Automatic',
       category: 'SUV',
+      plate: 'MH 12 WW 4400',
+      hub: 'Pune Intl. Airport',
+      odometer: 26150,
+      fuelPct: 85,
       year: 2020,
       seats: 5,
       img1: 'toyota-fortuner-1.png',
@@ -161,6 +181,10 @@ async function seed() {
       fuel: 'Diesel',
       transmission: 'Automatic',
       category: 'Sports',
+      plate: 'MH 12 WW 0007',
+      hub: 'Mumbai Airport T2',
+      odometer: 14910,
+      fuelPct: 78,
       year: 2017,
       seats: 2,
       img1: 'honda-city-1.png',
@@ -188,7 +212,7 @@ async function seed() {
       await conn.execute(`
         INSERT INTO tblvehicles (
           VehiclesTitle, VehiclesBrand, VehiclesOverview, PricePerDay, FuelType,
-          Transmission, Category,
+          Transmission, Category, RegistrationPlate, HubLocation, OdometerKm, FuelChargePct,
           ModelYear, SeatingCapacity, Vimage1, Vimage2, Vimage3, Vimage4, Vimage5,
           AirConditioner, PowerDoorLocks, AntiLockBrakingSystem, BrakeAssist,
           PowerSteering, DriverAirbag, PassengerAirbag, PowerWindows, CDPlayer,
@@ -197,7 +221,7 @@ async function seed() {
           vehicle_status
         ) VALUES (
           ?, ?, ?, ?, ?,
-          ?, ?,
+          ?, ?, ?, ?, ?, ?,
           ?, ?, ?, ?, ?, ?, ?,
           1, 1, 1, 1,
           1, 1, 1, 1, 0,
@@ -208,6 +232,7 @@ async function seed() {
       `, [
         v.title, v.brand, v.overview, v.price, v.fuel,
         v.transmission || 'Automatic', v.category || 'Sedan',
+        v.plate || null, v.hub || 'Pune Koregaon Park', v.odometer || 0, v.fuelPct ?? 100,
         v.year, v.seats, v.img1, v.img2, v.img3, v.img4, v.img5,
         m.sunroof || 0, m.applecarplay || 0, m.reversecamera || 0, m.cruisecontrol || 0,
         m.keylessentry || 0, m.gpsnavigation || 0, m.fastcharging || 0,
@@ -219,6 +244,10 @@ async function seed() {
         UPDATE tblvehicles SET
           Vimage1 = ?, Vimage2 = ?, Vimage3 = ?, Vimage4 = ?, Vimage5 = ?,
           PricePerDay = ?, FuelType = ?, Transmission = ?, Category = ?,
+          RegistrationPlate = COALESCE(RegistrationPlate, ?),
+          HubLocation = COALESCE(HubLocation, ?),
+          OdometerKm = IF(OdometerKm = 0, ?, OdometerKm),
+          FuelChargePct = COALESCE(FuelChargePct, ?),
           ModelYear = ?, SeatingCapacity = ?,
           Sunroof = ?, AppleCarPlay = ?, ReverseCamera = ?, CruiseControl = ?,
           KeylessEntry = ?, GPSNavigation = ?, FastCharging = ?
@@ -226,6 +255,7 @@ async function seed() {
       `, [
         v.img1, v.img2, v.img3, v.img4, v.img5,
         v.price, v.fuel, v.transmission || 'Automatic', v.category || 'Sedan',
+        v.plate || 'MH 12 WW 1000', v.hub || 'Pune Koregaon Park', v.odometer || 5000, v.fuelPct ?? 90,
         v.year, v.seats,
         m.sunroof || 0, m.applecarplay || 0, m.reversecamera || 0, m.cruisecontrol || 0,
         m.keylessentry || 0, m.gpsnavigation || 0, m.fastcharging || 0,
@@ -233,6 +263,44 @@ async function seed() {
       ]);
       console.log(`  ~ Updated vehicle images & specs: ${v.title}`);
     }
+  }
+
+  // 2b. Seed sample Fleet Ops maintenance, pricing rules, and notes if empty
+  const [[maintCount]] = await conn.execute('SELECT COUNT(*) as cnt FROM tblmaintenance');
+  if (maintCount.cnt === 0) {
+    const [vehRows] = await conn.execute('SELECT id, VehiclesTitle FROM tblvehicles ORDER BY id ASC LIMIT 3');
+    if (vehRows.length > 0) {
+      await conn.execute(
+        'INSERT INTO tblmaintenance (VehicleId, TaskTitle, DueDate, EstimatedCost, Status) VALUES (?, ?, DATE_ADD(CURDATE(), INTERVAL 4 DAY), 24500, ?)',
+        [vehRows[0].id, 'Brake Pad & Synthetic Oil Service', 'Scheduled']
+      );
+      if (vehRows[1]) {
+        await conn.execute(
+          'INSERT INTO tblmaintenance (VehicleId, TaskTitle, DueDate, EstimatedCost, Status) VALUES (?, ?, DATE_ADD(CURDATE(), INTERVAL 7 DAY), 42000, ?)',
+          [vehRows[1].id, 'Zero-Dep Insurance & PUC Renewal', 'Pending']
+        );
+      }
+      if (vehRows[2]) {
+        await conn.execute(
+          'INSERT INTO tblmaintenance (VehicleId, TaskTitle, DueDate, EstimatedCost, Status) VALUES (?, ?, CURDATE(), 6500, ?)',
+          [vehRows[2].id, 'Full Detailing & Sanitization Check', 'Completed']
+        );
+      }
+    }
+  }
+
+  await conn.execute(
+    'INSERT IGNORE INTO tblpricing_rules (id, WeekendSurgeEnabled, WeekendSurgePct, HolidaySurgeEnabled, HolidaySurgePct) VALUES (1, 0, 15, 0, 20)'
+  );
+
+  const [[notesCount]] = await conn.execute('SELECT COUNT(*) as cnt FROM tbladmin_notes');
+  if (notesCount.cnt === 0) {
+    await conn.execute(`
+      INSERT INTO tbladmin_notes (Title, Description, Category, IsDone) VALUES
+      ('Inspect sports fleet brake rotors before weekend dispatch', 'Schedule bay #2 at Pune hub for post-trip telemetry check.', 'Maintenance', 0),
+      ('Verify pending driver LMV Driving Licenses', 'Review DigiLocker KYC before key handover.', 'KYC', 0),
+      ('Sanitization audit for weekend SUV fleet', 'All inspected units passed 100% hygiene checklist.', 'Fleet Ops', 1)
+    `);
   }
 
   // 3. Seed test customer (configurable via env, generated dynamically if missing)

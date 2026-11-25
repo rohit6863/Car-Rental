@@ -1,5 +1,6 @@
 'use strict';
 const paymentsService = require('../../services/payments.service');
+const fleetOpsService = require('../../services/admin/fleetOps.service');
 
 class AdminPaymentsController {
   async getAll(req, res, next) {
@@ -34,6 +35,15 @@ class AdminPaymentsController {
       const paymentId = req.params.paymentId || req.params.id;
       const result = await paymentsService.adminReconcile(paymentId);
       res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getInvoice(req, res, next) {
+    try {
+      const invoice = await fleetOpsService.getGstInvoice(req.params.bookingId);
+      res.json(invoice);
     } catch (err) {
       next(err);
     }

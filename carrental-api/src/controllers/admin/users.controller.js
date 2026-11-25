@@ -10,6 +10,15 @@ class AdminUsersController {
       next(err);
     }
   }
+
+  async updateKyc(req, res, next) {
+    try {
+      const result = await usersService.adminUpdateKyc(req.params.id, req.body);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new AdminUsersController();
