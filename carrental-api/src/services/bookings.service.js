@@ -60,6 +60,9 @@ class BookingsService {
         bk.message,
         bk.Status,
         bk.PostingDate,
+        bk.ReturnedAt,
+        bk.ReturnOdometerKm,
+        bk.ReturnNotes,
         v.id as vid,
         v.VehiclesTitle,
         v.Vimage1,
@@ -112,6 +115,9 @@ class BookingsService {
         bk.message,
         bk.Status,
         bk.PostingDate,
+        bk.ReturnedAt,
+        bk.ReturnOdometerKm,
+        bk.ReturnNotes,
         bk.userEmail,
         u.FullName,
         v.id as vid,
@@ -235,6 +241,85 @@ class BookingsService {
       });
 
       return { success: true, message: 'Booking Cancelled and Vehicle Marked as Available' };
+    });
+  }
+
+  /**
+   * Admin: Confirm vehicle return with exact timestamp, optional odometer & inspection notes.
+   */
+  async adminReturn(bookingId, { returnedAt, returnOdometerKm, returnNotes } = {}) {
+    return withTransaction(async (conn) => {
+      const [rows] = await conn.execute(
+        'SELECT id, VehicleId, Status, ReturnedAt FROM tblbooking WHERE id = ? FOR UPDATE',
+        [bookingId]
+      );
+      if (rows.length === 0) throw new NotFoundError('Booking');
+
+      const booking = rows[0];
+      if (booking.Status !== 1) {
+        throw new ValidationError('Only confirmed bookings can be marked as returned');
+      }
+      if (booking.ReturnedAt) {
+        throw new ConflictError('Booking has already been marked as returned');
+      }
+
+      const resolvedDate = returnedAt ? new Date(returnedAt) : new Date();
+      if (isNaN(resolvedDate.getTime())) {
+        throw new ValidationError('Invalid return date/time');
+      }
+
+      const odoValue =
+        returnOdometerKm !== undefined && returnOdometerKm !== null
+          ? Number(returnOdometerKm)
+          : null;
+      const notesValue = returnNotes ? returnNotes.trim() : null;
+
+      await conn.execute(
+        'UPDATE tblbooking SET ReturnedAt = ?, ReturnOdometerKm = ?, ReturnNotes = ? WHERE id = ?',
+        [resolvedDate, odoValue, notesValue, bookingId]
+      );
+
+      if (odoValue !== null) {
+        await conn.execute(
+          'UPDATE tblvehicles SET OdometerKm = GREATEST(COALESCE(OdometerKm, 0), ?) WHERE id = ?',
+          [odoValue, booking.VehicleId]
+        );
+      }
+
+      const [activeToday] = await conn.execute(
+        `SELECT id FROM tblbooking
+         WHERE VehicleId = ?
+           AND Status = 1
+           AND ReturnedAt IS NULL
+           AND id != ?
+           AND CURDATE() BETWEEN FromDate AND ToDate`,
+        [booking.VehicleId, booking.id]
+      );
+
+      if (activeToday.length === 0) {
+        await conn.execute(
+          "UPDATE tblvehicles SET vehicle_status = 'Available' WHERE id = ?",
+          [booking.VehicleId]
+        );
+      }
+
+      auditLog('BOOKING_RETURNED_BY_ADMIN', {
+        actorType: 'admin',
+        actorId: bookingId,
+        details: {
+          vehicleId: booking.VehicleId,
+          returnedAt: resolvedDate.toISOString(),
+          returnOdometerKm: odoValue,
+        },
+      });
+
+      return {
+        success: true,
+        message: 'Vehicle return confirmed and marked Available',
+        returnedAt: resolvedDate.toISOString(),
+        returnOdometerKm: odoValue,
+        returnNotes: notesValue,
+      };
     });
   }
 

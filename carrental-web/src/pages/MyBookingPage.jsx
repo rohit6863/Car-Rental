@@ -132,6 +132,7 @@ export default function MyBookingPage() {
                         const bookingId = booking.id || booking.bookingId;
                         const isConfirmedBooking = Number(booking.Status) === 1;
                         const isCancelledBooking = Number(booking.Status) === 2;
+                        const isReturned = Boolean(booking.ReturnedAt);
                         const isPaymentConfirmed = booking.payment_status === 'confirmed';
 
                         return (
@@ -188,7 +189,17 @@ export default function MyBookingPage() {
                             <div className="vehicle_status flex flex-col items-start md:items-end gap-2.5 w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-slate-200">
                               
                               {/* Booking Status Badge */}
-                              {isConfirmedBooking ? (
+                              {isConfirmedBooking && isReturned ? (
+                                <div className="text-left md:text-right space-y-1">
+                                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
+                                    <i className="fa-solid fa-circle-check text-emerald-600 dark:text-emerald-400"></i>
+                                    <span>Returned</span>
+                                  </span>
+                                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                                    Returned on {new Date(booking.ReturnedAt).toLocaleString()}
+                                  </p>
+                                </div>
+                              ) : isConfirmedBooking ? (
                                 <a
                                   href="#"
                                   onClick={(e) => e.preventDefault()}
@@ -284,7 +295,7 @@ export default function MyBookingPage() {
                               </div>
 
                               {/* Cancel Booking Action */}
-                              {!isCancelledBooking && !isPaymentConfirmed && (
+                              {!isCancelledBooking && !isPaymentConfirmed && !isReturned && (
                                 <div className="pt-1">
                                   <button
                                     type="button"

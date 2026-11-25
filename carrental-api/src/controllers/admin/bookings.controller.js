@@ -28,6 +28,15 @@ class AdminBookingsController {
       next(err);
     }
   }
+
+  async returnBooking(req, res, next) {
+    try {
+      const result = await bookingsService.adminReturn(req.params.id, req.body);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new AdminBookingsController();

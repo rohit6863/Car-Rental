@@ -26,8 +26,23 @@ const bookingIdParamSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
 
+const returnBookingSchema = z.object({
+  returnedAt: z
+    .string()
+    .trim()
+    .refine((val) => !isNaN(Date.parse(val)), { message: 'ReturnedAt must be a valid date/time' })
+    .optional()
+    .nullable(),
+  returnOdometerKm: z.preprocess(
+    (val) => (val === '' || val === undefined || val === null ? null : val),
+    z.coerce.number().int().min(0, 'Odometer must be non-negative').max(2000000).nullable().optional()
+  ),
+  returnNotes: z.string().trim().max(255, 'Return notes must not exceed 255 characters').optional().nullable(),
+});
+
 module.exports = {
   checkAvailabilitySchema,
   createBookingSchema,
   bookingIdParamSchema,
+  returnBookingSchema,
 };
