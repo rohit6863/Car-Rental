@@ -60,7 +60,8 @@ const testFiles = [
   'auth-lockout-isolation.e2e.cjs',
   'admin-vehicle.e2e.cjs',
   'admin-management.e2e.cjs',
-  'datepicker.e2e.cjs'
+  'datepicker.e2e.cjs',
+  'modals.e2e.cjs'
 ];
 
 console.log('================================================================');
