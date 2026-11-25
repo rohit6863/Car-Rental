@@ -1,4 +1,4 @@
-# WandarWheels Car Rental — Modern Full-Stack System
+# WanderWheels Car Rental — Modern Full-Stack System
 
 A modernized, secure car rental platform built with Node.js/Express, MySQL/MariaDB, and React (Vite).
 
@@ -10,7 +10,7 @@ A modernized, secure car rental platform built with Node.js/Express, MySQL/Maria
 
 ---
 
-## Online Payment Gateway (Phase 5)
+## Online Payment Gateway Architecture
 
 The system replaces manual payment workflows with an automated payment gateway architecture behind a clean adapter interface:
 
@@ -105,7 +105,7 @@ MOCK_GATEWAY_SECRET=carrental_mock_gateway_secret_2026
    - The booking will initially show as `Not Confirm yet` (Status = 0).
 
 2. **Admin Confirms the Booking:**
-   - Log into Admin Portal at `http://localhost:5175/login` (`admin` / `AdminPassword123!`).
+   - Log into Admin Portal at `http://localhost:5175/login` (`admin` / password printed by `npm run db:setup` or configured via `SEED_ADMIN_PASSWORD`).
    - Go to **Manage Bookings** and click **Confirm** for the booking.
 
 3. **Customer Initiates Payment:**

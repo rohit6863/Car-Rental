@@ -4,12 +4,14 @@ const adminPaymentsController = require('../../controllers/admin/payments.contro
 const { requireAdmin } = require('../../middleware/auth');
 const { validate } = require('../../middleware/validate');
 const { paymentIdParamSchema } = require('../../validators/payment.validator');
+const { bookingIdParamSchema } = require('../../validators/fleetOps.validator');
 
 const router = express.Router();
 
 router.use(requireAdmin);
 
 router.get('/', adminPaymentsController.getAll);
+router.get('/:bookingId/invoice', validate({ params: bookingIdParamSchema }), adminPaymentsController.getInvoice);
 router.patch('/:id/confirm', validate({ params: paymentIdParamSchema }), adminPaymentsController.confirm);
 router.patch('/:id/reject', validate({ params: paymentIdParamSchema }), adminPaymentsController.reject);
 

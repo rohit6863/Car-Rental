@@ -26,6 +26,10 @@ export function setCsrfToken(token) {
 }
 
 api.interceptors.request.use(async (config) => {
+  if (config.data instanceof FormData) {
+    // Let the browser set multipart/form-data with the exact boundary
+    delete config.headers['Content-Type'];
+  }
   const method = config.method ? config.method.toUpperCase() : 'GET';
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
     if (!cachedCsrfToken) {
@@ -62,7 +66,7 @@ api.interceptors.response.use(
 );
 
 export function getVehicleImageUrl(filename) {
-  if (!filename) return '/assets/images/recent-car-1.jpg';
+  if (!filename) return '/assets/images/vehicle-placeholder.svg';
   if (filename.startsWith('http://') || filename.startsWith('https://')) return filename;
   // If stored as relative or plain filename, serve from /uploads/
   return `/uploads/${filename}`;

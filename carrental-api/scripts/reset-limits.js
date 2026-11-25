@@ -1,16 +1,20 @@
 'use strict';
 require('dotenv').config();
 
+const { assertSafeTestDatabase } = require('../src/db/dbGuard');
+
 const env = process.env.NODE_ENV || 'development';
-const dbName = process.env.DB_NAME;
+const dbName = (process.env.DB_NAME || 'wanderwheels_demo_test').trim();
 
 if (env === 'production' || !['development', 'test'].includes(env)) {
   console.error(`[dev:reset-limits] REFUSED: Refusing to run in production environment (NODE_ENV=${env}).`);
   process.exit(1);
 }
 
-if (dbName !== 'carrental_test') {
-  console.error(`[dev:reset-limits] REFUSED: Refusing to run against non-test database. DB_NAME must be 'carrental_test', found '${dbName}'.`);
+try {
+  assertSafeTestDatabase(dbName);
+} catch (err) {
+  console.error(`[dev:reset-limits] REFUSED: ${err.message}`);
   process.exit(1);
 }
 

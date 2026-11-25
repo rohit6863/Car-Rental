@@ -1,6 +1,6 @@
-# Phase 3: Comprehensive Security Hardening Review
+# Comprehensive Security Hardening & Threat Model Review
 
-**Target:** WandarWheels Car Rental System (`carrental-api`, `carrental-web`, `carrental-admin`)  
+**Target:** WanderWheels Car Rental System (`carrental-api`, `carrental-web`, `carrental-admin`)  
 **Date:** October 2026  
 **Auditor:** Senior Full-Stack Security Engineer  
 **Status:** Remediated & Fully Verified (All 49 Tests Passing)
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-During Phase 3, we performed a thorough threat-modeling and security-hardening review of the modernized Car Rental application across all three services. Eleven (11) distinct vulnerabilities and architectural security gaps were identified, categorized, exploited in test conditions, defensively remediated, and verified using automated test suites.
+During our security review, we performed a thorough threat-modeling and security-hardening review of the modernized Car Rental application across all three services. Eleven (11) distinct vulnerabilities and architectural security gaps were identified, categorized, exploited in test conditions, defensively remediated, and verified using automated test suites.
 
 Zero visible UI changes or breaking alterations were introduced. All 49 automated tests across 6 test suites now pass cleanly.
 
@@ -159,7 +159,7 @@ Zero visible UI changes or breaking alterations were introduced. All 49 automate
 
 ---
 
-## Phase 3b: Rate Limiter Isolation, Lockout Hardening & Dependency Upgrades
+## Rate Limiter Isolation, Lockout Hardening & Dependency Upgrades
 
 ### 1. Rate Limiter & Lockout Architecture Post-Mortem
 
@@ -179,7 +179,7 @@ During manual testing (customer login lockout test of 6 wrong attempts + forgot-
 
 #### B. Redesigned Rate Limiter Architecture
 
-In Phase 3b, rate limiting was completely redesigned into isolated purpose-built buckets:
+Rate limiting was completely redesigned into isolated purpose-built buckets:
 - `customerLoginLimiter`: `/api/auth/login` (skipSuccessfulRequests: true)
 - `adminLoginLimiter`: `/api/admin/auth/login` (skipSuccessfulRequests: true)
 - `forgotPasswordLimiter`: `/api/auth/forgot-password`, `/api/auth/reset-password`
@@ -241,7 +241,7 @@ upgradeInsecureRequests: isProd ? [] : null,
 #### C. `carrental-admin`
 - **`react-router-dom`:** Enabled future flags and upgraded to `7.18.5`.
 - **`bootstrap` (3.4.1):** Kept at 3.4.1 for legacy CSS parity. Zero `data-*` attributes are used in the admin application.
-- **`quill` (2.0.3):** Kept at 2.0.3. Advisory `GHSA-v3m3-f69x-jf25` relates to Quill's HTML export feature. In our application, all content read from the Quill editor is sanitized through `DOMPurify.sanitize()` prior to submission to the API (`AdminManagePagesPage.jsx`), and defense-in-depth sanitization (`sanitizeHtml`) is executed on the server before database storage. Verified with XSS test payload in `tests/phase3b.test.js`.
+- **`quill` (2.0.3):** Kept at 2.0.3. Advisory `GHSA-v3m3-f69x-jf25` relates to Quill's HTML export feature. In our application, all content read from the Quill editor is sanitized through `DOMPurify.sanitize()` prior to submission to the API (`AdminManagePagesPage.jsx`), and defense-in-depth sanitization (`sanitizeHtml`) is executed on the server before database storage. Verified with XSS test payload in `tests/security-hardening.test.js`.
 - **Command Output (`carrental-admin`):**
   ```
   2 vulnerabilities (1 low [quill 2.0.3], 1 moderate [bootstrap 3.4.1] - remediated via DOMPurify and static usage)
@@ -253,14 +253,14 @@ upgradeInsecureRequests: isProd ? [] : null,
 
 - **API Test Suites:** 8 passed, 8 total (77 passed, 77 total)
 - **Playwright E2E Suites:**
-  - `test-phase3b-playwright.cjs`: Customer login lockout (showing wait time in UI), admin login isolation without blockage, customer booking flow, and admin booking confirmation. **PASS (100%)**
+  - `e2e/auth-lockout-isolation.e2e.cjs`: Customer login lockout (showing wait time in UI), admin login isolation without blockage, customer booking flow, and admin booking confirmation. **PASS (100%)**
   - `test-e2e-flow.cjs`: Two customers overlapping booking race condition, admin confirmation, and inline 409 conflict error banner. **PASS (100%)**
   - `test-post-vehicle.cjs`: Real-click vehicle accessory toggling, multipart image validation, and file size limits. **PASS (100%)**
   - `test-google-playwright.cjs`: Real-click Google sign-in navigation, parameter verification at Google, full mock OIDC browser login, and cancellation flow. **PASS (100%)**
 
 ---
 
-## Phase 4: Customer Google OAuth Authentication & Pre-Hijacking Defense
+## Customer Google OAuth Authentication & Pre-Hijacking Defense
 
 **Scope:** Customer Google Sign-In (`carrental-api`, `carrental-web`)  
 **Strict Rule:** Customers only. Admins can never sign in or be created via Google.  
@@ -274,7 +274,7 @@ upgradeInsecureRequests: isProd ? [] : null,
 - **Threat Model / Attack Vector:**
   An attacker registers an account locally using a victim's email address (e.g. `victim@gmail.com`) before the victim joins the platform. When the real victim later clicks "Continue with Google", a naive OAuth implementation might associate the Google ID to the existing account without revoking credentials. The attacker could retain access using their known password or retain active session tokens created prior to the OAuth link.
 - **How to Exploit:**
-  1. Attacker registers `victim@example.com` with password `AttackerPassword123!`.
+  1. Attacker registers `victim@example.com` with password `AttackerGeneratedSecret!99`.
   2. Attacker logs in and maintains an active refresh token.
   3. Victim logs in with Google OAuth using verified email `victim@example.com`.
   4. If passwords or active sessions are not invalidated, attacker retains full persistent access through their previous credentials and refresh tokens.
@@ -350,7 +350,7 @@ upgradeInsecureRequests: isProd ? [] : null,
 
 ---
 
-### 2. Updated Authorization Matrix (Phase 4 Additions)
+### 2. Updated Authorization Matrix (Google OAuth Additions)
 
 | Method | Endpoint | Anonymous | Customer (`user`) | Admin (`admin`) | Security Enforcement |
 |:---|:---|:---:|:---:|:---:|:---|
@@ -381,7 +381,7 @@ upgradeInsecureRequests: isProd ? [] : null,
 
 ---
 
-## Phase 5: Online Payment Gateway & Security Hardening Review
+## Online Payment Gateway & Security Hardening Review
 
 ### 1. Payment Security Findings & Remediation Register
 
@@ -445,7 +445,7 @@ upgradeInsecureRequests: isProd ? [] : null,
 
 ---
 
-### 3. Verification Test Results (Phase 5)
+### 3. Verification Test Results
 
 - **Automated Unit & Integration Tests (`carrental-api`):**
   - `tests/payment-gateway.test.js`: 23 tests passing (100%).

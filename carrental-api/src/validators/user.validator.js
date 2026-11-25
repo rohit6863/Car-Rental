@@ -10,6 +10,15 @@ const profileUpdateSchema = z.object({
   country: z.string().trim().max(100).optional().default(''),
 });
 
+const kycSubmitSchema = z.object({
+  drivingLicenseNo: z
+    .string()
+    .trim()
+    .min(5, 'Driving License number must be at least 5 characters')
+    .max(50, 'Driving License number must not exceed 50 characters'),
+});
+
 module.exports = {
   profileUpdateSchema,
+  kycSubmitSchema,
 };

@@ -50,6 +50,24 @@ class AdminVehiclesController {
     }
   }
 
+  async updateStatus(req, res, next) {
+    try {
+      const result = await vehiclesService.adminUpdateStatus(req.params.id, req.body.status);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async updateTelematics(req, res, next) {
+    try {
+      const result = await vehiclesService.adminUpdateTelematics(req.params.id, req.body);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async delete(req, res, next) {
     try {
       await vehiclesService.adminDelete(req.params.id);

@@ -29,8 +29,8 @@ class PaymentsService {
    */
   async mockSimulate({ orderId, action, method, reason }) {
     const isProd = process.env.NODE_ENV === 'production';
-    const dbName = process.env.DB_NAME || '';
-    if (isProd || dbName !== 'carrental_test') {
+    const dbName = (process.env.DB_NAME || '').trim().toLowerCase();
+    if (isProd || !dbName.endsWith('_test') || dbName === 'carrental') {
       throw new ForbiddenError('Mock simulation is disabled in this environment');
     }
     const gateway = requirePaymentGateway();
@@ -90,9 +90,9 @@ class PaymentsService {
         }
         await conn.execute(`
           UPDATE tblpayments
-          SET amount = ?, payment_method = ?, transaction_id = ?, payment_status = 'pending', payment_date = NOW(), gateway = 'manual'
+          SET user_email = ?, amount = ?, payment_method = ?, transaction_id = ?, payment_status = 'pending', payment_date = NOW(), gateway = 'manual'
           WHERE id = ?
-        `, [totalAmount, payment_method, transaction_id, existing[0].id]);
+        `, [booking.userEmail || userEmail, totalAmount, payment_method, transaction_id, existing[0].id]);
 
         return {
           id: existing[0].id,
@@ -104,9 +104,9 @@ class PaymentsService {
       }
 
       const [result] = await conn.execute(`
-        INSERT INTO tblpayments (booking_id, amount, payment_method, transaction_id, payment_status, currency, gateway)
-        VALUES (?, ?, ?, ?, 'pending', 'INR', 'manual')
-      `, [booking_id, totalAmount, payment_method, transaction_id]);
+        INSERT INTO tblpayments (booking_id, user_email, amount, payment_method, transaction_id, payment_status, currency, gateway)
+        VALUES (?, ?, ?, ?, ?, 'pending', 'INR', 'manual')
+      `, [booking_id, booking.userEmail || userEmail, totalAmount, payment_method, transaction_id]);
 
       return {
         id: result.insertId,
@@ -211,15 +211,15 @@ class PaymentsService {
       if (existing.length > 0) {
         await conn.execute(`
           UPDATE tblpayments
-          SET gateway = ?, gateway_order_id = ?, amount = ?, currency = 'INR',
+          SET user_email = ?, gateway = ?, gateway_order_id = ?, amount = ?, currency = 'INR',
               payment_status = 'pending', payment_date = NOW(), transaction_id = NULL
           WHERE id = ?
-        `, [gateway.name, order.id, totalAmount, existing[0].id]);
+        `, [booking.userEmail || userEmail, gateway.name, order.id, totalAmount, existing[0].id]);
       } else {
         await conn.execute(`
-          INSERT INTO tblpayments (booking_id, gateway, gateway_order_id, amount, currency, payment_status, payment_date)
-          VALUES (?, ?, ?, ?, 'INR', 'pending', NOW())
-        `, [booking.id, gateway.name, order.id, totalAmount]);
+          INSERT INTO tblpayments (booking_id, user_email, gateway, gateway_order_id, amount, currency, payment_status, payment_date)
+          VALUES (?, ?, ?, ?, ?, 'INR', 'pending', NOW())
+        `, [booking.id, booking.userEmail || userEmail, gateway.name, order.id, totalAmount]);
       }
 
       auditLog('PAYMENT_ORDER_CREATED', {

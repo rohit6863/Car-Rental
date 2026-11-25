@@ -34,6 +34,7 @@ const adminSubscriberRoutes  = require('./routes/admin/subscribers.routes');
 const adminPageRoutes        = require('./routes/admin/pages.routes');
 const adminContactInfoRoutes = require('./routes/admin/contactInfo.routes');
 const adminAuthRoutes        = require('./routes/admin/auth.routes');
+const adminFleetOpsRoutes    = require('./routes/admin/fleetOps.routes');
 
 const app = express();
 
@@ -146,6 +147,7 @@ app.use('/api/admin/queries',     adminQueryRoutes);
 app.use('/api/admin/subscribers', adminSubscriberRoutes);
 app.use('/api/admin/pages',       adminPageRoutes);
 app.use('/api/admin/contact-info',adminContactInfoRoutes);
+app.use('/api/admin',             adminFleetOpsRoutes);
 
 // ─── 404 catch ────────────────────────────────────────────────────────────────
 app.use((_req, res) => res.status(404).json({ error: 'Not found' }));

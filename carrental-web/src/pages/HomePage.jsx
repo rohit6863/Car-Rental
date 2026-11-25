@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import LoginModal from '../components/LoginModal';
@@ -8,149 +8,308 @@ import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import api, { getVehicleImageUrl } from '../api/client';
 
 export default function HomePage() {
+  const navigate = useNavigate();
   const [vehicles, setVehicles] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBrand, setSelectedBrand] = useState('');
+  const [selectedFuel, setSelectedFuel] = useState('');
 
   useEffect(() => {
-    async function fetchVehicles() {
+    let isMounted = true;
+    async function loadData() {
       try {
-        const res = await api.get('/api/vehicles');
-        setVehicles(res.data);
+        const [vRes, bRes] = await Promise.all([
+          api.get('/api/vehicles'),
+          api.get('/api/brands').catch(() => ({ data: [] })),
+        ]);
+        if (isMounted) {
+          setVehicles(vRes.data || []);
+          setBrands(bRes.data || []);
+        }
       } catch (err) {
         console.error('Failed to load vehicles', err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     }
-    fetchVehicles();
+    loadData();
+    return () => { isMounted = false; };
   }, []);
 
+  const handleQuickSearch = (e) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (selectedBrand) params.append('brand', selectedBrand);
+    if (selectedFuel) params.append('fuel', selectedFuel);
+    navigate(`/car-listing?${params.toString()}`);
+  };
+
   return (
-    <>
+    <div className="min-h-screen flex flex-col transition-colors">
       <Header />
 
-      {/* Banners */}
-      <section id="banner" className="banner-section">
-        <div className="container">
-          <div className="div_zindex">
-            <div className="row">
-              <div className="col-md-5 col-md-push-7">
-                <div className="banner_content">
-                  <h1>Find the right car for you.</h1>
-                  <p>We have more than a thousand cars for you to choose. </p>
-                  <Link to="/car-listing" className="btn">
-                    Read More{' '}
-                    <span className="angle_arrow">
-                      <i className="fa fa-angle-right" aria-hidden="true"></i>
+      <main className="flex-grow">
+        {/* ==================== HERO SECTION ==================== */}
+        <section className="relative bg-brand-darker overflow-hidden py-14 lg:py-20 text-white">
+          {/* Hero Ambient Gradient & Grid Pattern */}
+          <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 hero-gradient"></div>
+            <div className="absolute inset-0 bg-radial from-brand-red/10 via-transparent to-transparent opacity-50"></div>
+          </div>
+
+          <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+              
+              {/* Left Column: Heading & CTA */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-amber-400 text-xs font-bold uppercase tracking-wider">
+                  <i className="fa-solid fa-sparkles text-xs"></i>
+                  <span>Premium Self-Drive Fleet</span>
+                </div>
+
+                <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-tight">
+                  FIND THE RIGHT <br />
+                  <span className="text-brand-red">CAR FOR YOU.</span>
+                </h1>
+
+                <p className="text-slate-300 text-base sm:text-lg max-w-xl font-medium leading-relaxed">
+                  We have more than a thousand cars for you to choose. Explore verified sedans, SUVs, and luxury models with transparent pricing and zero hidden fees.
+                </p>
+
+                <div className="pt-2 flex flex-wrap items-center gap-4">
+                  <Link
+                    to="/car-listing"
+                    className="bg-brand-red hover:bg-brand-darkRed text-white font-bold text-sm px-7 py-3.5 rounded-xl shadow-glow flex items-center gap-3 group transition-all"
+                  >
+                    <span>Explore Fleet</span>
+                    <span className="w-5 h-5 rounded-full bg-white text-brand-red flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                      <i className="fa-solid fa-chevron-right text-[10px]"></i>
                     </span>
+                  </Link>
+                  <Link
+                    to="/page/aboutus"
+                    className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm px-6 py-3.5 rounded-xl border border-slate-700 flex items-center gap-2 transition-all"
+                  >
+                    <span>Why WanderWheels</span>
                   </Link>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* /Banners */}
 
-      {/* Resent Cat */}
-      <section className="section-padding gray-bg">
-        <div className="container">
-          <div className="section-header text-center">
-            <h2>
-              Find the Best <span>CarForYou</span>
-            </h2>
-            <p style={{ whiteSpace: 'pre-line' }}>
-              {`At WanderWheels, we believe every adventure deserves the perfect ride. Whether you're exploring a new city, embarking on a road trip, or just need a reliable set of wheels, we've got you covered. With a wide selection of well-maintained vehicles, flexible rental options, and unbeatable prices, we make hitting the road effortless.
-
-Why Choose WanderWheels?
-✔ Variety of Vehicles – From compact cars to spacious SUVs
-✔ Affordable Rates – Competitive pricing with no hidden fees
-✔ Easy Booking – Quick online reservations & 24/7 support
-✔ Seamless Experience – Pick-up and drop-off made simple
-
-Start your journey with WanderWheels today – where freedom meets the open road! Rent. Drive. Explore.`}
-            </p>
-          </div>
-          <div className="row">
-            {/* Nav tabs */}
-            <div className="recent-tab">
-              <ul className="nav nav-tabs" role="tablist">
-                <li role="presentation" className="active">
-                  <a href="#resentnewcar" role="tab" data-toggle="tab">
-                    New Car
-                  </a>
-                </li>
-              </ul>
-            </div>
-            {/* Recently Listed New Cars */}
-            <div className="tab-content">
-              <div role="tabpanel" className="tab-pane active" id="resentnewcar">
-                {loading ? (
-                  <div className="text-center" style={{ padding: '40px' }}>
-                    Loading vehicles...
+              {/* Right Column: Fleet Showcase Graphic Card */}
+              <div className="lg:col-span-5">
+                <div className="relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl bg-slate-900/80 backdrop-blur-md p-6 space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                    <span className="text-xs font-bold uppercase tracking-widest text-amber-400">
+                      WanderWheels Fleet
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-extrabold uppercase">
+                      Instant Booking
+                    </span>
                   </div>
-                ) : (
-                  vehicles.map((v) => (
-                    <div className="col-list-3" key={v.id}>
-                      <div className="recent-car-list">
-                        <div className="car-info-box">
-                          <Link to={`/vehical-details/${v.id}`}>
-                            <img
-                              src={getVehicleImageUrl(v.Vimage1)}
-                              className="img-responsive"
-                              alt="image"
-                              style={{ width: '100%', height: '220px', objectFit: 'cover' }}
-                            />
+
+                  <div className="grid grid-cols-2 gap-3 py-2">
+                    <div className="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700/80">
+                      <p className="text-[11px] text-slate-400 font-semibold">Self-Drive Fleet</p>
+                      <p className="text-xl font-extrabold text-white mt-1">100%</p>
+                      <p className="text-[10px] text-emerald-400 mt-0.5">Inspected & Sanitized</p>
+                    </div>
+                    <div className="bg-slate-800/80 p-3.5 rounded-2xl border border-slate-700/80">
+                      <p className="text-[11px] text-slate-400 font-semibold">Pricing</p>
+                      <p className="text-xl font-extrabold text-amber-400 mt-1">Per Day</p>
+                      <p className="text-[10px] text-slate-300 mt-0.5">Zero Hidden Charges</p>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 text-xs text-slate-400 leading-relaxed">
+                    Book seamlessly online, pay securely via gateway, and enjoy door-to-door or hub pickup with 24/7 roadside assistance.
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* QUICK SEARCH BAR */}
+            <div className="surface-card bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl p-4 sm:p-6 shadow-2xl border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 transition-colors">
+              <form onSubmit={handleQuickSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
+                
+                {/* Brand Selector */}
+                <div className="lg:col-span-5">
+                  <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                    <i className="fa-solid fa-car text-brand-red mr-1"></i> Select Brand
+                  </label>
+                  <select
+                    className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-red"
+                    value={selectedBrand}
+                    onChange={(e) => setSelectedBrand(e.target.value)}
+                  >
+                    <option value="" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">All Brands</option>
+                    {brands.map((b) => (
+                      <option key={b.id} value={b.id} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+                        {b.BrandName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Fuel Type Selector */}
+                <div className="lg:col-span-4">
+                  <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                    <i className="fa-solid fa-gas-pump text-amber-500 mr-1"></i> Fuel Type
+                  </label>
+                  <select
+                    className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-red"
+                    value={selectedFuel}
+                    onChange={(e) => setSelectedFuel(e.target.value)}
+                  >
+                    <option value="" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">All Fuel Types</option>
+                    <option value="Petrol" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Petrol</option>
+                    <option value="Diesel" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Diesel</option>
+                    <option value="Electric" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Electric</option>
+                    <option value="CNG" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">CNG</option>
+                    <option value="Hybrid" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Hybrid</option>
+                  </select>
+                </div>
+
+                {/* Submit Search Button */}
+                <div className="lg:col-span-3">
+                  <button
+                    type="submit"
+                    className="w-full py-2.5 px-4 rounded-xl bg-brand-red hover:bg-brand-darkRed text-white font-bold text-sm uppercase tracking-wider shadow-md hover:shadow-glow transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
+                  >
+                    <i className="fa-solid fa-magnifying-glass text-xs"></i>
+                    <span>Find Cars</span>
+                  </button>
+                </div>
+
+              </form>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ==================== FEATURED FLEET SECTION ==================== */}
+        <section className="py-16 sm:py-20 bg-brand-light dark:bg-brand-darker transition-colors">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            
+            {/* Header & Description */}
+            <div className="text-center max-w-3xl mx-auto space-y-4">
+              <span className="px-3.5 py-1 rounded-full bg-brand-red/10 text-brand-red text-xs font-extrabold uppercase tracking-widest border border-brand-red/20 inline-block">
+                Our Showcase Fleet
+              </span>
+              <h2 className="text-adaptive-main font-display font-extrabold text-3xl sm:text-4xl tracking-tight text-slate-900 dark:text-white">
+                Find the Best <span className="text-brand-red">Car For You</span>
+              </h2>
+              <p className="text-adaptive-sub text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+                At WanderWheels, we believe every adventure deserves the perfect ride. Whether you're exploring a new city, embarking on a road trip, or just need a reliable set of wheels, we've got you covered.
+              </p>
+            </div>
+
+            {/* Vehicle Grid */}
+            {loading ? (
+              <div className="text-center py-12 text-slate-500 dark:text-slate-400 font-semibold">
+                <i className="fa-solid fa-spinner fa-spin text-brand-red text-2xl mb-2 block"></i>
+                <span>Loading available vehicles...</span>
+              </div>
+            ) : vehicles.length === 0 ? (
+              <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+                No vehicles available currently.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {vehicles.map((v) => (
+                  <div
+                    key={v.id}
+                    className="surface-card group bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-card hover:shadow-2xl hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-300 flex flex-col"
+                  >
+                    {/* Vehicle Image Container */}
+                    <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
+                      <Link to={`/vehical-details/${v.id}`} className="block w-full h-full">
+                        <img
+                          src={getVehicleImageUrl(v.Vimage1)}
+                          alt={v.VehiclesTitle}
+                          className="w-full h-full object-cover card-image-zoom"
+                          loading="lazy"
+                        />
+                      </Link>
+
+                      {/* Brand Badge */}
+                      <span className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-white font-extrabold text-[11px] uppercase tracking-wider border border-white/10">
+                        {v.BrandName}
+                      </span>
+
+                      {/* Price Badge */}
+                      <span className="absolute bottom-3.5 right-3.5 px-3 py-1.5 rounded-xl bg-brand-red text-white font-black text-sm shadow-md">
+                        Rs. {v.PricePerDay} <span className="text-[10px] font-bold uppercase opacity-85">/ Day</span>
+                      </span>
+                    </div>
+
+                    {/* Vehicle Details Content */}
+                    <div className="p-5 flex flex-col flex-grow justify-between space-y-4">
+                      <div>
+                        <h3 className="font-display font-extrabold text-lg text-slate-900 dark:text-white group-hover:text-brand-red transition-colors line-clamp-1">
+                          <Link to={`/vehical-details/${v.id}`} className="text-slate-900 dark:text-white hover:text-brand-red transition-colors">
+                            {v.VehiclesTitle}
                           </Link>
-                          <ul>
-                            <li>
-                              <i className="fa fa-car" aria-hidden="true"></i>
-                              {v.FuelType}
-                            </li>
-                            <li>
-                              <i className="fa fa-calendar" aria-hidden="true"></i>
-                              {v.ModelYear} Model
-                            </li>
-                            <li>
-                              <i className="fa fa-user" aria-hidden="true"></i>
-                              {v.SeatingCapacity} seats
-                            </li>
-                          </ul>
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                          {v.VehiclesOverview || 'Verified luxury performance vehicle with premium safety features.'}
+                        </p>
+                      </div>
+
+                      {/* Specs Row */}
+                      <div className="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-semibold text-center">
+                        <div className="flex flex-col items-center">
+                          <i className="fa-solid fa-gas-pump text-amber-500 mb-1"></i>
+                          <span>{v.FuelType}</span>
                         </div>
-                        <div className="car-title-m">
-                          <h6>
-                            <Link to={`/vehical-details/${v.id}`}>
-                              {v.BrandName} , {v.VehiclesTitle}
-                            </Link>
-                          </h6>
-                          <span className="price">Rs.{v.PricePerDay} /Day</span>
+                        <div className="flex flex-col items-center">
+                          <i className="fa-solid fa-calendar text-brand-red mb-1"></i>
+                          <span>{v.ModelYear} Model</span>
                         </div>
-                        <div className="inventory_info_m">
-                          <p>{v.VehiclesOverview ? v.VehiclesOverview.substring(0, 70) : ''}</p>
+                        <div className="flex flex-col items-center">
+                          <i className="fa-solid fa-user-group text-blue-500 mb-1"></i>
+                          <span>{v.SeatingCapacity} Seats</span>
                         </div>
                       </div>
+
+                      {/* Action Button */}
+                      <div>
+                        <Link
+                          to={`/vehical-details/${v.id}`}
+                          className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-brand-red dark:bg-slate-800 dark:hover:bg-brand-red text-white hover:text-white font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+                        >
+                          <span>View Details</span>
+                          <i className="fa-solid fa-arrow-right text-[10px]"></i>
+                        </Link>
+                      </div>
                     </div>
-                  ))
-                )}
+                  </div>
+                ))}
               </div>
+            )}
+
+            {/* Bottom View All Link */}
+            <div className="text-center pt-4">
+              <Link
+                to="/car-listing"
+                className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-brand-red text-white hover:text-white font-bold text-xs uppercase tracking-wider transition-all"
+              >
+                <span>View All Fleet</span>
+                <i className="fa-solid fa-chevron-right text-[10px]"></i>
+              </Link>
             </div>
+
           </div>
-        </div>
-      </section>
-      {/* /Resent Cat */}
+        </section>
+      </main>
 
       <Footer />
 
-      {/* Back to top */}
-      <div id="back-top" className="back-top">
-        <a href="#top" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-          <i className="fa fa-angle-up" aria-hidden="true"></i>
-        </a>
-      </div>
-
+      {/* Auth Modals */}
       <LoginModal />
       <SignupModal />
       <ForgotPasswordModal />
-    </>
+    </div>
   );
 }

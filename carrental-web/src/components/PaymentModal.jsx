@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import client from '../api/client';
+import useModalFocusTrap from '../hooks/useModalFocusTrap';
 
 export default function PaymentModal({ booking, onClose, onSuccess }) {
   const [config, setConfig] = useState(null);
@@ -11,8 +12,38 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [pollCount, setPollCount] = useState(0);
   const pollTimerRef = useRef(null);
+  const dialogRef = useRef(null);
+  const openerRef = useRef(null);
 
   const isProd = import.meta.env.PROD;
+  const isOpen = Boolean(booking);
+
+  const handleSafeClose = useCallback(() => {
+    if (step !== 'preparing' && step !== 'verifying') {
+      onClose();
+    }
+  }, [step, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    openerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    document.body.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      const opener = openerRef.current;
+      openerRef.current = null;
+      if (opener && opener.isConnected && typeof opener.focus === 'function') {
+        requestAnimationFrame(() => {
+          if (opener.isConnected) opener.focus();
+        });
+      }
+    };
+  }, [isOpen]);
+
+  useModalFocusTrap(isOpen, dialogRef, handleSafeClose);
 
   useEffect(() => {
     let isMounted = true;
@@ -100,7 +131,7 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
         key: order.keyId,
         amount: order.amount,
         currency: order.currency || 'INR',
-        name: 'WandarWheels Car Rental',
+        name: 'WanderWheels',
         description: `Booking #${bookingId}`,
         order_id: order.orderId,
         handler: async (response) => {
@@ -240,238 +271,109 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
   const isMockGateway = Boolean(!isProd && config && config.gateway === 'mock');
 
   return (
-    <div className="modal payment-modal-overlay">
-      <style>{`
-        .payment-modal-overlay {
-          display: block;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-color: rgba(0, 0, 0, 0.6);
-          overflow-y: auto;
-          overflow-x: hidden;
-          z-index: 1050;
-          box-sizing: border-box;
-          padding: 10px;
+    <div
+      ref={dialogRef}
+      tabIndex={-1}
+      className="modal payment-modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto overflow-x-hidden"
+      role="dialog"
+      aria-modal="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          handleSafeClose();
         }
-        .payment-modal-dialog {
-          margin: 60px auto;
-          max-width: 550px;
-          width: 100%;
-          box-sizing: border-box;
-        }
-        .payment-modal-content {
-          border-radius: 6px;
-          background: #fff;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-          overflow: hidden;
-          box-sizing: border-box;
-          width: 100%;
-          border: 1px solid rgba(0, 0, 0, 0.2);
-        }
-        .payment-btn {
-          min-height: 44px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 14px;
-          font-weight: 600;
-          padding: 10px 16px;
-          box-sizing: border-box;
-          cursor: pointer;
-          border-radius: 4px;
-        }
-        .mock-action-buttons {
-          display: flex;
-          gap: 10px;
-          flex-wrap: wrap;
-        }
-        .mock-action-buttons .payment-btn {
-          flex: 1 1 auto;
-        }
-        .booking-amount-highlight {
-          font-size: 16px;
-          color: #fa2837;
-          font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-          .payment-modal-overlay {
-            padding: 8px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-          }
-          .payment-modal-dialog {
-            margin: 0 auto !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            max-height: calc(100vh - 16px) !important;
-            display: flex !important;
-            flex-direction: column !important;
-          }
-          .payment-modal-content {
-            max-height: calc(100vh - 16px) !important;
-            display: flex !important;
-            flex-direction: column !important;
-            border-radius: 8px !important;
-            width: 100% !important;
-          }
-          .payment-modal-header {
-            padding: 12px 14px !important;
-            flex-shrink: 0 !important;
-            border-bottom: 1px solid #e5e5e5;
-          }
-          .payment-modal-header .close {
-            min-width: 44px;
-            min-height: 44px;
-            margin-top: -6px;
-            font-size: 28px;
-            line-height: 44px;
-            text-align: center;
-            opacity: 0.8;
-          }
-          .payment-modal-body {
-            overflow-y: auto !important;
-            -webkit-overflow-scrolling: touch !important;
-            flex: 1 1 auto !important;
-            padding: 14px !important;
-            max-height: calc(100vh - 150px) !important;
-            box-sizing: border-box;
-          }
-          .payment-modal-footer {
-            flex-shrink: 0 !important;
-            padding: 12px 14px !important;
-            display: flex !important;
-            flex-direction: column-reverse !important;
-            gap: 8px !important;
-            border-top: 1px solid #e5e5e5;
-          }
-          .payment-modal-footer .payment-btn {
-            width: 100% !important;
-            margin: 0 !important;
-            font-size: 15px !important;
-          }
-          .mock-action-buttons {
-            flex-direction: column !important;
-            gap: 8px !important;
-          }
-          .mock-action-buttons .payment-btn {
-            width: 100% !important;
-            font-size: 14px !important;
-          }
-          .mock-tabs {
-            display: flex !important;
-            width: 100% !important;
-            margin-bottom: 12px !important;
-          }
-          .mock-tabs > li {
-            flex: 1 1 0 !important;
-            text-align: center !important;
-          }
-          .mock-tabs > li > a {
-            padding: 10px 4px !important;
-            font-size: 12px !important;
-            min-height: 44px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-          }
-          .booking-amount-highlight {
-            font-size: 18px !important;
-          }
-        }
-      `}</style>
-
-      <div className="modal-dialog payment-modal-dialog">
-        <div className="modal-content payment-modal-content">
-          <div className="modal-header payment-modal-header">
+      }}
+    >
+      <div className="modal-dialog payment-modal-dialog w-full max-w-lg mx-auto my-auto">
+        <div className="modal-content payment-modal-content surface-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-1.5rem)] transition-colors">
+          
+          {/* Header */}
+          <div className="modal-header payment-modal-header bg-brand-dark text-white px-5 py-4 flex items-center justify-between gap-3 border-b border-slate-800 flex-shrink-0">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <i className="fa-solid fa-shield-halved text-brand-red text-base flex-shrink-0"></i>
+              <h4 className="modal-title font-display font-extrabold text-sm sm:text-base text-white truncate">
+                Secure Online Payment — Booking #{bookingId}
+              </h4>
+            </div>
             <button
               type="button"
-              className="close"
+              className="close w-11 h-11 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none flex-shrink-0 cursor-pointer disabled:opacity-50"
               onClick={onClose}
               aria-label="Close"
               disabled={step === 'preparing' || step === 'verifying'}
             >
-              <span aria-hidden="true">&times;</span>
+              <span aria-hidden="true" className="text-xl leading-none">&times;</span>
             </button>
-            <h4 className="modal-title" style={{ fontSize: '16px', fontWeight: 'bold' }}>
-              Secure Online Payment — Booking #{bookingId}
-            </h4>
           </div>
 
-          <div className="modal-body payment-modal-body">
+          {/* Body */}
+          <div className="modal-body payment-modal-body p-5 space-y-4 overflow-y-auto flex-1 text-slate-800 dark:text-slate-100">
             {/* Mock Safety Banner */}
             {isMockGateway && (
-              <div
-                className="alert alert-warning"
-                style={{
-                  backgroundColor: '#fff3cd',
-                  color: '#856404',
-                  borderColor: '#ffeeba',
-                  padding: '10px 14px',
-                  marginBottom: '15px',
-                  borderRadius: '4px',
-                  fontSize: '13px',
-                }}
-              >
+              <div className="alert alert-warning p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs font-medium leading-relaxed">
+                <i className="fa-solid fa-flask mr-1.5 text-amber-600 dark:text-amber-400"></i>
                 <strong>Test Mode:</strong> Test payment gateway (mock): no real money is charged.
               </div>
             )}
 
             {/* Gateway Unavailable Warning */}
             {!configLoading && !isOnlineAvailable && (
-              <div className="alert alert-danger" style={{ marginBottom: '15px' }}>
+              <div className="alert alert-danger p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold">
+                <i className="fa-solid fa-circle-xmark mr-1.5 text-rose-600 dark:text-rose-400"></i>
                 Online payments are currently unavailable. Please contact support.
               </div>
             )}
 
             {/* Booking Summary Box */}
-            <div
-              style={{
-                backgroundColor: '#f9f9f9',
-                border: '1px solid #e1e1e1',
-                padding: '14px',
-                borderRadius: '4px',
-                marginBottom: '18px',
-              }}
-            >
-              <h5 style={{ margin: '0 0 10px 0', borderBottom: '1px solid #ddd', paddingBottom: '6px' }}>
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-2.5">
+              <h5 className="font-display font-bold text-sm text-slate-900 dark:text-white pb-2 border-b border-slate-200 dark:border-slate-700">
                 Booking Summary
               </h5>
-              <div style={{ fontSize: '13px', lineHeight: '1.8' }}>
-                <div><strong>Vehicle:</strong> {booking.BrandName ? `${booking.BrandName}, ` : ''}{booking.VehiclesTitle}</div>
-                <div><strong>Dates:</strong> {booking.FromDate} to {booking.ToDate}</div>
-                <div><strong>Rate per Day:</strong> Rs. {booking.PricePerDay}</div>
-                <div style={{ marginTop: '8px', fontSize: '15px', color: '#111' }}>
-                  <strong>Total Amount:</strong> <span className="booking-amount-highlight">Rs. {booking.totalAmount}</span>
+              <div className="text-xs sm:text-sm space-y-1.5 text-slate-600 dark:text-slate-300">
+                <div className="flex justify-between gap-2">
+                  <strong className="text-slate-700 dark:text-slate-200">Vehicle:</strong>
+                  <span className="font-semibold text-right text-slate-900 dark:text-white">
+                    {booking.BrandName ? `${booking.BrandName}, ` : ''}{booking.VehiclesTitle}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-2">
+                  <strong className="text-slate-700 dark:text-slate-200">Dates:</strong>
+                  <span className="font-semibold text-right">{booking.FromDate} to {booking.ToDate}</span>
+                </div>
+                <div className="flex justify-between gap-2">
+                  <strong className="text-slate-700 dark:text-slate-200">Rate per Day:</strong>
+                  <span className="font-semibold text-right">Rs. {booking.PricePerDay}</span>
+                </div>
+                <div className="flex justify-between items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-700 text-sm sm:text-base">
+                  <strong className="text-slate-900 dark:text-white">Total Amount:</strong>
+                  <span className="booking-amount-highlight font-black text-brand-red">Rs. {booking.totalAmount}</span>
                 </div>
               </div>
             </div>
 
             {/* Error Message Display */}
             {errorMessage && (
-              <div className="alert alert-danger" style={{ marginBottom: '15px' }}>
+              <div className="alert alert-danger p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold leading-relaxed">
+                <i className="fa-solid fa-triangle-exclamation mr-1.5 text-rose-600 dark:text-rose-400"></i>
                 {errorMessage}
               </div>
             )}
 
             {/* State: Preparing / Verifying */}
             {(step === 'preparing' || step === 'verifying') && (
-              <div className="text-center" style={{ padding: '20px 0' }}>
-                <p style={{ fontSize: '16px', fontWeight: 'bold' }}>
+              <div className="text-center py-6 space-y-2">
+                <i className="fa-solid fa-spinner fa-spin text-brand-red text-2xl"></i>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">
                   {step === 'preparing' ? 'Preparing payment...' : 'Verifying payment with gateway...'}
                 </p>
-                <div style={{ color: '#777', fontSize: '13px' }}>Please do not close this window.</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400">Please do not close this window.</div>
               </div>
             )}
 
             {/* State: Polling */}
             {step === 'polling' && (
-              <div className="text-center" style={{ padding: '20px 0' }}>
-                <p style={{ fontSize: '15px', fontWeight: 'bold', color: '#31708f' }}>
+              <div className="text-center py-6 space-y-2">
+                <i className="fa-solid fa-spinner fa-spin text-sky-500 text-2xl"></i>
+                <p className="text-sm font-bold text-sky-700 dark:text-sky-300">
                   Payment pending confirmation. Refreshing... (attempt {pollCount}/5)
                 </p>
               </div>
@@ -479,38 +381,41 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
 
             {/* State: Polling Stopped */}
             {step === 'polling_stopped' && (
-              <div className="alert alert-info">
+              <div className="alert alert-info p-4 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 text-sky-800 dark:text-sky-200 text-xs font-semibold">
                 Payment is being processed. Please check back shortly.
               </div>
             )}
 
             {/* State: Success */}
             {step === 'success' && (
-              <div className="alert alert-success" style={{ padding: '16px' }}>
-                <h4 style={{ margin: '0 0 8px 0' }}>Payment Successful!</h4>
-                <p style={{ margin: '0 0 12px 0' }}>
+              <div className="alert alert-success p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100 space-y-3">
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-circle-check text-emerald-600 dark:text-emerald-400 text-lg"></i>
+                  <h4 className="font-display font-extrabold text-base">Payment Successful!</h4>
+                </div>
+                <p className="text-xs sm:text-sm text-emerald-800 dark:text-emerald-200">
                   Payment of Rs. {booking.totalAmount} was confirmed successfully.
                 </p>
                 <Link
                   to={`/receipt/${bookingId}`}
                   target="_blank"
-                  className="btn btn-success payment-btn"
-                  style={{ textDecoration: 'none' }}
+                  className="payment-btn inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-2.5 min-h-[48px] rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white hover:text-white font-bold text-xs uppercase tracking-wider shadow-sm transition-colors"
                 >
-                  View Receipt
+                  <i className="fa-solid fa-receipt text-xs"></i>
+                  <span>View Receipt</span>
                 </Link>
               </div>
             )}
 
             {/* State: Failed */}
             {step === 'failed' && (
-              <div className="alert alert-danger" style={{ padding: '14px' }}>
-                <p style={{ margin: '0 0 10px 0' }}>
+              <div className="alert alert-danger p-4 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 space-y-3">
+                <p className="text-xs sm:text-sm font-semibold">
                   Payment failed. Your booking is still confirmed. You can try again.
                 </p>
                 <button
                   type="button"
-                  className="btn btn-primary payment-btn"
+                  className="payment-btn w-full sm:w-auto px-5 py-2.5 min-h-[48px] rounded-xl bg-brand-red hover:bg-brand-darkRed text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
                   onClick={handleRetry}
                 >
                   Retry
@@ -520,13 +425,13 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
 
             {/* State: Cancelled */}
             {step === 'cancelled' && (
-              <div className="alert alert-warning" style={{ padding: '14px' }}>
-                <p style={{ margin: '0 0 10px 0' }}>
+              <div className="alert alert-warning p-4 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 space-y-3">
+                <p className="text-xs sm:text-sm font-semibold">
                   Payment cancelled. You can try again.
                 </p>
                 <button
                   type="button"
-                  className="btn btn-primary payment-btn"
+                  className="payment-btn w-full sm:w-auto px-5 py-2.5 min-h-[48px] rounded-xl bg-brand-red hover:bg-brand-darkRed text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
                   onClick={handleRetry}
                 >
                   Retry
@@ -536,92 +441,108 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
 
             {/* State: Mock Checkout Popup */}
             {!isProd && step === 'mock_checkout' && (
-              <div
-                style={{
-                  border: '2px dashed #0088cc',
-                  padding: '16px',
-                  borderRadius: '6px',
-                  backgroundColor: '#f0f8ff',
-                  marginTop: '10px',
-                }}
-              >
-                <h5 style={{ margin: '0 0 12px 0', color: '#0088cc' }}>
+              <div className="p-4 rounded-xl border-2 border-dashed border-sky-400 dark:border-sky-600 bg-sky-50/70 dark:bg-sky-950/30 space-y-4">
+                <h5 className="font-display font-bold text-sm text-sky-700 dark:text-sky-300">
                   Mock Payment Simulator (Local Development Only)
                 </h5>
 
                 {/* Decorative Tabs */}
-                <ul className="nav nav-tabs mock-tabs" style={{ marginBottom: '14px' }}>
-                  <li className={mockTab === 'upi' ? 'active' : ''}>
-                    <a href="#" onClick={(e) => { e.preventDefault(); setMockTab('upi'); }}>
+                <ul className="mock-tabs grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                  <li>
+                    <a
+                      href="#"
+                      onClick={(e) => { e.preventDefault(); setMockTab('upi'); }}
+                      className={`min-h-[44px] px-2 py-2 rounded-lg text-xs font-bold flex items-center justify-center text-center transition-colors ${
+                        mockTab === 'upi'
+                          ? 'bg-sky-600 text-white shadow-sm'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
                       UPI (Mock)
                     </a>
                   </li>
-                  <li className={mockTab === 'card' ? 'active' : ''}>
-                    <a href="#" onClick={(e) => { e.preventDefault(); setMockTab('card'); }}>
+                  <li>
+                    <a
+                      href="#"
+                      onClick={(e) => { e.preventDefault(); setMockTab('card'); }}
+                      className={`min-h-[44px] px-2 py-2 rounded-lg text-xs font-bold flex items-center justify-center text-center transition-colors ${
+                        mockTab === 'card'
+                          ? 'bg-sky-600 text-white shadow-sm'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
                       Card (Mock)
                     </a>
                   </li>
-                  <li className={mockTab === 'netbanking' ? 'active' : ''}>
-                    <a href="#" onClick={(e) => { e.preventDefault(); setMockTab('netbanking'); }}>
+                  <li>
+                    <a
+                      href="#"
+                      onClick={(e) => { e.preventDefault(); setMockTab('netbanking'); }}
+                      className={`min-h-[44px] px-2 py-2 rounded-lg text-xs font-bold flex items-center justify-center text-center transition-colors ${
+                        mockTab === 'netbanking'
+                          ? 'bg-sky-600 text-white shadow-sm'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
                       Netbanking (Mock)
                     </a>
                   </li>
                 </ul>
 
-                <div style={{ marginBottom: '15px' }}>
+                <div>
                   {mockTab === 'upi' && (
-                    <div>
-                      <label style={{ fontSize: '12px' }}>Simulated VPA / UPI ID:</label>
+                    <div className="space-y-1">
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-300">Simulated VPA / UPI ID:</label>
                       <input
                         type="text"
-                        className="form-control input-sm"
+                        className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-xs font-mono"
                         readOnly
-                        value="customer@wandarwheels"
+                        value="customer@wanderwheels"
                       />
                     </div>
                   )}
                   {mockTab === 'card' && (
-                    <div>
-                      <label style={{ fontSize: '12px' }}>Simulated Card Number:</label>
+                    <div className="space-y-1">
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-300">Simulated Card Number:</label>
                       <input
                         type="text"
-                        className="form-control input-sm"
+                        className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-xs font-mono"
                         readOnly
                         value="4111 •••• •••• 1111 (Visa Mock)"
                       />
                     </div>
                   )}
                   {mockTab === 'netbanking' && (
-                    <div>
-                      <label style={{ fontSize: '12px' }}>Simulated Bank:</label>
+                    <div className="space-y-1">
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-300">Simulated Bank:</label>
                       <input
                         type="text"
-                        className="form-control input-sm"
+                        className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-xs font-mono"
                         readOnly
-                        value="State Bank of WandarWheels"
+                        value="State Bank of WanderWheels"
                       />
                     </div>
                   )}
                 </div>
 
-                <div className="mock-action-buttons">
+                <div className="mock-action-buttons flex flex-col sm:flex-row gap-2.5">
                   <button
                     type="button"
-                    className="btn btn-success payment-btn"
+                    className="payment-btn flex-1 min-h-[48px] px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition-colors cursor-pointer"
                     onClick={handleMockSuccess}
                   >
                     Simulate success
                   </button>
                   <button
                     type="button"
-                    className="btn btn-danger payment-btn"
+                    className="payment-btn flex-1 min-h-[48px] px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition-colors cursor-pointer"
                     onClick={handleMockFailure}
                   >
                     Simulate failure
                   </button>
                   <button
                     type="button"
-                    className="btn btn-default payment-btn"
+                    className="payment-btn flex-1 min-h-[48px] px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition-colors cursor-pointer"
                     onClick={handleMockCancel}
                   >
                     Close without paying
@@ -631,37 +552,40 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
             )}
           </div>
 
-          <div className="modal-footer payment-modal-footer">
-            {step === 'idle' && (
-              <>
+          {/* Footer */}
+          {(step === 'idle' || step === 'success' || step === 'polling_stopped') && (
+            <div className="modal-footer payment-modal-footer px-5 py-4 bg-slate-50 dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-800 flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 flex-shrink-0">
+              {step === 'idle' && (
+                <>
+                  <button
+                    type="button"
+                    className="payment-btn w-full sm:w-auto min-h-[48px] px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                    onClick={onClose}
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="button"
+                    className="payment-btn w-full sm:w-auto min-h-[48px] px-6 py-2.5 rounded-xl bg-brand-red hover:bg-brand-darkRed text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-glow transition-all cursor-pointer disabled:opacity-50"
+                    onClick={handlePayClick}
+                    disabled={configLoading || !isOnlineAvailable}
+                  >
+                    {configLoading ? 'Checking gateway...' : 'Pay securely'}
+                  </button>
+                </>
+              )}
+
+              {(step === 'success' || step === 'polling_stopped') && (
                 <button
                   type="button"
-                  className="btn btn-default payment-btn"
+                  className="payment-btn w-full sm:w-auto min-h-[48px] px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
                   onClick={onClose}
                 >
                   Close
                 </button>
-                <button
-                  type="button"
-                  className="btn btn-primary payment-btn"
-                  onClick={handlePayClick}
-                  disabled={configLoading || !isOnlineAvailable}
-                >
-                  {configLoading ? 'Checking gateway...' : 'Pay securely'}
-                </button>
-              </>
-            )}
-
-            {(step === 'success' || step === 'polling_stopped') && (
-              <button
-                type="button"
-                className="btn btn-default payment-btn"
-                onClick={onClose}
-              >
-                Close
-              </button>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

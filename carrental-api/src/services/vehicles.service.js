@@ -37,7 +37,7 @@ class VehiclesService {
    * Search vehicles by brand and fuel type.
    * Note (B9): Preserves legacy behavior where both brand and fueltype filters are applied.
    */
-  async search({ brand, fueltype }) {
+  async search({ brand, fueltype, transmission, category }) {
     let sql = `
       SELECT v.*, b.BrandName, b.id as bid
       FROM tblvehicles v
@@ -53,6 +53,14 @@ class VehiclesService {
     if (fueltype) {
       sql += ' AND v.FuelType = ?';
       params.push(fueltype);
+    }
+    if (transmission) {
+      sql += ' AND v.Transmission = ?';
+      params.push(transmission);
+    }
+    if (category) {
+      sql += ' AND v.Category = ?';
+      params.push(category);
     }
 
     sql += ' ORDER BY v.id DESC';
@@ -164,11 +172,14 @@ class VehiclesService {
     const sql = `
       INSERT INTO tblvehicles (
         VehiclesTitle, VehiclesBrand, VehiclesOverview, PricePerDay, FuelType,
+        Transmission, Category, RegistrationPlate, HubLocation, OdometerKm, FuelChargePct,
         ModelYear, SeatingCapacity, Vimage1, Vimage2, Vimage3, Vimage4, Vimage5,
         AirConditioner, PowerDoorLocks, AntiLockBrakingSystem, BrakeAssist,
         PowerSteering, DriverAirbag, PassengerAirbag, PowerWindows, CDPlayer,
-        CentralLocking, CrashSensor, LeatherSeats, Status, vehicle_status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'Available')
+        CentralLocking, CrashSensor, LeatherSeats,
+        Sunroof, AppleCarPlay, ReverseCamera, CruiseControl, KeylessEntry, GPSNavigation, FastCharging,
+        Status, vehicle_status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
     `;
 
     const params = [
@@ -177,6 +188,12 @@ class VehiclesService {
       vehicleData.vehicalorcview,
       vehicleData.priceperday,
       vehicleData.fueltype,
+      vehicleData.transmission || 'Automatic',
+      vehicleData.category || 'Sedan',
+      vehicleData.registrationplate || null,
+      vehicleData.hublocation || 'Pune Koregaon Park',
+      vehicleData.odometerkm ?? 0,
+      vehicleData.fuelchargepct ?? 100,
       vehicleData.modelyear,
       vehicleData.seatingcapacity,
       imageFilenames.vimage1 || '',
@@ -196,9 +213,23 @@ class VehiclesService {
       vehicleData.centrallocking || 0,
       vehicleData.crashcensor || 0,
       vehicleData.leatherseats || 0,
+      vehicleData.sunroof || 0,
+      vehicleData.applecarplay || 0,
+      vehicleData.reversecamera || 0,
+      vehicleData.cruisecontrol || 0,
+      vehicleData.keylessentry || 0,
+      vehicleData.gpsnavigation || 0,
+      vehicleData.fastcharging || 0,
+      vehicleData.vehiclestatus || 'Available',
     ];
 
     const [result] = await query(sql, params);
+    if (!vehicleData.registrationplate) {
+      await query(
+        'UPDATE tblvehicles SET RegistrationPlate = ? WHERE id = ?',
+        [`MH 12 WW ${String(result.insertId).padStart(4, '0')}`, result.insertId]
+      );
+    }
     return { id: result.insertId };
   }
 
@@ -206,10 +237,15 @@ class VehiclesService {
     const sql = `
       UPDATE tblvehicles SET
         VehiclesTitle = ?, VehiclesBrand = ?, VehiclesOverview = ?, PricePerDay = ?,
-        FuelType = ?, ModelYear = ?, SeatingCapacity = ?,
+        FuelType = ?, Transmission = ?, Category = ?,
+        RegistrationPlate = COALESCE(?, RegistrationPlate),
+        HubLocation = ?, OdometerKm = ?, FuelChargePct = ?, vehicle_status = ?,
+        ModelYear = ?, SeatingCapacity = ?,
         AirConditioner = ?, PowerDoorLocks = ?, AntiLockBrakingSystem = ?, BrakeAssist = ?,
         PowerSteering = ?, DriverAirbag = ?, PassengerAirbag = ?, PowerWindows = ?,
-        CDPlayer = ?, CentralLocking = ?, CrashSensor = ?, LeatherSeats = ?
+        CDPlayer = ?, CentralLocking = ?, CrashSensor = ?, LeatherSeats = ?,
+        Sunroof = ?, AppleCarPlay = ?, ReverseCamera = ?, CruiseControl = ?,
+        KeylessEntry = ?, GPSNavigation = ?, FastCharging = ?
       WHERE id = ?
     `;
 
@@ -219,6 +255,13 @@ class VehiclesService {
       vehicleData.vehicalorcview,
       vehicleData.priceperday,
       vehicleData.fueltype,
+      vehicleData.transmission || 'Automatic',
+      vehicleData.category || 'Sedan',
+      vehicleData.registrationplate || null,
+      vehicleData.hublocation || 'Pune Koregaon Park',
+      vehicleData.odometerkm ?? 0,
+      vehicleData.fuelchargepct ?? 100,
+      vehicleData.vehiclestatus || 'Available',
       vehicleData.modelyear,
       vehicleData.seatingcapacity,
       vehicleData.airconditioner || 0,
@@ -233,10 +276,37 @@ class VehiclesService {
       vehicleData.centrallocking || 0,
       vehicleData.crashcensor || 0,
       vehicleData.leatherseats || 0,
+      vehicleData.sunroof || 0,
+      vehicleData.applecarplay || 0,
+      vehicleData.reversecamera || 0,
+      vehicleData.cruisecontrol || 0,
+      vehicleData.keylessentry || 0,
+      vehicleData.gpsnavigation || 0,
+      vehicleData.fastcharging || 0,
       id,
     ];
 
     await query(sql, params);
+    return { success: true };
+  }
+
+  async adminUpdateStatus(id, status) {
+    const [result] = await query('UPDATE tblvehicles SET vehicle_status = ? WHERE id = ?', [status, id]);
+    if (result.affectedRows === 0) throw new NotFoundError('Vehicle');
+    return { success: true, status };
+  }
+
+  async adminUpdateTelematics(id, { registrationPlate, hubLocation, odometerKm, fuelChargePct }) {
+    const [result] = await query(
+      `UPDATE tblvehicles
+       SET RegistrationPlate = COALESCE(?, RegistrationPlate),
+           HubLocation = ?,
+           OdometerKm = ?,
+           FuelChargePct = ?
+       WHERE id = ?`,
+      [registrationPlate || null, hubLocation, odometerKm, fuelChargePct, id]
+    );
+    if (result.affectedRows === 0) throw new NotFoundError('Vehicle');
     return { success: true };
   }
 

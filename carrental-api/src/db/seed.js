@@ -1,27 +1,32 @@
 'use strict';
 require('dotenv').config();
-const fs = require('fs');
-const path = require('path');
 const mysql = require('mysql2/promise');
+const path = require('path');
+const fs = require('fs');
+const crypto = require('crypto');
 const { hashPassword } = require('../utils/crypto');
+const { assertSafeTestDatabase } = require('./dbGuard');
+
+function generateRandomPassword(prefix = 'Wander') {
+  return `${prefix}!${crypto.randomBytes(6).toString('hex')}A1`;
+}
 
 async function seed() {
-  const dbName = process.env.DB_NAME || '';
-  if (dbName !== 'carrental_test') {
-    console.error(`[SEED ERROR] Refusing to run seed: DB_NAME must be 'carrental_test', currently '${dbName}'`);
-    process.exit(1);
+  const dbName = assertSafeTestDatabase(process.env.DB_NAME || 'wanderwheels_demo_test');
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(`Refusing to seed database "${dbName}" in production.`);
   }
 
   const conn = await mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: process.env.DB_USER || 'root',
+    user: process.env.DB_USER || '',
     password: process.env.DB_PASS || '',
     database: dbName,
     multipleStatements: true,
   });
 
-  console.log(`[SEED] Connected to ${dbName}. Seeding sample data...`);
+  console.log(`[SEED] Connected as user "${process.env.DB_USER || 'none'}" to ${dbName}. Seeding sample data...`);
 
   // Ensure uploads directory exists
   const targetUploadsDir = path.join(__dirname, '..', '..', 'uploads', 'vehicles');
@@ -29,27 +34,26 @@ async function seed() {
     fs.mkdirSync(targetUploadsDir, { recursive: true });
   }
 
-  // Source directory for legacy images
-  const legacyImgDir = path.resolve('C:\\xampp\\htdocs\\carrental\\admin\\img\\vehicleimages');
+  // Source directory for repo-local license-clean placeholder images
+  const seedAssetsDir = path.join(__dirname, '..', '..', 'seed-assets', 'vehicles');
 
   // Copy images helper
   const copyImage = (filename) => {
     if (!filename) return;
-    const src = path.join(legacyImgDir, filename);
+    const src = path.join(seedAssetsDir, filename);
     const dest = path.join(targetUploadsDir, filename);
     if (fs.existsSync(src)) {
       fs.copyFileSync(src, dest);
     }
   };
 
-  // 1. Ensure Brand 'Lamborghini' exists
-  const [lambo] = await conn.execute("SELECT id FROM tblbrands WHERE BrandName = 'Lamborghini'");
-  let lamboId;
-  if (lambo.length === 0) {
-    const [res] = await conn.execute("INSERT INTO tblbrands (BrandName) VALUES ('Lamborghini')");
-    lamboId = res.insertId;
-  } else {
-    lamboId = lambo[0].id;
+  // 1. Ensure required Brands exist
+  const initialBrands = ['Toyota', 'BMW', 'Lamborghini', 'Audi', 'Nissan', 'Mercedes'];
+  for (const bName of initialBrands) {
+    const [bRows] = await conn.execute('SELECT id FROM tblbrands WHERE BrandName = ?', [bName]);
+    if (bRows.length === 0) {
+      await conn.execute('INSERT INTO tblbrands (BrandName) VALUES (?)', [bName]);
+    }
   }
 
   // Get brand IDs
@@ -57,7 +61,7 @@ async function seed() {
   const brandMap = {};
   brands.forEach(b => { brandMap[b.BrandName] = b.id; });
 
-  // 2. Define 6 sample vehicles using actual legacy image filenames
+  // 2. Define 6 sample vehicles using repo-local license-clean placeholder images
   const sampleVehicles = [
     {
       title: 'Supra',
@@ -65,59 +69,87 @@ async function seed() {
       overview: 'The Toyota Supra is a high-performance sports car known for its sleek design, responsive handling, and powerful turbocharged engine. Ideal for enthusiasts who crave speed and style.',
       price: 30000,
       fuel: 'Petrol',
+      transmission: 'Automatic',
+      category: 'Sports',
+      plate: 'MH 12 WW 3000',
+      hub: 'Hinjewadi IT Park Hub',
+      odometer: 11090,
+      fuelPct: 91,
       year: 2020,
       seats: 2,
-      img1: 'OIP (1).jpeg',
-      img2: 'OIP (2).jpeg',
-      img3: 'OIP (3).jpeg',
+      img1: 'toyota-fortuner-1.png',
+      img2: 'toyota-fortuner-2.png',
+      img3: 'toyota-fortuner-3.png',
       img4: '',
       img5: '',
       vehicle_status: 'Available',
+      modern: { sunroof: 0, applecarplay: 1, reversecamera: 1, cruisecontrol: 1, keylessentry: 1, gpsnavigation: 1, fastcharging: 0 },
     },
     {
       title: '5 Series',
       brand: brandMap['BMW'] || 2,
       overview: 'The BMW 5 Series is a premium executive sedan that blends luxury, comfort, and dynamic performance seamlessly. Designed for business and leisure travel.',
       price: 10000,
-      fuel: 'Petrol',
+      fuel: 'Hybrid',
+      transmission: 'Automatic',
+      category: 'Luxury',
+      plate: 'MH 12 WW 5530',
+      hub: 'Koregaon Park Hub',
+      odometer: 18740,
+      fuelPct: 90,
       year: 2022,
       seats: 5,
-      img1: 'OIP (4).jpeg',
-      img2: 'OIP (5).jpeg',
-      img3: 'OIP (6).jpeg',
+      img1: 'bmw-5-series-1.png',
+      img2: 'bmw-5-series-2.png',
+      img3: 'bmw-5-series-3.png',
       img4: '',
       img5: '',
       vehicle_status: 'Available',
+      modern: { sunroof: 1, applecarplay: 1, reversecamera: 1, cruisecontrol: 1, keylessentry: 1, gpsnavigation: 1, fastcharging: 0 },
     },
     {
       title: 'Urus',
       brand: brandMap['Lamborghini'] || lamboId,
-      overview: 'The Lamborghini Urus is the worlds first Super Sport Utility Vehicle, fusing the soul of a super sports car with the practical functionality of an SUV.',
+      overview: 'The Lamborghini Urus is the world first Super Sport Utility Vehicle, fusing the soul of a super sports car with the practical functionality of an SUV.',
       price: 25000,
       fuel: 'Petrol',
+      transmission: 'Automatic',
+      category: 'SUV',
+      plate: 'MH 01 WW 9999',
+      hub: 'Bandra Worli Hub',
+      odometer: 5120,
+      fuelPct: 95,
       year: 2024,
       seats: 4,
-      img1: 'OIP (7).jpeg',
-      img2: 'OIP (8).jpeg',
-      img3: 'OIP (9).jpeg',
+      img1: 'mercedes-c-class-1.png',
+      img2: 'mercedes-c-class-2.png',
+      img3: 'mercedes-c-class-3.png',
       img4: '',
       img5: '',
       vehicle_status: 'Available',
+      modern: { sunroof: 1, applecarplay: 1, reversecamera: 1, cruisecontrol: 1, keylessentry: 1, gpsnavigation: 1, fastcharging: 0 },
     },
     {
       title: 'R8',
       brand: brandMap['Audi'] || 3,
       overview: 'The Audi R8 is a breathtaking supercar that blends iconic design with motorsport performance, featuring a roaring V10 engine and Quattro all-wheel drive.',
       price: 8000,
-      fuel: 'Petrol',
-      year: 2018,
+      fuel: 'Electric',
+      transmission: 'Automatic',
+      category: 'EV',
+      plate: 'MH 12 WW 8808',
+      hub: 'Viman Nagar Lounge',
+      odometer: 19300,
+      fuelPct: 88,
+      year: 2024,
       seats: 2,
-      img1: 'download (1).jpeg',
-      img2: 'download (2).jpeg',
-      img3: 'download (3).jpeg',
+      img1: 'audi-a4-1.png',
+      img2: 'audi-a4-2.png',
+      img3: 'audi-a4-3.png',
       img4: '',
       img5: '',
       vehicle_status: 'Available',
+      modern: { sunroof: 0, applecarplay: 1, reversecamera: 1, cruisecontrol: 1, keylessentry: 1, gpsnavigation: 1, fastcharging: 1 },
     },
     {
       title: 'Land Cruiser',
@@ -125,14 +157,21 @@ async function seed() {
       overview: 'The Toyota Land Cruiser is a legendary full-size SUV known for its rugged off-road capability, peerless reliability, and refined interior luxury.',
       price: 11000,
       fuel: 'Petrol',
+      transmission: 'Automatic',
+      category: 'SUV',
+      plate: 'MH 12 WW 4400',
+      hub: 'Pune Intl. Airport',
+      odometer: 26150,
+      fuelPct: 85,
       year: 2020,
       seats: 5,
-      img1: 'th (1).jpeg',
-      img2: 'th (2).jpeg',
-      img3: 'th.jpeg',
+      img1: 'toyota-fortuner-1.png',
+      img2: 'toyota-fortuner-2.png',
+      img3: 'toyota-fortuner-3.png',
       img4: '',
       img5: '',
       vehicle_status: 'Available',
+      modern: { sunroof: 1, applecarplay: 1, reversecamera: 1, cruisecontrol: 1, keylessentry: 1, gpsnavigation: 1, fastcharging: 0 },
     },
     {
       title: 'GTR',
@@ -140,19 +179,26 @@ async function seed() {
       overview: 'The Nissan GT-R is a legendary high-performance sports car that combines cutting-edge twin-turbo power with precision all-wheel drive technology.',
       price: 22000,
       fuel: 'Diesel',
+      transmission: 'Automatic',
+      category: 'Sports',
+      plate: 'MH 12 WW 0007',
+      hub: 'Mumbai Airport T2',
+      odometer: 14910,
+      fuelPct: 78,
       year: 2017,
       seats: 2,
-      img1: 'featured-img-1.jpg',
-      img2: 'featured-img-3.jpg',
-      img3: 'featured-img-3.jpg',
+      img1: 'honda-city-1.png',
+      img2: 'honda-city-2.png',
+      img3: 'honda-city-3.png',
       img4: '',
       img5: '',
       vehicle_status: 'Available',
+      modern: { sunroof: 0, applecarplay: 1, reversecamera: 1, cruisecontrol: 1, keylessentry: 1, gpsnavigation: 1, fastcharging: 0 },
     },
   ];
 
   for (const v of sampleVehicles) {
-    // Copy images
+    // Copy images from repo-local seed assets
     [v.img1, v.img2, v.img3, v.img4, v.img5].forEach(copyImage);
 
     // Check if vehicle title exists
@@ -161,46 +207,112 @@ async function seed() {
       [v.title, v.brand]
     );
 
+    const m = v.modern || {};
     if (existing.length === 0) {
       await conn.execute(`
         INSERT INTO tblvehicles (
           VehiclesTitle, VehiclesBrand, VehiclesOverview, PricePerDay, FuelType,
+          Transmission, Category, RegistrationPlate, HubLocation, OdometerKm, FuelChargePct,
           ModelYear, SeatingCapacity, Vimage1, Vimage2, Vimage3, Vimage4, Vimage5,
           AirConditioner, PowerDoorLocks, AntiLockBrakingSystem, BrakeAssist,
           PowerSteering, DriverAirbag, PassengerAirbag, PowerWindows, CDPlayer,
-          CentralLocking, CrashSensor, LeatherSeats, Status, vehicle_status
+          CentralLocking, CrashSensor, LeatherSeats,
+          Sunroof, AppleCarPlay, ReverseCamera, CruiseControl, KeylessEntry, GPSNavigation, FastCharging,
+          vehicle_status
         ) VALUES (
           ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?,
           ?, ?, ?, ?, ?, ?, ?,
           1, 1, 1, 1,
-          1, 1, 1, 1, 1,
-          1, 1, 1, 1, ?
+          1, 1, 1, 1, 0,
+          1, 1, 1,
+          ?, ?, ?, ?, ?, ?, ?,
+          ?
         )
       `, [
         v.title, v.brand, v.overview, v.price, v.fuel,
+        v.transmission || 'Automatic', v.category || 'Sedan',
+        v.plate || null, v.hub || 'Pune Koregaon Park', v.odometer || 0, v.fuelPct ?? 100,
         v.year, v.seats, v.img1, v.img2, v.img3, v.img4, v.img5,
+        m.sunroof || 0, m.applecarplay || 0, m.reversecamera || 0, m.cruisecontrol || 0,
+        m.keylessentry || 0, m.gpsnavigation || 0, m.fastcharging || 0,
         v.vehicle_status
       ]);
       console.log(`  + Seeded vehicle: ${v.title}`);
     } else {
       await conn.execute(`
-        UPDATE tblvehicles SET Vimage1 = ?, Vimage2 = ?, Vimage3 = ?, Vimage4 = ?, Vimage5 = ?, PricePerDay = ?, FuelType = ?, ModelYear = ?, SeatingCapacity = ?
+        UPDATE tblvehicles SET
+          Vimage1 = ?, Vimage2 = ?, Vimage3 = ?, Vimage4 = ?, Vimage5 = ?,
+          PricePerDay = ?, FuelType = ?, Transmission = ?, Category = ?,
+          RegistrationPlate = COALESCE(RegistrationPlate, ?),
+          HubLocation = COALESCE(HubLocation, ?),
+          OdometerKm = IF(OdometerKm = 0, ?, OdometerKm),
+          FuelChargePct = COALESCE(FuelChargePct, ?),
+          ModelYear = ?, SeatingCapacity = ?,
+          Sunroof = ?, AppleCarPlay = ?, ReverseCamera = ?, CruiseControl = ?,
+          KeylessEntry = ?, GPSNavigation = ?, FastCharging = ?
         WHERE id = ?
-      `, [v.img1, v.img2, v.img3, v.img4, v.img5, v.price, v.fuel, v.year, v.seats, existing[0].id]);
+      `, [
+        v.img1, v.img2, v.img3, v.img4, v.img5,
+        v.price, v.fuel, v.transmission || 'Automatic', v.category || 'Sedan',
+        v.plate || 'MH 12 WW 1000', v.hub || 'Pune Koregaon Park', v.odometer || 5000, v.fuelPct ?? 90,
+        v.year, v.seats,
+        m.sunroof || 0, m.applecarplay || 0, m.reversecamera || 0, m.cruisecontrol || 0,
+        m.keylessentry || 0, m.gpsnavigation || 0, m.fastcharging || 0,
+        existing[0].id
+      ]);
       console.log(`  ~ Updated vehicle images & specs: ${v.title}`);
     }
   }
 
-  // 3. Seed test customer
-  const customerEmail = 'test@example.com';
-  const customerPassword = 'Password123!';
+  // 2b. Seed sample Fleet Ops maintenance, pricing rules, and notes if empty
+  const [[maintCount]] = await conn.execute('SELECT COUNT(*) as cnt FROM tblmaintenance');
+  if (maintCount.cnt === 0) {
+    const [vehRows] = await conn.execute('SELECT id, VehiclesTitle FROM tblvehicles ORDER BY id ASC LIMIT 3');
+    if (vehRows.length > 0) {
+      await conn.execute(
+        'INSERT INTO tblmaintenance (VehicleId, TaskTitle, DueDate, EstimatedCost, Status) VALUES (?, ?, DATE_ADD(CURDATE(), INTERVAL 4 DAY), 24500, ?)',
+        [vehRows[0].id, 'Brake Pad & Synthetic Oil Service', 'Scheduled']
+      );
+      if (vehRows[1]) {
+        await conn.execute(
+          'INSERT INTO tblmaintenance (VehicleId, TaskTitle, DueDate, EstimatedCost, Status) VALUES (?, ?, DATE_ADD(CURDATE(), INTERVAL 7 DAY), 42000, ?)',
+          [vehRows[1].id, 'Zero-Dep Insurance & PUC Renewal', 'Pending']
+        );
+      }
+      if (vehRows[2]) {
+        await conn.execute(
+          'INSERT INTO tblmaintenance (VehicleId, TaskTitle, DueDate, EstimatedCost, Status) VALUES (?, ?, CURDATE(), 6500, ?)',
+          [vehRows[2].id, 'Full Detailing & Sanitization Check', 'Completed']
+        );
+      }
+    }
+  }
+
+  await conn.execute(
+    'INSERT IGNORE INTO tblpricing_rules (id, WeekendSurgeEnabled, WeekendSurgePct, HolidaySurgeEnabled, HolidaySurgePct) VALUES (1, 0, 15, 0, 20)'
+  );
+
+  const [[notesCount]] = await conn.execute('SELECT COUNT(*) as cnt FROM tbladmin_notes');
+  if (notesCount.cnt === 0) {
+    await conn.execute(`
+      INSERT INTO tbladmin_notes (Title, Description, Category, IsDone) VALUES
+      ('Inspect sports fleet brake rotors before weekend dispatch', 'Schedule bay #2 at Pune hub for post-trip telemetry check.', 'Maintenance', 0),
+      ('Verify pending driver LMV Driving Licenses', 'Review DigiLocker KYC before key handover.', 'KYC', 0),
+      ('Sanitization audit for weekend SUV fleet', 'All inspected units passed 100% hygiene checklist.', 'Fleet Ops', 1)
+    `);
+  }
+
+  // 3. Seed test customer (configurable via env, generated dynamically if missing)
+  const customerEmail = process.env.SEED_CUSTOMER_EMAIL || 'customer@example.com';
+  const customerPassword = process.env.SEED_CUSTOMER_PASSWORD || generateRandomPassword('Customer');
   const customerHash = await hashPassword(customerPassword);
 
   const [existingUser] = await conn.execute('SELECT id FROM tblusers WHERE EmailId = ?', [customerEmail]);
   if (existingUser.length === 0) {
     await conn.execute(`
       INSERT INTO tblusers (FullName, EmailId, ContactNo, Password, password_hash, Address, City, Country, auth_provider, email_verified)
-      VALUES ('Test Customer', ?, '9876543210', '', ?, '123 Test Street', 'Pune', 'India', 'local', 0)
+      VALUES ('Test Customer', ?, '9999900000', '', ?, '123 Test Street', 'Pune', 'India', 'local', 0)
     `, [customerEmail, customerHash]);
     console.log(`  + Seeded test customer: ${customerEmail}`);
   } else {
@@ -208,9 +320,9 @@ async function seed() {
     console.log(`  - Updated test customer password hash: ${customerEmail}`);
   }
 
-  // 4. Seed test admin
-  const adminUsername = 'admin';
-  const adminPassword = 'AdminPassword123!';
+  // 4. Seed test admin (configurable via env, generated dynamically if missing)
+  const adminUsername = process.env.SEED_ADMIN_USERNAME || 'admin';
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || generateRandomPassword('Admin');
   const adminHash = await hashPassword(adminPassword);
 
   const [existingAdmin] = await conn.execute('SELECT id FROM admin WHERE UserName = ?', [adminUsername]);
@@ -225,27 +337,52 @@ async function seed() {
     console.log(`  - Updated test admin password hash: ${adminUsername}`);
   }
 
-  // 5. Ensure contact info exists
+  // 5. Ensure contact info exists with support@example.com and safe placeholder phone
+  const supportEmail = process.env.SEED_SUPPORT_EMAIL || 'support@example.com';
+  const supportPhone = process.env.SEED_SUPPORT_PHONE || '+91 99999 00000';
+
   const [contactRows] = await conn.execute('SELECT id FROM tblcontactusinfo LIMIT 1');
   if (contactRows.length === 0) {
     await conn.execute(`
       INSERT INTO tblcontactusinfo (Address, EmailId, ContactNo)
-      VALUES ('Hadapsar, Pune, Maharashtra, India', 'Wheelsechiles@gmail.com', '+91-9876543210')
-    `);
+      VALUES ('100 Business Park, Suite 400, Pune, Maharashtra, India', ?, ?)
+    `, [supportEmail, supportPhone]);
+  } else {
+    await conn.execute(`
+      UPDATE tblcontactusinfo SET EmailId = ?, ContactNo = ? WHERE id = ?
+    `, [supportEmail, supportPhone, contactRows[0].id]);
   }
 
-  // 6. Ensure default CMS pages exist
+  // 6. Ensure default CMS pages exist with clean demonstration copy
   const cmsPages = [
-    { name: 'About Us', type: 'aboutus', detail: 'At WanderWheels, we believe every adventure deserves the perfect ride. Whether you are exploring a new city, embarking on a road trip, or just need a reliable set of wheels, we have got you covered.' },
-    { name: 'FAQs', type: 'faqs', detail: 'Find answers to frequently asked questions about booking, cancellations, insurance, and vehicle pick-up.' },
-    { name: 'Privacy Policy', type: 'privacy', detail: 'Your privacy is of utmost importance to us. We protect your personal information and transaction data.' },
-    { name: 'Terms and Conditions', type: 'terms', detail: 'Please read our terms and conditions carefully before booking any vehicle with WanderWheels.' },
+    {
+      name: 'About Us',
+      type: 'aboutus',
+      detail: '<p>Welcome to <strong>WanderWheels</strong>, an educational demonstration vehicle rental web application engineered with modern React frontends and a secure Node.js/Express REST API backend.</p><p><strong>Notice:</strong> This web portal is strictly a software demonstration and testing platform. No real-world vehicles are available for booking or rental, and no commercial transactions are processed through this portal.</p><h4>Project Highlights</h4><ul><li>Full-featured customer vehicle catalog, search, and date-range availability calculation.</li><li>Role-based access control with Argon2id password hashing and CSRF protection.</li><li>Simulated mock payment gateway integration for test booking workflows.</li><li>Comprehensive administration portal for fleet management, booking approvals, and customer communication.</li></ul><p>Whether exploring code architecture or trying out test bookings, WanderWheels showcases a modern, robust, and clean development pattern.</p>',
+    },
+    {
+      name: 'FAQs',
+      type: 'faqs',
+      detail: '<p>Below are frequently asked questions regarding the WanderWheels demonstration platform.</p><h4>Is this a real vehicle rental service?</h4><p>No. WanderWheels is an educational software showcase and test environment. All vehicles, bookings, invoices, and payments displayed are entirely simulated.</p><h4>Can I book a real car on this website?</h4><p>No real vehicles can be reserved, rented, or collected through this website. Any booking created in the system is stored only as a test database record.</p><h4>Are real credit cards or bank accounts charged?</h4><p>No. WanderWheels runs in simulated test mode. The payment interface is an interactive mock gateway for evaluation purposes. Never enter real financial or banking credentials.</p><h4>How do I log in or test administrative features?</h4><p>You can register a test customer account or use the seed credentials generated during database initialization. The admin dashboard is accessible at the dedicated admin portal URL.</p>',
+    },
+    {
+      name: 'Privacy Policy',
+      type: 'privacy',
+      detail: '<p><strong>Demonstration Privacy Notice</strong></p><p>This privacy notice explains how test data is handled within the WanderWheels demonstration system.</p><h4>Data Collection and Scope</h4><p>WanderWheels is a demonstration application. Any names, email addresses, phone numbers, or passwords entered into registration or contact forms are stored locally in the development test database solely for verifying software features (such as user authentication, profile editing, and email simulation).</p><h4>No Commercial Use or Sharing</h4><p>We do not sell, license, rent, or distribute any user information submitted to this demonstration application. Do not submit sensitive real-world personal information or production passwords.</p><h4>Account Security</h4><p>Passwords are hashed using industry-standard Argon2id cryptographic hashing before storage, and session authentication utilizes httpOnly security cookies. However, because this is an active demonstration sandbox, databases may be purged or reset periodically.</p><p><em>Disclaimer: This statement describes test environment data handling practices and does not constitute formal legal counsel.</em></p>',
+    },
+    {
+      name: 'Terms and Conditions',
+      type: 'terms',
+      detail: '<p><strong>Demonstration Terms of Use</strong></p><p>Please read these terms carefully before exploring or testing the WanderWheels application. By accessing or using this portal, you acknowledge and agree that:</p><ol><li><strong>Educational Demonstration Only:</strong> WanderWheels is created and maintained solely for educational, portfolio, and technical demonstration purposes. It does not provide commercial vehicle rental services.</li><li><strong>Simulated Transactions:</strong> Any booking, cancellation, fee, invoice, or receipt created within this application is purely simulated and holds no legal, financial, or contractual validity.</li><li><strong>No Warranties or Liability:</strong> The software is provided "as is" without warranties of any kind. The authors and contributors bear no liability for misuse or assumptions of commercial availability.</li><li><strong>Test Data:</strong> All sample data, user profiles, vehicle records, and mock reviews may be reset, altered, or deleted at any time during development or testing cycles.</li></ol><p><em>Disclaimer: This document is provided for demonstrative software purposes only and does not constitute formal legal advice.</em></p>',
+    },
   ];
 
   for (const page of cmsPages) {
     const [p] = await conn.execute('SELECT id FROM tblpages WHERE type = ?', [page.type]);
     if (p.length === 0) {
       await conn.execute('INSERT INTO tblpages (PageName, type, detail) VALUES (?, ?, ?)', [page.name, page.type, page.detail]);
+    } else {
+      await conn.execute('UPDATE tblpages SET PageName = ?, detail = ? WHERE id = ?', [page.name, page.detail, p[0].id]);
     }
   }
 
@@ -253,6 +390,7 @@ async function seed() {
   console.log('SEED COMPLETED SUCCESSFULLY (LOCAL DEVELOPMENT CREDENTIALS):');
   console.log(`Customer: Email="${customerEmail}", Password="${customerPassword}"`);
   console.log(`Admin:    Username="${adminUsername}", Password="${adminPassword}"`);
+  console.log(`Support:  Email="${supportEmail}", Phone="${supportPhone}"`);
   console.log('============================================================\n');
 
   await conn.end();

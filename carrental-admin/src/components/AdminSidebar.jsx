@@ -1,132 +1,289 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  Award,
+  Car,
+  CalendarCheck,
+  CreditCard,
+  MessageSquare,
+  Users,
+  FileText,
+  Headphones,
+  Mail,
+  ChevronDown,
+  Wrench,
+  Sliders,
+  MapPin,
+} from 'lucide-react';
 
-export default function AdminSidebar({ isOpen }) {
+export default function AdminSidebar({ isOpen, desktopCollapsed, onClose }) {
   const location = useLocation();
 
   const isBrandsActive = location.pathname.includes('brand');
-  const isVehiclesActive = location.pathname.includes('vehic');
+  const isVehiclesActive =
+    location.pathname.includes('vehic') || location.pathname.includes('change-image');
 
   const [brandsOpen, setBrandsOpen] = useState(isBrandsActive);
   const [vehiclesOpen, setVehiclesOpen] = useState(isVehiclesActive);
 
+  const linkClass = ({ isActive }) =>
+    `w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13px] transition no-underline ${
+      isActive
+        ? 'nav-item-active'
+        : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-[#1C1C1F] hover:text-slate-900 dark:hover:text-zinc-100 font-medium'
+    }`;
+
+  const subLinkClass = ({ isActive }) =>
+    `w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[12.5px] transition no-underline ${
+      isActive
+        ? 'nav-item-active'
+        : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-[#1C1C1F] hover:text-slate-900 dark:hover:text-zinc-100 font-medium'
+    }`;
+
   return (
-    <nav className={`ts-sidebar ${isOpen ? 'menu-open' : ''}`}>
-      <ul className="ts-sidebar-menu">
-        <li className="ts-label">Main</li>
+    <aside
+      className={`ts-sidebar no-print fixed lg:sticky top-16 left-0 z-30 h-[calc(100vh-4rem)] w-[250px] bg-white dark:bg-[#141416] border-r border-hairline dark:border-[#27272A] overflow-y-auto px-3.5 py-5 transition-all duration-200 shrink-0 ${
+        isOpen ? 'translate-x-0 menu-open' : '-translate-x-full'
+      } ${desktopCollapsed ? 'lg:hidden' : 'lg:translate-x-0'}`}
+    >
+      <ul className="ts-sidebar-menu space-y-6 list-none m-0 p-0">
+        {/* Dashboards */}
         <li>
-          <NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'active' : '')}>
-            <i className="fa fa-dashboard"></i> Dashboard
-          </NavLink>
-        </li>
-
-        {/* Brands Dropdown */}
-        <li className={brandsOpen ? 'open' : ''}>
-          <div className="more" onClick={() => setBrandsOpen(!brandsOpen)}>
-            <i className={`fa ${brandsOpen ? 'fa-angle-up' : 'fa-angle-down'}`}></i>
+          <div className="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-400 dark:text-zinc-500">
+            Dashboards
           </div>
-          <a
-            href="#"
-            className="parent"
-            onClick={(e) => {
-              e.preventDefault();
-              setBrandsOpen(!brandsOpen);
-            }}
-          >
-            <i className="fa fa-files-o"></i> Brands
-          </a>
-          <ul style={{ display: brandsOpen ? 'block' : 'none' }}>
-            <li>
-              <NavLink to="/create-brand" className={({ isActive }) => (isActive ? 'active' : '')}>
-                Create Brand
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/manage-brands" className={({ isActive }) => (isActive ? 'active' : '')}>
-                Manage Brands
-              </NavLink>
-            </li>
-          </ul>
-        </li>
+          <div className="space-y-1">
+            <NavLink to="/dashboard" onClick={onClose} className={linkClass}>
+              {({ isActive }) => (
+                <>
+                  <span className="flex items-center gap-2.5">
+                    <LayoutDashboard className="w-4 h-4" />
+                    <span>Dashboard</span>
+                  </span>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                </>
+              )}
+            </NavLink>
 
-        {/* Vehicles Dropdown */}
-        <li className={vehiclesOpen ? 'open' : ''}>
-          <div className="more" onClick={() => setVehiclesOpen(!vehiclesOpen)}>
-            <i className={`fa ${vehiclesOpen ? 'fa-angle-up' : 'fa-angle-down'}`}></i>
+            <NavLink to="/telematics" onClick={onClose} className={linkClass}>
+              {({ isActive }) => (
+                <>
+                  <span className="flex items-center gap-2.5">
+                    <MapPin className="w-4 h-4" />
+                    <span>Telematics &amp; GPS</span>
+                  </span>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                </>
+              )}
+            </NavLink>
+
+            <NavLink to="/pricing" onClick={onClose} className={linkClass}>
+              {({ isActive }) => (
+                <>
+                  <span className="flex items-center gap-2.5">
+                    <Sliders className="w-4 h-4" />
+                    <span>Dynamic Pricing</span>
+                  </span>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                </>
+              )}
+            </NavLink>
           </div>
-          <a
-            href="#"
-            className="parent"
-            onClick={(e) => {
-              e.preventDefault();
-              setVehiclesOpen(!vehiclesOpen);
-            }}
-          >
-            <i className="fa fa-sitemap"></i> Vehicles
-          </a>
-          <ul style={{ display: vehiclesOpen ? 'block' : 'none' }}>
-            <li>
-              <NavLink to="/post-vehicle" className={({ isActive }) => (isActive ? 'active' : '')}>
-                Post a Vehicle
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/manage-vehicles" className={({ isActive }) => (isActive ? 'active' : '')}>
-                Manage Vehicles
-              </NavLink>
-            </li>
-          </ul>
         </li>
 
-        {/* Manage Booking */}
+        {/* Fleet & Operations */}
         <li>
-          <NavLink to="/manage-bookings" className={({ isActive }) => (isActive ? 'active' : '')}>
-            <i className="fa fa-users"></i> Manage Booking
-          </NavLink>
+          <div className="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-400 dark:text-zinc-500">
+            Fleet &amp; Ops
+          </div>
+          <div className="space-y-1">
+            {/* Brands Dropdown */}
+            <div>
+              <a
+                href="#"
+                className="parent w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13px] font-medium text-slate-600 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-[#1C1C1F] hover:text-slate-900 dark:hover:text-zinc-100 transition no-underline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setBrandsOpen(!brandsOpen);
+                }}
+              >
+                <span className="flex items-center gap-2.5">
+                  <Award className="w-4 h-4 text-slate-400 dark:text-zinc-500" />
+                  <span>Brands</span>
+                </span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 transition-transform ${
+                    brandsOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </a>
+              <div className={`pl-8 pr-1 py-1 space-y-1 ${brandsOpen ? 'block' : 'hidden'}`}>
+                <NavLink to="/create-brand" onClick={onClose} className={subLinkClass}>
+                  {({ isActive }) => (
+                    <>
+                      <span>Create Brand</span>
+                      {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                    </>
+                  )}
+                </NavLink>
+                <NavLink to="/manage-brands" onClick={onClose} className={subLinkClass}>
+                  {({ isActive }) => (
+                    <>
+                      <span>Manage Brands</span>
+                      {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                    </>
+                  )}
+                </NavLink>
+              </div>
+            </div>
+
+            {/* Vehicles Dropdown */}
+            <div>
+              <a
+                href="#"
+                className="parent w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13px] font-medium text-slate-600 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-[#1C1C1F] hover:text-slate-900 dark:hover:text-zinc-100 transition no-underline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setVehiclesOpen(!vehiclesOpen);
+                }}
+              >
+                <span className="flex items-center gap-2.5">
+                  <Car className="w-4 h-4 text-slate-400 dark:text-zinc-500" />
+                  <span>Vehicles</span>
+                </span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 transition-transform ${
+                    vehiclesOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </a>
+              <div className={`pl-8 pr-1 py-1 space-y-1 ${vehiclesOpen ? 'block' : 'hidden'}`}>
+                <NavLink to="/post-vehicle" onClick={onClose} className={subLinkClass}>
+                  {({ isActive }) => (
+                    <>
+                      <span>Post a Vehicle</span>
+                      {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                    </>
+                  )}
+                </NavLink>
+                <NavLink to="/manage-vehicles" onClick={onClose} className={subLinkClass}>
+                  {({ isActive }) => (
+                    <>
+                      <span>Manage Vehicles</span>
+                      {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                    </>
+                  )}
+                </NavLink>
+              </div>
+            </div>
+
+            <NavLink to="/manage-bookings" onClick={onClose} className={linkClass}>
+              {({ isActive }) => (
+                <>
+                  <span className="flex items-center gap-2.5">
+                    <CalendarCheck className="w-4 h-4" />
+                    <span>Manage Booking</span>
+                  </span>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                </>
+              )}
+            </NavLink>
+
+            <NavLink to="/maintenance" onClick={onClose} className={linkClass}>
+              {({ isActive }) => (
+                <>
+                  <span className="flex items-center gap-2.5">
+                    <Wrench className="w-4 h-4" />
+                    <span>Maintenance &amp; Service</span>
+                  </span>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                </>
+              )}
+            </NavLink>
+
+            <NavLink to="/manage-payments" onClick={onClose} className={linkClass}>
+              {({ isActive }) => (
+                <>
+                  <span className="flex items-center gap-2.5">
+                    <CreditCard className="w-4 h-4" />
+                    <span>Manage Payments</span>
+                  </span>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                </>
+              )}
+            </NavLink>
+
+            <NavLink to="/reg-users" onClick={onClose} className={linkClass}>
+              {({ isActive }) => (
+                <>
+                  <span className="flex items-center gap-2.5">
+                    <Users className="w-4 h-4" />
+                    <span>Reg Users</span>
+                  </span>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                </>
+              )}
+            </NavLink>
+          </div>
         </li>
 
-        {/* Manage Payments */}
+        {/* Pages & Support */}
         <li>
-          <NavLink to="/manage-payments" className={({ isActive }) => (isActive ? 'active' : '')}>
-            <i className="fa fa-money"></i> Manage Payments
-          </NavLink>
-        </li>
+          <div className="px-3 mb-2 text-[10px] font-bold uppercase tracking-[0.08em] text-slate-400 dark:text-zinc-500">
+            Pages &amp; CMS
+          </div>
+          <div className="space-y-1">
+            <NavLink to="/manage-contactusquery" onClick={onClose} className={linkClass}>
+              {({ isActive }) => (
+                <>
+                  <span className="flex items-center gap-2.5">
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Manage Contact Us Query</span>
+                  </span>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                </>
+              )}
+            </NavLink>
 
-        {/* Manage Contact Us Query */}
-        <li>
-          <NavLink to="/manage-contactusquery" className={({ isActive }) => (isActive ? 'active' : '')}>
-            <i className="fa fa-desktop"></i> Manage Contact Us Query
-          </NavLink>
-        </li>
+            <NavLink to="/manage-pages" onClick={onClose} className={linkClass}>
+              {({ isActive }) => (
+                <>
+                  <span className="flex items-center gap-2.5">
+                    <FileText className="w-4 h-4" />
+                    <span>Manage Pages</span>
+                  </span>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                </>
+              )}
+            </NavLink>
 
-        {/* Reg Users */}
-        <li>
-          <NavLink to="/reg-users" className={({ isActive }) => (isActive ? 'active' : '')}>
-            <i className="fa fa-users"></i> Reg Users
-          </NavLink>
-        </li>
+            <NavLink to="/update-contactinfo" onClick={onClose} className={linkClass}>
+              {({ isActive }) => (
+                <>
+                  <span className="flex items-center gap-2.5">
+                    <Headphones className="w-4 h-4" />
+                    <span>Update Contact Info</span>
+                  </span>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                </>
+              )}
+            </NavLink>
 
-        {/* Manage Pages */}
-        <li>
-          <NavLink to="/manage-pages" className={({ isActive }) => (isActive ? 'active' : '')}>
-            <i className="fa fa-files-o"></i> Manage Pages
-          </NavLink>
-        </li>
-
-        {/* Update Contact Info */}
-        <li>
-          <NavLink to="/update-contactinfo" className={({ isActive }) => (isActive ? 'active' : '')}>
-            <i className="fa fa-files-o"></i> Update Contact Info
-          </NavLink>
-        </li>
-
-        {/* Manage Subscribers */}
-        <li>
-          <NavLink to="/manage-subscribers" className={({ isActive }) => (isActive ? 'active' : '')}>
-            <i className="fa fa-table"></i> Manage Subscribers
-          </NavLink>
+            <NavLink to="/manage-subscribers" onClick={onClose} className={linkClass}>
+              {({ isActive }) => (
+                <>
+                  <span className="flex items-center gap-2.5">
+                    <Mail className="w-4 h-4" />
+                    <span>Manage Subscribers</span>
+                  </span>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full nav-dot-indicator" />}
+                </>
+              )}
+            </NavLink>
+          </div>
         </li>
       </ul>
-    </nav>
+    </aside>
   );
 }

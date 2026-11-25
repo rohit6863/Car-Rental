@@ -7,6 +7,7 @@ import LoginModal from '../components/LoginModal';
 import SignupModal from '../components/SignupModal';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import { useAuth } from '../context/AuthContext';
+import { useModal } from '../context/ModalContext';
 import api, { getVehicleImageUrl } from '../api/client';
 
 /**
@@ -70,6 +71,7 @@ export default function VehicleDetailsPage() {
   const id = paramId || searchParams.get('vhid') || searchParams.get('id');
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { openModal } = useModal();
 
   const [vehicle, setVehicle] = useState(null);
   const [similarCars, setSimilarCars] = useState([]);
@@ -89,7 +91,7 @@ export default function VehicleDetailsPage() {
   const [days, setDays] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [validationError, setValidationError] = useState('');
-  const [fromDateStatus, setFromDateStatus] = useState(null); // { available: boolean, text: string }
+  const [fromDateStatus, setFromDateStatus] = useState(null);
   const [toDateStatus, setToDateStatus] = useState(null);
   const [availability, setAvailability] = useState({ checked: false, available: false, message: '' });
   const [bookingLoading, setBookingLoading] = useState(false);
@@ -98,6 +100,7 @@ export default function VehicleDetailsPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
+  // Flatpickr refs
   const fromDateRef = useRef(null);
   const toDateRef = useRef(null);
   const fpFrom = useRef(null);
@@ -191,7 +194,7 @@ export default function VehicleDetailsPage() {
 
       // Update individual date availability badges if parseable
       if (normFrom) {
-        const isBooked = currentBookedDates.includes(normFrom);
+        const isBooked = (currentBookedDates || []).includes(normFrom);
         setFromDateStatus({
           available: !isBooked,
           text: isBooked ? 'This date is not available' : 'Date available',
@@ -203,7 +206,7 @@ export default function VehicleDetailsPage() {
       }
 
       if (normTo) {
-        const isBooked = currentBookedDates.includes(normTo);
+        const isBooked = (currentBookedDates || []).includes(normTo);
         setToDateStatus({
           available: !isBooked,
           text: isBooked ? 'This date is not available' : 'Date available',
@@ -363,6 +366,11 @@ export default function VehicleDetailsPage() {
   const handleFromDateChange = (val) => {
     fromDateInputRef.current = val;
     setFromDateInput(val);
+    const norm = parseAndNormalizeDate(val);
+    if (norm && fpFrom.current) {
+      fpFrom.current.setDate(norm, false);
+      fpFrom.current.close();
+    }
     evaluateDates(val, toDateInputRef.current, vehicleRef.current, bookedDatesRef.current);
   };
 
@@ -370,6 +378,11 @@ export default function VehicleDetailsPage() {
   const handleToDateChange = (val) => {
     toDateInputRef.current = val;
     setToDateInput(val);
+    const norm = parseAndNormalizeDate(val);
+    if (norm && fpTo.current) {
+      fpTo.current.setDate(norm, false);
+      fpTo.current.close();
+    }
     evaluateDates(fromDateInputRef.current, val, vehicleRef.current, bookedDatesRef.current);
   };
 
@@ -378,23 +391,24 @@ export default function VehicleDetailsPage() {
     evaluateDates(fromDateInputRef.current, toDateInputRef.current, vehicleRef.current, bookedDatesRef.current);
   };
 
+  // Form submission
   const handleBookingSubmit = async (e) => {
     e.preventDefault();
-    setBookingSuccess('');
     setBookingError('');
+    setBookingSuccess('');
 
     if (!user) {
-      if (window.$) window.$('#loginform').modal('show');
+      openModal('login');
       return;
     }
 
-    if (validationError) {
-      setBookingError(validationError);
+    if (!normalizedFromDate || !normalizedToDate) {
+      setValidationError('Please enter valid dates (YYYY-MM-DD or DD/MM/YYYY)');
       return;
     }
 
-    if (!availability.available) {
-      setBookingError(availability.message || 'Vehicle is not available for selected dates');
+    if (normalizedFromDate > normalizedToDate) {
+      setValidationError('End date must be after start date');
       return;
     }
 
@@ -424,11 +438,14 @@ export default function VehicleDetailsPage() {
 
   if (loading || !vehicle) {
     return (
-      <>
+      <div className="min-h-screen flex flex-col bg-brand-light transition-colors">
         <Header />
-        <div style={{ padding: '80px 0', textAlign: 'center' }}>Loading vehicle details...</div>
+        <div className="flex-grow flex items-center justify-center py-20 text-slate-500 font-semibold">
+          <i className="fa-solid fa-spinner fa-spin text-brand-red text-2xl mr-2"></i>
+          <span>Loading vehicle details...</span>
+        </div>
         <Footer />
-      </>
+      </div>
     );
   }
 
@@ -436,390 +453,352 @@ export default function VehicleDetailsPage() {
   const images = [vehicle.Vimage1, vehicle.Vimage2, vehicle.Vimage3, vehicle.Vimage4, vehicle.Vimage5].filter(Boolean);
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col bg-brand-light transition-colors">
       <Header />
 
-      {/* Embedded Flatpickr & Datepicker Legacy Styles */}
+      {/* Flatpickr Scoped Styles */}
       <style>{`
         .date-picker-wrapper {
           position: relative;
-          margin-bottom: 15px;
-        }
-        .date-picker-wrapper .form-control {
-          background-color: #fff;
-          border: 1px solid #ced4da;
-          border-radius: 4px;
-          padding: 10px 15px;
-          width: 100%;
-          color: #495057;
-          font-size: 14px;
-          height: 45px;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          margin-bottom: 12px;
         }
         .flatpickr-calendar {
           background: #fff;
-          border: 1px solid #ddd;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          border: 1px solid #e2e8f0;
+          box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+          border-radius: 12px;
+          z-index: 1000;
         }
         .flatpickr-day {
-          border-radius: 4px;
-          font-size: 14px;
-          color: #333;
-          font-weight: 500;
+          border-radius: 8px;
+          font-size: 13px;
+          color: #1e293b;
+          font-weight: 600;
         }
         .flatpickr-day.selected {
-          background: #007bff;
-          border-color: #007bff;
+          background: #E11D48 !important;
+          border-color: #E11D48 !important;
+          color: #fff !important;
         }
         .flatpickr-day:hover {
-          background: #f0f0f0;
+          background: #f1f5f9;
         }
         .flatpickr-day.disabled {
           background-color: #ffebee !important;
-          color: #dc3545 !important;
+          color: #dc2626 !important;
           text-decoration: line-through;
           opacity: 0.7;
         }
         .flatpickr-current-month {
-          font-size: 16px;
-          color: #333;
+          font-size: 15px;
+          color: #0f172a;
+          font-weight: 700;
         }
         .flatpickr-weekday {
-          color: #666;
-          font-weight: 600;
+          color: #64748b;
+          font-weight: 700;
+          font-size: 11px;
         }
         .date-status {
-          margin-top: 8px;
-          padding: 8px 12px;
-          border-radius: 4px;
-          font-size: 13px;
-          font-weight: 500;
+          margin-top: 6px;
+          padding: 6px 10px;
+          border-radius: 8px;
+          font-size: 11px;
+          font-weight: 600;
         }
         .date-status.available {
-          background-color: #e8f5e9;
-          color: #2e7d32;
+          background-color: #ecfdf5;
+          color: #047857;
+          border: 1px solid #a7f3d0;
           display: block;
-          border: 1px solid #c8e6c9;
         }
         .date-status.unavailable {
-          background-color: #ffebee;
-          color: #c62828;
+          background-color: #fef2f2;
+          color: #b91c1c;
+          border: 1px solid #fecaca;
           display: block;
-          border: 1px solid #ffcdd2;
         }
         .date-legend {
-          margin-top: 15px;
+          margin-top: 14px;
           padding: 12px;
-          background: #f8f9fa;
-          border: 1px solid #e9ecef;
-          border-radius: 4px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
         }
         .legend-item {
           display: flex;
           align-items: center;
-          margin-bottom: 8px;
-          font-size: 13px;
+          margin-bottom: 6px;
+          font-size: 12px;
+          color: #475569;
+          font-weight: 600;
+        }
+        .legend-item:last-child {
+          margin-bottom: 0;
         }
         .legend-color {
-          width: 20px;
-          height: 20px;
-          margin-right: 10px;
-          border-radius: 3px;
+          width: 16px;
+          height: 16px;
+          margin-right: 8px;
+          border-radius: 4px;
         }
         .legend-available {
           background-color: #fff;
-          border: 1px solid #ddd;
+          border: 1px solid #cbd5e1;
         }
         .legend-unavailable {
-          background-color: #ffebee;
-          border: 1px solid #ffcdd2;
+          background-color: #fee2e2;
+          border: 1px solid #fca5a5;
         }
       `}</style>
 
-      {/* Listing-Image-Slider */}
-      <section id="listing_img_slider" style={{ background: '#222', textAlign: 'center', padding: '10px 0' }}>
-        <div className="container">
-          {images.length > 0 && (
-            <img
-              src={getVehicleImageUrl(images[activeImageIndex])}
-              className="img-responsive"
-              alt="vehicle"
-              style={{ maxHeight: '520px', margin: '0 auto', objectFit: 'contain' }}
-            />
-          )}
-          {images.length > 1 && (
-            <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-              {images.map((img, idx) => (
-                <img
-                  key={idx}
-                  src={getVehicleImageUrl(img)}
-                  alt="thumbnail"
-                  onClick={() => setActiveImageIndex(idx)}
-                  style={{
-                    width: '80px',
-                    height: '50px',
-                    objectFit: 'cover',
-                    cursor: 'pointer',
-                    border: idx === activeImageIndex ? '2px solid #ed1b24' : '1px solid #555',
-                    borderRadius: '3px',
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+      <main className="flex-grow">
+        {/* Sub-Banner Header */}
+        <section className="relative h-44 sm:h-52 bg-slate-950 flex items-center justify-center text-center overflow-hidden">
+          <div className="absolute inset-0 subbanner-overlay"></div>
+          <div className="relative z-10 px-4">
+            <span className="px-3 py-1 rounded-full bg-brand-red/20 text-brand-red text-xs font-extrabold uppercase tracking-wider border border-brand-red/30 mb-2 inline-block">
+              {vehicle.BrandName}
+            </span>
+            <h1 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-tight">
+              {vehicle.VehiclesTitle}
+            </h1>
+            <nav className="flex items-center justify-center gap-2 text-xs text-slate-300 font-medium mt-2">
+              <Link to="/" className="hover:text-brand-red transition-colors">Home</Link>
+              <i className="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+              <Link to="/car-listing" className="hover:text-brand-red transition-colors">Fleet</Link>
+              <i className="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+              <span className="text-white font-semibold">{vehicle.VehiclesTitle}</span>
+            </nav>
+          </div>
+        </section>
 
-      {/* Listing-detail */}
-      <section className="listing-detail">
-        <div className="container">
-          <div className="listing_detail_head row">
-            <div className="col-md-9">
-              <h2>
-                {vehicle.BrandName} , {vehicle.VehiclesTitle}
-              </h2>
-            </div>
-            <div className="col-md-3">
-              <div className="price_info">
-                <p>Rs.{vehicle.PricePerDay} </p>Per Day
+        {/* Vehicle Showcase Section */}
+        <section className="py-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          
+          {/* Main Showcase Card */}
+          <div className="surface-card bg-white rounded-3xl border border-slate-200/90 shadow-card p-6 sm:p-8 transition-colors">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* Left Column: Image Viewer */}
+              <div className="lg:col-span-7 space-y-4">
+                <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 shadow-lg flex items-center justify-center">
+                  {images.length > 0 ? (
+                    <img
+                      src={getVehicleImageUrl(images[activeImageIndex])}
+                      alt={vehicle.VehiclesTitle}
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="text-slate-600 font-semibold text-sm">No image available</div>
+                  )}
+                  <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-white font-bold text-xs uppercase tracking-wider border border-white/10">
+                    {vehicle.BrandName}
+                  </span>
+                </div>
+
+                {/* Thumbnails */}
+                {images.length > 1 && (
+                  <div className="flex items-center gap-3 overflow-x-auto pb-2">
+                    {images.map((img, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setActiveImageIndex(idx)}
+                        className={`w-20 h-14 rounded-xl overflow-hidden bg-slate-900 flex-shrink-0 border-2 transition-all ${
+                          idx === activeImageIndex
+                            ? 'border-brand-red ring-2 ring-brand-red/30'
+                            : 'border-slate-200 hover:border-slate-400 opacity-75 hover:opacity-100'
+                        }`}
+                      >
+                        <img
+                          src={getVehicleImageUrl(img)}
+                          alt={`Thumbnail ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
+
+              {/* Right Column: Title, 3 Specs Cards, Pricing */}
+              <div className="lg:col-span-5 space-y-6">
+                <div>
+                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                    Premium Self-Drive
+                  </span>
+                  <h2 className="text-adaptive-main font-display font-extrabold text-2xl sm:text-3xl text-slate-900 dark:text-white mt-1">
+                    {vehicle.BrandName} , {vehicle.VehiclesTitle}
+                  </h2>
+                  <div className="mt-3 inline-flex items-baseline gap-1.5 px-4 py-2 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 text-brand-red">
+                    <span className="text-2xl font-black">Rs. {vehicle.PricePerDay}</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400">/ Day</span>
+                  </div>
+                </div>
+
+                {/* Core Specs Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div className="surface-muted bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 text-center">
+                    <i className="fa-solid fa-calendar text-brand-red text-base mb-1 block"></i>
+                    <p className="text-xs font-extrabold text-slate-900 dark:text-white">{vehicle.ModelYear}</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Model Year</p>
+                  </div>
+                  <div className="surface-muted bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 text-center">
+                    <i className="fa-solid fa-gas-pump text-amber-500 text-base mb-1 block"></i>
+                    <p className="text-xs font-extrabold text-slate-900 dark:text-white">{vehicle.FuelType}</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Fuel Type</p>
+                  </div>
+                  <div className="surface-muted bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 text-center">
+                    <i className="fa-solid fa-user-group text-blue-500 text-base mb-1 block"></i>
+                    <p className="text-xs font-extrabold text-slate-900 dark:text-white">{vehicle.SeatingCapacity}</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Seats</p>
+                  </div>
+                  <div className="surface-muted bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 text-center">
+                    <i className="fa-solid fa-gears text-emerald-500 text-base mb-1 block"></i>
+                    <p className="text-xs font-extrabold text-slate-900 dark:text-white">{vehicle.Transmission || 'Automatic'}</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Transmission</p>
+                  </div>
+                  <div className="surface-muted bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 text-center col-span-2 sm:col-span-2">
+                    <i className="fa-solid fa-car-side text-indigo-500 text-base mb-1 block"></i>
+                    <p className="text-xs font-extrabold text-slate-900 dark:text-white">{vehicle.Category || 'Sedan'}</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Body Category</p>
+                  </div>
+                </div>
+
+                <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                  <p>
+                    {vehicle.VehiclesOverview || 'Verified luxury performance vehicle with premium safety features and 24/7 roadside assistance.'}
+                  </p>
+                </div>
+
+                {/* Jump to Booking CTA */}
+                <a
+                  href="#bookingForm"
+                  className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-brand-red dark:bg-slate-800 dark:hover:bg-brand-red text-white hover:text-white font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+                >
+                  <i className="fa-solid fa-calendar-check text-xs"></i>
+                  <span>Configure Dates Below</span>
+                </a>
+              </div>
+
             </div>
           </div>
 
-          <div className="row">
-            <div className="col-md-9">
-              <div className="main_features">
-                <ul>
-                  <li>
-                    <i className="fa fa-calendar" aria-hidden="true"></i>
-                    <h5>{vehicle.ModelYear}</h5>
-                    <p>Reg.Year</p>
-                  </li>
-                  <li>
-                    <i className="fa fa-cogs" aria-hidden="true"></i>
-                    <h5>{vehicle.FuelType}</h5>
-                    <p>Fuel Type</p>
-                  </li>
-                  <li>
-                    <i className="fa fa-user-plus" aria-hidden="true"></i>
-                    <h5>{vehicle.SeatingCapacity}</h5>
-                    <p>Seats</p>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="listing_more_info">
-                <div className="listing_detail_wrap">
-                  {/* Nav tabs */}
-                  <ul className="nav nav-tabs gray-bg" role="tablist">
-                    <li role="presentation" className={activeTab === 'overview' ? 'active' : ''}>
-                      <a href="#vehicle-overview" onClick={(e) => { e.preventDefault(); setActiveTab('overview'); }}>
-                        Vehicle Overview
-                      </a>
-                    </li>
-                    <li role="presentation" className={activeTab === 'accessories' ? 'active' : ''}>
-                      <a href="#accessories" onClick={(e) => { e.preventDefault(); setActiveTab('accessories'); }}>
-                        Accessories
-                      </a>
-                    </li>
-                  </ul>
-
-                  {/* Tab panes */}
-                  <div className="tab-content">
-                    {/* vehicle-overview */}
-                    <div
-                      role="tabpanel"
-                      className={`tab-pane ${activeTab === 'overview' ? 'active' : ''}`}
-                      id="vehicle-overview"
-                    >
-                      <p>{vehicle.VehiclesOverview}</p>
-                    </div>
-
-                    {/* Accessories */}
-                    <div
-                      role="tabpanel"
-                      className={`tab-pane ${activeTab === 'accessories' ? 'active' : ''}`}
-                      id="accessories"
-                    >
-                      <table>
-                        <thead>
-                          <tr>
-                            <th colSpan="2">Accessories</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>Air Conditioner</td>
-                            <td>
-                              {vehicle.AirConditioner === 1 ? (
-                                <i className="fa fa-check" aria-hidden="true"></i>
-                              ) : (
-                                <i className="fa fa-close" aria-hidden="true"></i>
-                              )}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>AntiLock Braking System</td>
-                            <td>
-                              {vehicle.AntiLockBrakingSystem === 1 ? (
-                                <i className="fa fa-check" aria-hidden="true"></i>
-                              ) : (
-                                <i className="fa fa-close" aria-hidden="true"></i>
-                              )}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Power Steering</td>
-                            <td>
-                              {vehicle.PowerSteering === 1 ? (
-                                <i className="fa fa-check" aria-hidden="true"></i>
-                              ) : (
-                                <i className="fa fa-close" aria-hidden="true"></i>
-                              )}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Power Windows</td>
-                            <td>
-                              {vehicle.PowerWindows === 1 ? (
-                                <i className="fa fa-check" aria-hidden="true"></i>
-                              ) : (
-                                <i className="fa fa-close" aria-hidden="true"></i>
-                              )}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>CD Player</td>
-                            <td>
-                              {vehicle.CDPlayer === 1 ? (
-                                <i className="fa fa-check" aria-hidden="true"></i>
-                              ) : (
-                                <i className="fa fa-close" aria-hidden="true"></i>
-                              )}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Leather Seats</td>
-                            <td>
-                              {vehicle.LeatherSeats === 1 ? (
-                                <i className="fa fa-check" aria-hidden="true"></i>
-                              ) : (
-                                <i className="fa fa-close" aria-hidden="true"></i>
-                              )}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Central Locking</td>
-                            <td>
-                              {vehicle.CentralLocking === 1 ? (
-                                <i className="fa fa-check" aria-hidden="true"></i>
-                              ) : (
-                                <i className="fa fa-close" aria-hidden="true"></i>
-                              )}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Power Door Locks</td>
-                            <td>
-                              {vehicle.PowerDoorLocks === 1 ? (
-                                <i className="fa fa-check" aria-hidden="true"></i>
-                              ) : (
-                                <i className="fa fa-close" aria-hidden="true"></i>
-                              )}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Brake Assist</td>
-                            <td>
-                              {vehicle.BrakeAssist === 1 ? (
-                                <i className="fa fa-check" aria-hidden="true"></i>
-                              ) : (
-                                <i className="fa fa-close" aria-hidden="true"></i>
-                              )}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Driver Airbag</td>
-                            <td>
-                              {vehicle.DriverAirbag === 1 ? (
-                                <i className="fa fa-check" aria-hidden="true"></i>
-                              ) : (
-                                <i className="fa fa-close" aria-hidden="true"></i>
-                              )}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Passenger Airbag</td>
-                            <td>
-                              {vehicle.PassengerAirbag === 1 ? (
-                                <i className="fa fa-check" aria-hidden="true"></i>
-                              ) : (
-                                <i className="fa fa-close" aria-hidden="true"></i>
-                              )}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Crash Sensor</td>
-                            <td>
-                              {vehicle.CrashSensor === 1 ? (
-                                <i className="fa fa-check" aria-hidden="true"></i>
-                              ) : (
-                                <i className="fa fa-close" aria-hidden="true"></i>
-                              )}
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+          {/* Details & Booking Section (2-Column Grid) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Left 8 Cols: Tabs (Overview & Accessories) */}
+            <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+              <div className="surface-card bg-white rounded-3xl border border-slate-200 shadow-card overflow-hidden transition-colors">
+                
+                {/* Tab Navigation */}
+                <div className="flex border-b border-slate-200 bg-slate-50/80 px-6 pt-4 gap-4 text-xs font-bold uppercase tracking-wider">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('overview')}
+                    className={`pb-3 px-2 border-b-2 transition-all ${
+                      activeTab === 'overview'
+                        ? 'border-brand-red text-brand-red'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    Vehicle Overview
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('accessories')}
+                    className={`pb-3 px-2 border-b-2 transition-all ${
+                      activeTab === 'accessories'
+                        ? 'border-brand-red text-brand-red'
+                        : 'border-transparent text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    Accessories & Features
+                  </button>
                 </div>
+
+                {/* Tab Content */}
+                <div className="p-6 sm:p-8">
+                  {activeTab === 'overview' ? (
+                    <div className="text-slate-700 text-sm leading-relaxed space-y-4">
+                      <p>{vehicle.VehiclesOverview || 'No description available for this vehicle.'}</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-semibold text-slate-700 dark:text-slate-200">
+                      {[
+                        { label: 'Air Conditioner', val: vehicle.AirConditioner },
+                        { label: 'Sunroof / Panoramic Roof', val: vehicle.Sunroof },
+                        { label: 'Apple CarPlay / Android Auto', val: vehicle.AppleCarPlay },
+                        { label: 'Reverse Camera', val: vehicle.ReverseCamera },
+                        { label: 'Cruise Control', val: vehicle.CruiseControl },
+                        { label: 'Keyless Entry & Push Start', val: vehicle.KeylessEntry },
+                        { label: 'GPS Navigation', val: vehicle.GPSNavigation },
+                        { label: 'EV Fast Charging / Regen Braking', val: vehicle.FastCharging },
+                        { label: 'AntiLock Braking System (ABS)', val: vehicle.AntiLockBrakingSystem },
+                        { label: 'Power Steering', val: vehicle.PowerSteering },
+                        { label: 'Power Windows', val: vehicle.PowerWindows },
+                        { label: 'Leather Seats', val: vehicle.LeatherSeats },
+                        { label: 'Central Locking', val: vehicle.CentralLocking },
+                        { label: 'Power Door Locks', val: vehicle.PowerDoorLocks },
+                        { label: 'Brake Assist', val: vehicle.BrakeAssist },
+                        { label: 'Driver Airbag', val: vehicle.DriverAirbag },
+                        { label: 'Passenger Airbag', val: vehicle.PassengerAirbag },
+                        { label: 'Crash Sensor', val: vehicle.CrashSensor },
+                        { label: 'CD / Multimedia Player', val: vehicle.CDPlayer },
+                      ].map((item, i) => (
+                        <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700">
+                          <span>{item.label}</span>
+                          {item.val === 1 ? (
+                            <span className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs">
+                              <i className="fa-solid fa-check"></i>
+                            </span>
+                          ) : (
+                            <span className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 flex items-center justify-center text-xs">
+                              <i className="fa-solid fa-xmark"></i>
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
               </div>
             </div>
 
-            {/* Side-Bar */}
-            <aside className="col-md-3">
-              <div className="share_vehicle">
-                <p>
-                  Share:{' '}
-                  <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
-                    <i className="fa fa-facebook-square" aria-hidden="true"></i>
-                  </a>
-                  <a href="https://x.com" target="_blank" rel="noopener noreferrer">
-                    <svg width="15" height="15" viewBox="0 0 22 22" style={{ verticalAlign: 'middle', marginLeft: '5px' }}>
-                      <path
-                        fill="currentColor"
-                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-                      />
-                    </svg>
-                  </a>
-                  <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" style={{ marginLeft: '5px' }}>
-                    <i className="fa fa-linkedin-square" aria-hidden="true"></i>
-                  </a>
-                </p>
-              </div>
-
-              <div className="sidebar_widget">
-                <div className="widget_heading">
-                  <h5 style={{ color: '#fff' }}>
-                    <i className="fa fa-envelope" aria-hidden="true" style={{ color: '#fff', marginRight: '8px' }}></i> Book Now
-                  </h5>
+            {/* Right 5 Cols: Booking Form Widget */}
+            <aside className="lg:col-span-5 xl:col-span-4 space-y-6">
+              <div className="surface-card bg-white rounded-3xl border border-slate-200 shadow-card overflow-hidden transition-colors">
+                
+                {/* Header */}
+                <div className="bg-brand-dark px-6 py-4 text-white flex items-center justify-between border-b border-slate-800">
+                  <div className="flex items-center gap-2.5">
+                    <i className="fa-solid fa-calendar-check text-brand-red text-base"></i>
+                    <h3 className="font-display font-extrabold text-base text-white">Book This Car</h3>
+                  </div>
+                  <span className="text-xs font-bold text-amber-400">Rs. {vehicle.PricePerDay}/Day</span>
                 </div>
-                <form id="bookingForm" onSubmit={handleBookingSubmit}>
+
+                {/* Form */}
+                <form id="bookingForm" onSubmit={handleBookingSubmit} className="p-6 space-y-4">
+                  
                   {/* From Date */}
                   <div className="form-group">
-                    <label htmlFor="fromdate">
-                      <i className="fa fa-calendar" style={{ marginRight: '5px' }}></i> From Date:
+                    <label htmlFor="fromdate" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      <i className="fa-solid fa-calendar text-brand-red mr-1.5"></i> From Date <span className="text-brand-red">*</span>
                     </label>
                     <div className="date-picker-wrapper">
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-red focus:bg-white transition-all"
                         name="fromdate"
                         id="fromdate"
                         placeholder="Select start date"
                         required
                         ref={fromDateRef}
                         value={fromDateInput}
+                        onFocus={() => { if (fpTo.current) fpTo.current.close(); }}
                         onChange={(e) => handleFromDateChange(e.target.value)}
                         onBlur={handleDateBlur}
                       />
@@ -833,19 +812,20 @@ export default function VehicleDetailsPage() {
 
                   {/* To Date */}
                   <div className="form-group">
-                    <label htmlFor="todate">
-                      <i className="fa fa-calendar" style={{ marginRight: '5px' }}></i> To Date:
+                    <label htmlFor="todate" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      <i className="fa-solid fa-calendar text-brand-red mr-1.5"></i> To Date <span className="text-brand-red">*</span>
                     </label>
                     <div className="date-picker-wrapper">
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-red focus:bg-white transition-all"
                         name="todate"
                         id="todate"
                         placeholder="Select end date"
                         required
                         ref={toDateRef}
                         value={toDateInput}
+                        onFocus={() => { if (fpFrom.current) fpFrom.current.close(); }}
                         onChange={(e) => handleToDateChange(e.target.value)}
                         onBlur={handleDateBlur}
                       />
@@ -857,9 +837,10 @@ export default function VehicleDetailsPage() {
                     </div>
                   </div>
 
-                  {/* Clear validation message */}
+                  {/* Validation Error Banner */}
                   {validationError && (
-                    <div className="alert alert-warning" style={{ fontSize: '13px', padding: '10px', marginBottom: '15px' }}>
+                    <div className="alert alert-warning p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold leading-relaxed">
+                      <i className="fa-solid fa-triangle-exclamation mr-1.5 text-amber-600"></i>
                       {validationError}
                     </div>
                   )}
@@ -868,9 +849,13 @@ export default function VehicleDetailsPage() {
                   {availability.checked && !validationError && (
                     <div
                       id="availability-status"
-                      className={`alert ${availability.available ? 'alert-success' : 'alert-danger'}`}
-                      style={{ display: 'block', fontSize: '13px', padding: '10px', marginBottom: '15px' }}
+                      className={`alert p-3 rounded-xl text-xs font-semibold leading-relaxed ${
+                        availability.available
+                          ? 'alert-success bg-emerald-50 border border-emerald-200 text-emerald-800'
+                          : 'alert-danger bg-rose-50 border border-rose-200 text-rose-800'
+                      }`}
                     >
+                      <i className={`fa-solid ${availability.available ? 'fa-circle-check text-emerald-600' : 'fa-circle-xmark text-rose-600'} mr-1.5`}></i>
                       {availability.message}
                     </div>
                   )}
@@ -887,145 +872,148 @@ export default function VehicleDetailsPage() {
                     </div>
                   </div>
 
-                  {/* Duration and Total Summary in Booking Widget */}
-                  <div className="booking-summary" style={{ margin: '15px 0', padding: '15px', background: '#f9f9f9', borderRadius: '4px' }}>
-                    <p style={{ margin: '0 0 6px' }}>
-                      <strong>Price per day:</strong> Rs.{vehicle.PricePerDay}
-                    </p>
-                    <p style={{ margin: '0 0 6px' }}>
-                      <strong>Duration:</strong> <span id="numberOfDays">{days} days</span>
-                    </p>
-                    <p style={{ margin: 0 }}>
-                      <strong>Total Amount:</strong> <span id="totalAmount">Rs. {totalAmount}</span>
-                    </p>
+                  {/* Duration and Total Box */}
+                  <div className="booking-summary p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs text-slate-700">
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-slate-500">Rate per day:</span>
+                      <span className="font-bold">Rs. {vehicle.PricePerDay}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-semibold text-slate-500">Duration:</span>
+                      <span id="numberOfDays" className="font-extrabold text-slate-900">{days} days</span>
+                    </div>
+                    <div className="flex justify-between pt-1 border-t border-slate-200 text-sm">
+                      <span className="font-bold text-slate-900">Total Amount:</span>
+                      <span id="totalAmount" className="font-black text-brand-red">Rs. {totalAmount}</span>
+                    </div>
                   </div>
 
+                  {/* Message Input */}
                   <div className="form-group">
-                    <label htmlFor="message">Message:</label>
+                    <label htmlFor="message" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      Booking Notes / Message <span className="text-brand-red">*</span>
+                    </label>
                     <textarea
-                      rows="4"
-                      className="form-control"
+                      rows="3"
+                      className="form-control w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-brand-red focus:bg-white transition-all"
                       name="message"
                       id="message"
-                      placeholder="Message"
+                      placeholder="Special requests or pick-up instructions"
                       required
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                     ></textarea>
                   </div>
 
+                  {/* Action Button */}
                   {user ? (
-                    <div className="form-group">
+                    <div className="form-group pt-1">
                       <input
                         type="submit"
-                        className="btn"
+                        className="btn w-full py-3.5 px-4 rounded-xl bg-brand-red hover:bg-brand-darkRed text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-glow transition-all cursor-pointer min-h-[44px]"
                         name="submit"
                         value={bookingLoading ? 'Booking...' : 'Book Now'}
                         disabled={bookingLoading}
                       />
                     </div>
                   ) : (
-                    <a
-                      href="#loginform"
-                      className="btn btn-xs uppercase"
-                      data-toggle="modal"
-                      data-dismiss="modal"
-                    >
-                      Login For Book
-                    </a>
+                    <div className="form-group pt-1">
+                      <a
+                        href="#loginform"
+                        data-testid="vehicle-login-btn"
+                        className="btn btn-xs uppercase w-full py-3.5 px-4 rounded-xl bg-slate-900 hover:bg-brand-red text-white font-bold text-xs tracking-wider transition-colors block text-center min-h-[44px] flex items-center justify-center"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          openModal('login', e.currentTarget);
+                        }}
+                      >
+                        Login For Book
+                      </a>
+                    </div>
                   )}
 
+                  {/* Success Banner */}
                   {bookingSuccess && (
-                    <div className="alert alert-success" style={{ fontSize: '13px', padding: '12px', marginTop: '15px' }}>
-                      <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>{bookingSuccess}</p>
-                      <Link to="/my-booking" className="btn btn-xs btn-primary">
+                    <div className="alert alert-success p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs space-y-2">
+                      <p className="font-bold">{bookingSuccess}</p>
+                      <Link
+                        to="/my-booking"
+                        className="inline-block px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white hover:text-white font-bold text-[11px] transition-colors"
+                      >
                         View My Bookings &rarr;
                       </Link>
                     </div>
                   )}
 
+                  {/* Error Banner */}
                   {bookingError && (
-                    <div className="alert alert-danger" style={{ fontSize: '13px', padding: '10px', marginTop: '15px' }}>
+                    <div className="alert alert-danger p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold leading-relaxed">
+                      <i className="fa-solid fa-circle-xmark mr-1.5 text-rose-600"></i>
                       {bookingError}
                     </div>
                   )}
-                </form>
-              </div>
 
-              {/* Second Booking Summary Box (matching legacy) */}
-              <div className="sidebar_widget">
-                <div className="widget_heading">
-                  <h5>
-                    <i className="fa fa-calculator" aria-hidden="true"></i> Booking Summary
-                  </h5>
-                </div>
-                <div className="booking-summary-content" style={{ padding: '15px', background: '#f9f9f9', borderRadius: '4px' }}>
-                  <p style={{ margin: '0 0 6px' }}>
-                    <strong>Price per day:</strong> Rs.{vehicle.PricePerDay}
-                  </p>
-                  <p style={{ margin: '0 0 6px' }}>
-                    <strong>Duration:</strong> <span id="numberOfDays2">{days} days</span>
-                  </p>
-                  <p style={{ margin: 0 }}>
-                    <strong>Total Amount:</strong> <span id="totalAmount2">Rs. {totalAmount}</span>
-                  </p>
-                </div>
+                </form>
+
               </div>
             </aside>
+
           </div>
 
-          <div className="space-20"></div>
-          <div className="divider"></div>
-
-          {/* Similar-Cars */}
-          <div className="similar_cars">
-            <h3>Similar Cars</h3>
-            <div className="row">
-              {similarCars.length === 0 ? (
-                <div className="col-md-12">
-                  <p>No similar cars found.</p>
-                </div>
-              ) : (
-                similarCars.map((car) => (
-                  <div className="col-md-3 grid_listing" key={car.id}>
-                    <div className="product-listing-m gray-bg">
-                      <div className="product-listing-img">
-                        <Link to={`/vehical-details/${car.id}`}>
-                          <img src={getVehicleImageUrl(car.Vimage1)} className="img-responsive" alt="image" />
-                        </Link>
-                      </div>
-                      <div className="product-listing-content">
-                        <h5>
-                          <Link to={`/vehical-details/${car.id}`}>
-                            {car.BrandName} , {car.VehiclesTitle}
+          {/* Similar Cars Section */}
+          {similarCars.length > 0 && (
+            <div className="pt-10 border-t border-slate-200 space-y-6">
+              <h3 className="font-display font-extrabold text-xl text-slate-900">
+                Similar Vehicles You May Like
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {similarCars.map((sc) => (
+                  <div
+                    key={sc.id}
+                    className="surface-card group bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-xl hover:border-slate-300 transition-all overflow-hidden flex flex-col"
+                  >
+                    <div className="aspect-[16/10] overflow-hidden bg-slate-900">
+                      <Link to={`/vehical-details/${sc.id}`}>
+                        <img
+                          src={getVehicleImageUrl(sc.Vimage1)}
+                          alt={sc.VehiclesTitle}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                      </Link>
+                    </div>
+                    <div className="p-4 flex flex-col justify-between flex-grow space-y-3">
+                      <div>
+                        <h4 className="font-display font-bold text-sm text-slate-900 group-hover:text-brand-red transition-colors">
+                          <Link to={`/vehical-details/${sc.id}`}>
+                            {sc.BrandName ? `${sc.BrandName}, ` : ''}{sc.VehiclesTitle}
                           </Link>
-                        </h5>
-                        <p className="list-price">Rs.{car.PricePerDay}</p>
-                        <div className="car-location">
-                          <span>
-                            <i className="fa fa-user-plus" aria-hidden="true"></i> {car.SeatingCapacity} seats
-                          </span>
-                          <span>
-                            <i className="fa fa-calendar" aria-hidden="true"></i> {car.ModelYear} model
-                          </span>
-                          <span>
-                            <i className="fa fa-car" aria-hidden="true"></i> {car.FuelType}
-                          </span>
-                        </div>
+                        </h4>
+                        <p className="text-xs font-extrabold text-brand-red mt-1">
+                          Rs. {sc.PricePerDay} <span className="text-[10px] text-slate-500 font-semibold">/ Day</span>
+                        </p>
                       </div>
+                      <Link
+                        to={`/vehical-details/${sc.id}`}
+                        className="w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-brand-red text-white font-bold text-xs uppercase tracking-wider transition-colors text-center block"
+                      >
+                        View Details
+                      </Link>
                     </div>
                   </div>
-                ))
-              )}
+                ))}
+              </div>
             </div>
-          </div>
-        </div>
-      </section>
+          )}
+
+        </section>
+      </main>
 
       <Footer />
+
+      {/* Modals */}
       <LoginModal />
       <SignupModal />
       <ForgotPasswordModal />
-    </>
+    </div>
   );
 }

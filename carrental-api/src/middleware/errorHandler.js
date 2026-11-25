@@ -2,14 +2,56 @@
 const { AppError, ValidationError } = require('../utils/errors');
 
 /**
- * Redact sensitive fields from request payloads before logging.
+ * Sensitive key pattern: case-insensitive keys containing
+ * pass, token, secret, signature, authorization, cookie, card, cvv, otp, key
  */
-function sanitizeRequestBody(body) {
-  if (!body || typeof body !== 'object') return body;
-  const sanitized = { ...body };
-  const sensitiveKeys = ['password', 'newpassword', 'confirmpassword', 'token', 'refreshToken', 'accessToken', 'card_number', 'cvv'];
-  for (const key of sensitiveKeys) {
-    if (key in sanitized) sanitized[key] = '***REDACTED***';
+const SENSITIVE_KEY_PATTERN = /(pass|token|secret|signature|authorization|cookie|card|cvv|otp|key)/i;
+
+/**
+ * Recursively redact sensitive fields from request payloads before logging.
+ * Never logs Buffer/raw bodies in clear text (logs only length and content type).
+ */
+function sanitizeRequestBody(body, req = null, seen = new WeakSet()) {
+  if (body == null) return body;
+
+  // Handle Buffer or raw binary bodies
+  if (Buffer.isBuffer(body)) {
+    return {
+      type: 'Buffer',
+      length: body.length,
+      contentType: req?.headers?.['content-type'] || 'application/octet-stream',
+    };
+  }
+
+  // Primitives
+  if (typeof body !== 'object') return body;
+
+  // Cycle detection
+  if (seen.has(body)) {
+    return '[Circular]';
+  }
+  seen.add(body);
+
+  // Arrays
+  if (Array.isArray(body)) {
+    return body.map((item) => sanitizeRequestBody(item, req, seen));
+  }
+
+  // Objects
+  const sanitized = {};
+  for (const [key, val] of Object.entries(body)) {
+    if (SENSITIVE_KEY_PATTERN.test(key)) {
+      sanitized[key] = '***REDACTED***';
+    } else if (Buffer.isBuffer(val)) {
+      sanitized[key] = {
+        type: 'Buffer',
+        length: val.length,
+      };
+    } else if (typeof val === 'object' && val !== null) {
+      sanitized[key] = sanitizeRequestBody(val, req, seen);
+    } else {
+      sanitized[key] = val;
+    }
   }
   return sanitized;
 }
@@ -28,14 +70,35 @@ function errorHandler(err, req, res, _next) {
     } catch {}
   }
 
-  // Safe internal logging with sensitive parameter redaction
-  const safeBody = sanitizeRequestBody(req.body);
-  console.error(`[${new Date().toISOString()}] ${req.method} ${req.path}`, {
-    name: err.name,
-    message: err.message,
-    code: err.code,
-    body: safeBody,
-  });
+  // Determine status code for error logging and response
+  let statusCode = 500;
+  if (err instanceof ValidationError || err.name === 'MulterError') {
+    statusCode = 422;
+  } else if (err instanceof AppError && err.statusCode) {
+    statusCode = err.statusCode;
+  } else if (err.code === 'ER_DUP_ENTRY') {
+    statusCode = 409;
+  } else if (err.message && err.message.startsWith('CORS:')) {
+    statusCode = 403;
+  } else if (typeof err.statusCode === 'number') {
+    statusCode = err.statusCode;
+  } else if (typeof err.status === 'number') {
+    statusCode = err.status;
+  }
+
+  // Log full stacks only for 5xx errors and a single line for 4xx
+  const method = req?.method || 'UNKNOWN';
+  const path = req?.originalUrl || req?.path || '/';
+  if (statusCode >= 500) {
+    const safeBody = sanitizeRequestBody(req?.body, req);
+    console.error(`[${new Date().toISOString()}] ${method} ${path} ${statusCode} - ${err.name}: ${err.message}`, {
+      code: err.code,
+      body: safeBody,
+      stack: err.stack,
+    });
+  } else {
+    console.warn(`[${new Date().toISOString()}] ${method} ${path} ${statusCode} - ${err.name}: ${err.message}`);
+  }
 
   // Multer errors (e.g. file size limit exceeded)
   if (err.name === 'MulterError') {
@@ -87,4 +150,4 @@ function errorHandler(err, req, res, _next) {
   });
 }
 
-module.exports = { errorHandler };
+module.exports = { errorHandler, sanitizeRequestBody, SENSITIVE_KEY_PATTERN };

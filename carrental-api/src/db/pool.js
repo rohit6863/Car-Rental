@@ -1,12 +1,17 @@
 'use strict';
 const mysql = require('mysql2/promise');
+const { assertSafeTestDatabase } = require('./dbGuard');
+
+const targetDb = assertSafeTestDatabase(process.env.DB_NAME || 'wanderwheels_demo_test');
+
+console.log(`[DB] Initializing connection pool for user "${process.env.DB_USER || 'none'}" on database "${targetDb}"`);
 
 const pool = mysql.createPool({
   host:            process.env.DB_HOST     || 'localhost',
   port:            parseInt(process.env.DB_PORT || '3306', 10),
-  user:            process.env.DB_USER     || 'root',
+  user:            process.env.DB_USER     || '',
   password:        process.env.DB_PASS     || '',
-  database:        process.env.DB_NAME     || 'carrental',
+  database:        targetDb,
   connectionLimit: parseInt(process.env.DB_POOL_LIMIT || '10', 10),
   charset:         'utf8mb4',
   timezone:        '+00:00',

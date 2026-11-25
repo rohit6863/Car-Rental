@@ -14,8 +14,9 @@ function getPaymentGateway() {
 
   if (type === 'mock') {
     const isProd = process.env.NODE_ENV === 'production';
-    const dbName = process.env.DB_NAME || '';
-    if (isProd || dbName !== 'carrental_test') {
+    const dbName = (process.env.DB_NAME || '').trim();
+    const isTestDb = Boolean(dbName && dbName.endsWith('_test') && dbName.toLowerCase() !== 'carrental');
+    if (isProd || (!isTestDb && process.env.NODE_ENV !== 'test')) {
       return null; // Safety: refuse mock gateway
     }
     if (!mockGatewayInstance) {
@@ -77,14 +78,15 @@ function reportPaymentGatewayConfig() {
 function validatePaymentGatewayConfig() {
   const selected = (process.env.PAYMENT_GATEWAY || '').toLowerCase().trim();
   const isProd = process.env.NODE_ENV === 'production';
-  const dbName = process.env.DB_NAME || '';
+  const dbName = (process.env.DB_NAME || '').trim();
+  const isTestDb = Boolean(dbName && dbName.endsWith('_test') && dbName.toLowerCase() !== 'carrental');
 
   if (selected === 'mock') {
     if (isProd) {
       throw new Error('[FATAL] PAYMENT_GATEWAY=mock is strictly prohibited in production.');
     }
-    if (dbName !== 'carrental_test') {
-      throw new Error(`[FATAL] PAYMENT_GATEWAY=mock requires DB_NAME='carrental_test', currently '${dbName}'.`);
+    if (!isTestDb && process.env.NODE_ENV !== 'test') {
+      throw new Error(`[FATAL] PAYMENT_GATEWAY=mock requires a test database ending in '_test', currently '${dbName}'.`);
     }
   }
 

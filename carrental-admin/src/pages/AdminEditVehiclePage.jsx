@@ -1,42 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { Car, Fuel, Sparkles, Shield, Image as ImageIcon, Check, MapPin } from 'lucide-react';
 import client, { getVehicleImageUrl } from '../api/client';
+import {
+  FUEL_TYPES,
+  TRANSMISSIONS,
+  VEHICLE_CATEGORIES,
+  MODERN_FEATURES,
+  CORE_ACCESSORIES,
+  INITIAL_VEHICLE_FORM,
+} from '../utils/vehicleOptions';
 
 export default function AdminEditVehiclePage() {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const [brands, setBrands] = useState([]);
-  const [formData, setFormData] = useState({
-    vehicletitle: '',
-    brandname: '',
-    vehicalorcview: '',
-    priceperday: '',
-    fueltype: '',
-    modelyear: '',
-    seatingcapacity: '',
-    airconditioner: 0,
-    powerdoorlocks: 0,
-    antilockbrakingsys: 0,
-    brakeassist: 0,
-    powersteering: 0,
-    driverairbag: 0,
-    passengerairbag: 0,
-    powerwindow: 0,
-    cdplayer: 0,
-    centrallocking: 0,
-    crashcensor: 0,
-    leatherseats: 0,
-  });
-
-  const [images, setImages] = useState({
-    vimage1: '',
-    vimage2: '',
-    vimage3: '',
-    vimage4: '',
-    vimage5: '',
-  });
-
+  const [formData, setFormData] = useState(INITIAL_VEHICLE_FORM);
+  const [images, setImages] = useState({ vimage1: '', vimage2: '', vimage3: '', vimage4: '', vimage5: '' });
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
   const [loading, setLoading] = useState(true);
@@ -57,6 +37,13 @@ export default function AdminEditVehiclePage() {
           vehicalorcview: v.VehiclesOverview || '',
           priceperday: v.PricePerDay || '',
           fueltype: v.FuelType || '',
+          transmission: v.Transmission || 'Automatic',
+          category: v.Category || 'Sedan',
+          registrationplate: v.RegistrationPlate || '',
+          hublocation: v.HubLocation || 'Pune Koregaon Park',
+          odometerkm: String(v.OdometerKm ?? 0),
+          fuelchargepct: String(v.FuelChargePct ?? 100),
+          vehiclestatus: v.vehicle_status || 'Available',
           modelyear: v.ModelYear || '',
           seatingcapacity: v.SeatingCapacity || '',
           airconditioner: v.AirConditioner || 0,
@@ -71,6 +58,13 @@ export default function AdminEditVehiclePage() {
           centrallocking: v.CentralLocking || 0,
           crashcensor: v.CrashSensor || 0,
           leatherseats: v.LeatherSeats || 0,
+          sunroof: v.Sunroof || 0,
+          applecarplay: v.AppleCarPlay || 0,
+          reversecamera: v.ReverseCamera || 0,
+          cruisecontrol: v.CruiseControl || 0,
+          keylessentry: v.KeylessEntry || 0,
+          gpsnavigation: v.GPSNavigation || 0,
+          fastcharging: v.FastCharging || 0,
         });
         setImages({
           vimage1: v.Vimage1 || '',
@@ -79,7 +73,7 @@ export default function AdminEditVehiclePage() {
           vimage4: v.Vimage4 || '',
           vimage5: v.Vimage5 || '',
         });
-      } catch (err) {
+      } catch {
         setError('Failed to load vehicle data');
       } finally {
         setLoading(false);
@@ -90,11 +84,10 @@ export default function AdminEditVehiclePage() {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (type === 'checkbox') {
-      setFormData((prev) => ({ ...prev, [name]: checked ? 1 : 0 }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (checked ? 1 : 0) : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -117,447 +110,307 @@ export default function AdminEditVehiclePage() {
     }
   };
 
+  const inputCls =
+    'w-full bg-white dark:bg-[#1C1C1F] border border-slate-200 dark:border-[#27272A] focus:border-lavender-600 dark:focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-zinc-100 placeholder-slate-400 outline-none';
+  const labelCls = 'block text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1.5';
+
+  const renderCheckboxGrid = (items) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {items.map((item) => (
+        <label
+          key={item.id}
+          htmlFor={item.id}
+          className="flex items-center gap-2.5 p-3 rounded-xl border border-hairline dark:border-[#27272A] bg-slate-50/70 dark:bg-[#1C1C1F] hover:bg-indigo-50/40 dark:hover:bg-amber-500/10 cursor-pointer transition select-none"
+        >
+          <input
+            type="checkbox"
+            id={item.id}
+            name={item.name}
+            checked={formData[item.name] === 1}
+            onChange={handleInputChange}
+            className="w-4 h-4 rounded text-lavender-600 focus:ring-lavender-600 dark:focus:ring-amber-500 border-slate-300 dark:border-[#3F3F46] cursor-pointer"
+          />
+          <span className="text-xs font-semibold text-slate-700 dark:text-zinc-200">{item.label}</span>
+        </label>
+      ))}
+    </div>
+  );
+
   return (
-    <div className="row">
-      <div className="col-md-12">
-        <h2 className="page-title">Edit Vehicle</h2>
+    <div className="space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h2 className="page-title text-xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">Edit Vehicle</h2>
+          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+            Update vehicle specifications, powertrain, telemetry, features, and gallery images
+          </p>
+        </div>
+        <Link
+          to="/manage-vehicles"
+          className="text-xs font-semibold text-slate-600 dark:text-zinc-300 hover:text-lavender-600 dark:hover:text-amber-300 no-underline"
+        >
+          &larr; Back to Manage Vehicles
+        </Link>
+      </div>
 
-        <div className="row">
-          <div className="col-md-12">
-            <div className="panel panel-default">
-              <div className="panel-heading">Basic Info</div>
+      {error && <div className="errorWrap"><strong>ERROR</strong>: {error}</div>}
+      {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
 
-              {error && (
-                <div className="errorWrap" style={{
-                  padding: '10px',
-                  margin: '20px',
-                  background: '#fff',
-                  borderLeft: '4px solid #dd3d36',
-                  boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-                }}>
-                  <strong>ERROR</strong>: {error}
-                </div>
-              )}
-              {msg && (
-                <div className="succWrap" style={{
-                  padding: '10px',
-                  margin: '20px',
-                  background: '#fff',
-                  borderLeft: '4px solid #5cb85c',
-                  boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-                }}>
-                  <strong>SUCCESS</strong>: {msg}
-                </div>
-              )}
+      {loading ? (
+        <div className="bento-card p-6 text-sm text-slate-500 dark:text-zinc-400">Loading vehicle data...</div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Core Specs */}
+          <div className="bento-card p-6 space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-[#27272A]">
+              <Car className="w-4 h-4 text-lavender-600 dark:text-amber-400" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Core Specifications</h3>
+            </div>
 
-              <div className="panel-body">
-                {loading ? (
-                  <p>Loading vehicle data...</p>
-                ) : (
-                  <form className="form-horizontal" onSubmit={handleSubmit}>
-                    <div className="form-group">
-                      <label className="col-sm-2 control-label">
-                        Vehicle Title<span style={{ color: 'red' }}>*</span>
-                      </label>
-                      <div className="col-sm-4">
-                        <input
-                          type="text"
-                          name="vehicletitle"
-                          className="form-control"
-                          value={formData.vehicletitle}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                      <label className="col-sm-2 control-label">
-                        Select Brand<span style={{ color: 'red' }}>*</span>
-                      </label>
-                      <div className="col-sm-4">
-                        <select
-                          className="form-control"
-                          name="brandname"
-                          value={formData.brandname}
-                          onChange={handleInputChange}
-                          required
-                        >
-                          <option value=""> Select </option>
-                          {brands.map((b) => (
-                            <option key={b.id} value={b.id}>
-                              {b.BrandName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelCls}>
+                  Vehicle Title <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="vehicletitle"
+                  value={formData.vehicletitle}
+                  onChange={handleInputChange}
+                  className={inputCls}
+                  required
+                />
+              </div>
 
-                    <div className="hr-dashed" style={{ borderTop: '1px dashed #e4e4e4', margin: '20px 0' }}></div>
+              <div>
+                <label className={labelCls}>
+                  Select Brand <span className="text-rose-500">*</span>
+                </label>
+                <select name="brandname" value={formData.brandname} onChange={handleInputChange} className={inputCls} required>
+                  <option value="">Select</option>
+                  {brands.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.BrandName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
-                    <div className="form-group">
-                      <label className="col-sm-2 control-label">
-                        Vehical Overview<span style={{ color: 'red' }}>*</span>
-                      </label>
-                      <div className="col-sm-10">
-                        <textarea
-                          className="form-control"
-                          name="vehicalorcview"
-                          rows="3"
-                          value={formData.vehicalorcview}
-                          onChange={handleInputChange}
-                          required
-                        ></textarea>
-                      </div>
-                    </div>
+            <div>
+              <label className={labelCls}>
+                Vehicle Overview <span className="text-rose-500">*</span>
+              </label>
+              <textarea
+                name="vehicalorcview"
+                rows={3}
+                value={formData.vehicalorcview}
+                onChange={handleInputChange}
+                className={inputCls}
+                required
+              />
+            </div>
 
-                    <div className="form-group">
-                      <label className="col-sm-2 control-label">
-                        Price Per Day(in Rs.)<span style={{ color: 'red' }}>*</span>
-                      </label>
-                      <div className="col-sm-4">
-                        <input
-                          type="number"
-                          name="priceperday"
-                          className="form-control"
-                          value={formData.priceperday}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                      <label className="col-sm-2 control-label">
-                        Select Fuel Type<span style={{ color: 'red' }}>*</span>
-                      </label>
-                      <div className="col-sm-4">
-                        <select
-                          className="form-control"
-                          name="fueltype"
-                          value={formData.fueltype}
-                          onChange={handleInputChange}
-                          required
-                        >
-                          <option value=""> Select </option>
-                          <option value="Petrol">Petrol</option>
-                          <option value="Diesel">Diesel</option>
-                          <option value="CNG">CNG</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <label className="col-sm-2 control-label">
-                        Model Year<span style={{ color: 'red' }}>*</span>
-                      </label>
-                      <div className="col-sm-4">
-                        <input
-                          type="number"
-                          name="modelyear"
-                          className="form-control"
-                          value={formData.modelyear}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                      <label className="col-sm-2 control-label">
-                        Seating Capacity<span style={{ color: 'red' }}>*</span>
-                      </label>
-                      <div className="col-sm-4">
-                        <input
-                          type="number"
-                          name="seatingcapacity"
-                          className="form-control"
-                          value={formData.seatingcapacity}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="hr-dashed" style={{ borderTop: '1px dashed #e4e4e4', margin: '20px 0' }}></div>
-
-                    <div className="form-group">
-                      <div className="col-sm-12">
-                        <h4><b>Vehicle Images</b></h4>
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <div className="col-sm-4">
-                        Image 1
-                        <div>
-                          <img
-                            src={getVehicleImageUrl(images.vimage1)}
-                            alt="Image 1"
-                            width="300"
-                            height="200"
-                            style={{ border: 'solid 1px #000', objectFit: 'cover' }}
-                          />
-                        </div>
-                        <Link to={`/change-image/${id}/1`}>Change Image 1</Link>
-                      </div>
-                      <div className="col-sm-4">
-                        Image 2
-                        <div>
-                          <img
-                            src={getVehicleImageUrl(images.vimage2)}
-                            alt="Image 2"
-                            width="300"
-                            height="200"
-                            style={{ border: 'solid 1px #000', objectFit: 'cover' }}
-                          />
-                        </div>
-                        <Link to={`/change-image/${id}/2`}>Change Image 2</Link>
-                      </div>
-                      <div className="col-sm-4">
-                        Image 3
-                        <div>
-                          {images.vimage3 ? (
-                            <img
-                              src={getVehicleImageUrl(images.vimage3)}
-                              alt="Image 3"
-                              width="300"
-                              height="200"
-                              style={{ border: 'solid 1px #000', objectFit: 'cover' }}
-                            />
-                          ) : (
-                            <div style={{ width: '300px', height: '200px', border: 'solid 1px #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              No Image
-                            </div>
-                          )}
-                        </div>
-                        <Link to={`/change-image/${id}/3`}>Change Image 3</Link>
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <div className="col-sm-4">
-                        Image 4
-                        <div>
-                          {images.vimage4 ? (
-                            <img
-                              src={getVehicleImageUrl(images.vimage4)}
-                              alt="Image 4"
-                              width="300"
-                              height="200"
-                              style={{ border: 'solid 1px #000', objectFit: 'cover' }}
-                            />
-                          ) : (
-                            <div style={{ width: '300px', height: '200px', border: 'solid 1px #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              No Image
-                            </div>
-                          )}
-                        </div>
-                        <Link to={`/change-image/${id}/4`}>Change Image 4</Link>
-                      </div>
-                      <div className="col-sm-4">
-                        Image 5
-                        <div>
-                          {images.vimage5 ? (
-                            <img
-                              src={getVehicleImageUrl(images.vimage5)}
-                              alt="Image 5"
-                              width="300"
-                              height="200"
-                              style={{ border: 'solid 1px #000', objectFit: 'cover' }}
-                            />
-                          ) : (
-                            <div style={{ width: '300px', height: '200px', border: 'solid 1px #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              No Image
-                            </div>
-                          )}
-                        </div>
-                        <Link to={`/change-image/${id}/5`}>Change Image 5</Link>
-                      </div>
-                    </div>
-
-                    <div className="hr-dashed" style={{ borderTop: '1px dashed #e4e4e4', margin: '20px 0' }}></div>
-
-                    <div className="row">
-                      <div className="col-md-12">
-                        <div className="panel panel-default">
-                          <div className="panel-heading">Accessories</div>
-                          <div className="panel-body">
-                            <div className="form-group">
-                              <div className="col-sm-3">
-                                <div className="checkbox checkbox-inline">
-                                  <input
-                                    type="checkbox"
-                                    id="airconditioner"
-                                    name="airconditioner"
-                                    checked={formData.airconditioner === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  <label htmlFor="airconditioner"> Air Conditioner </label>
-                                </div>
-                              </div>
-                              <div className="col-sm-3">
-                                <div className="checkbox checkbox-inline">
-                                  <input
-                                    type="checkbox"
-                                    id="powerdoorlocks"
-                                    name="powerdoorlocks"
-                                    checked={formData.powerdoorlocks === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  <label htmlFor="powerdoorlocks"> Power Door Locks </label>
-                                </div>
-                              </div>
-                              <div className="col-sm-3">
-                                <div className="checkbox checkbox-inline">
-                                  <input
-                                    type="checkbox"
-                                    id="antilockbrakingsys"
-                                    name="antilockbrakingsys"
-                                    checked={formData.antilockbrakingsys === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  <label htmlFor="antilockbrakingsys"> AntiLock Braking System </label>
-                                </div>
-                              </div>
-                              <div className="col-sm-3">
-                                <div className="checkbox checkbox-inline">
-                                  <input
-                                    type="checkbox"
-                                    id="brakeassist"
-                                    name="brakeassist"
-                                    checked={formData.brakeassist === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  <label htmlFor="brakeassist"> Brake Assist </label>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="form-group">
-                              <div className="col-sm-3">
-                                <div className="checkbox checkbox-inline">
-                                  <input
-                                    type="checkbox"
-                                    id="powersteering"
-                                    name="powersteering"
-                                    checked={formData.powersteering === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  <label htmlFor="powersteering"> Power Steering </label>
-                                </div>
-                              </div>
-                              <div className="col-sm-3">
-                                <div className="checkbox checkbox-inline">
-                                  <input
-                                    type="checkbox"
-                                    id="driverairbag"
-                                    name="driverairbag"
-                                    checked={formData.driverairbag === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  <label htmlFor="driverairbag"> Driver Airbag </label>
-                                </div>
-                              </div>
-                              <div className="col-sm-3">
-                                <div className="checkbox checkbox-inline">
-                                  <input
-                                    type="checkbox"
-                                    id="passengerairbag"
-                                    name="passengerairbag"
-                                    checked={formData.passengerairbag === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  <label htmlFor="passengerairbag"> Passenger Airbag </label>
-                                </div>
-                              </div>
-                              <div className="col-sm-3">
-                                <div className="checkbox checkbox-inline">
-                                  <input
-                                    type="checkbox"
-                                    id="powerwindow"
-                                    name="powerwindow"
-                                    checked={formData.powerwindow === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  <label htmlFor="powerwindow"> Power Windows </label>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="form-group">
-                              <div className="col-sm-3">
-                                <div className="checkbox checkbox-inline">
-                                  <input
-                                    type="checkbox"
-                                    id="cdplayer"
-                                    name="cdplayer"
-                                    checked={formData.cdplayer === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  <label htmlFor="cdplayer"> CD Player </label>
-                                </div>
-                              </div>
-                              <div className="col-sm-3">
-                                <div className="checkbox checkbox-inline">
-                                  <input
-                                    type="checkbox"
-                                    id="centrallocking"
-                                    name="centrallocking"
-                                    checked={formData.centrallocking === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  <label htmlFor="centrallocking"> Central Locking </label>
-                                </div>
-                              </div>
-                              <div className="col-sm-3">
-                                <div className="checkbox checkbox-inline">
-                                  <input
-                                    type="checkbox"
-                                    id="crashcensor"
-                                    name="crashcensor"
-                                    checked={formData.crashcensor === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  <label htmlFor="crashcensor"> Crash Sensor </label>
-                                </div>
-                              </div>
-                              <div className="col-sm-3">
-                                <div className="checkbox checkbox-inline">
-                                  <input
-                                    type="checkbox"
-                                    id="leatherseats"
-                                    name="leatherseats"
-                                    checked={formData.leatherseats === 1}
-                                    onChange={handleInputChange}
-                                  />
-                                  <label htmlFor="leatherseats"> Leather Seats </label>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <div className="col-sm-8 col-sm-offset-2">
-                        <button
-                          className="btn btn-default"
-                          type="button"
-                          onClick={() => navigate('/manage-vehicles')}
-                        >
-                          Cancel
-                        </button>
-                        &nbsp;
-                        <button
-                          className="btn btn-primary"
-                          name="submit"
-                          type="submit"
-                          disabled={submitting}
-                        >
-                          {submitting ? 'Saving...' : 'Save changes'}
-                        </button>
-                      </div>
-                    </div>
-                  </form>
-                )}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className={labelCls}>
+                  Price Per Day (INR) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  name="priceperday"
+                  value={formData.priceperday}
+                  onChange={handleInputChange}
+                  className={`${inputCls} tabular-nums`}
+                  required
+                />
+              </div>
+              <div>
+                <label className={labelCls}>
+                  Model Year <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  name="modelyear"
+                  value={formData.modelyear}
+                  onChange={handleInputChange}
+                  className={`${inputCls} tabular-nums`}
+                  required
+                />
+              </div>
+              <div>
+                <label className={labelCls}>
+                  Seating Capacity <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  name="seatingcapacity"
+                  value={formData.seatingcapacity}
+                  onChange={handleInputChange}
+                  className={`${inputCls} tabular-nums`}
+                  required
+                />
               </div>
             </div>
           </div>
-        </div>
-      </div>
+
+          {/* Fuel & Powertrain */}
+          <div className="bento-card p-6 space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-[#27272A]">
+              <Fuel className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Fuel &amp; Powertrain</h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className={labelCls}>
+                  Select Fuel Type <span className="text-rose-500">*</span>
+                </label>
+                <select name="fueltype" value={formData.fueltype} onChange={handleInputChange} className={inputCls} required>
+                  <option value="">Select</option>
+                  {FUEL_TYPES.map((f) => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className={labelCls}>Transmission</label>
+                <select name="transmission" value={formData.transmission} onChange={handleInputChange} className={inputCls}>
+                  {TRANSMISSIONS.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className={labelCls}>Body Category</label>
+                <select name="category" value={formData.category} onChange={handleInputChange} className={inputCls}>
+                  {VEHICLE_CATEGORIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Fleet Telemetry */}
+          <div className="bento-card p-6 space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-[#27272A]">
+              <MapPin className="w-4 h-4 text-sky-600 dark:text-amber-400" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Fleet Telemetry &amp; Dispatch</h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label className={labelCls}>Registration Plate</label>
+                <input
+                  type="text"
+                  name="registrationplate"
+                  value={formData.registrationplate}
+                  onChange={handleInputChange}
+                  className={`${inputCls} uppercase`}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Assigned Hub</label>
+                <input
+                  type="text"
+                  name="hublocation"
+                  value={formData.hublocation}
+                  onChange={handleInputChange}
+                  className={inputCls}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Odometer (km)</label>
+                <input
+                  type="number"
+                  min="0"
+                  name="odometerkm"
+                  value={formData.odometerkm}
+                  onChange={handleInputChange}
+                  className={`${inputCls} tabular-nums`}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Operational Status</label>
+                <select name="vehiclestatus" value={formData.vehiclestatus} onChange={handleInputChange} className={inputCls}>
+                  <option value="Available">Available</option>
+                  <option value="Rented">Rented</option>
+                  <option value="Maintenance">Maintenance</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Modern Tech & Comfort */}
+          <div className="bento-card p-6 space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-[#27272A]">
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Modern Tech &amp; Comfort Features</h3>
+            </div>
+            {renderCheckboxGrid(MODERN_FEATURES)}
+          </div>
+
+          {/* Safety & Legacy Compatibility */}
+          <div className="bento-card p-6 space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-[#27272A]">
+              <Shield className="w-4 h-4 text-indigo-600 dark:text-amber-400" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Safety &amp; Core Equipment</h3>
+            </div>
+            {renderCheckboxGrid(CORE_ACCESSORIES)}
+          </div>
+
+          {/* Vehicle Images */}
+          <div className="bento-card p-6 space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-[#27272A]">
+              <ImageIcon className="w-4 h-4 text-sky-600 dark:text-amber-400" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Vehicle Images</h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1, 2, 3, 4, 5].map((num) => {
+                const imgVal = images[`vimage${num}`];
+                return (
+                  <div key={num} className="p-3 rounded-xl border border-hairline dark:border-[#27272A] bg-slate-50/50 dark:bg-[#1C1C1F] space-y-2">
+                    <div className="text-xs font-semibold text-slate-700 dark:text-zinc-200">Image {num}</div>
+                    {imgVal ? (
+                      <img
+                        src={getVehicleImageUrl(imgVal)}
+                        alt={`Image ${num}`}
+                        className="w-full h-36 object-cover rounded-lg border border-hairline dark:border-[#27272A]"
+                      />
+                    ) : (
+                      <div className="w-full h-36 rounded-lg border border-dashed border-slate-300 dark:border-[#27272A] flex items-center justify-center text-xs text-slate-400">
+                        No image uploaded
+                      </div>
+                    )}
+                    <Link
+                      to={`/change-image/${id}/${num}`}
+                      className="inline-block text-xs font-semibold text-lavender-600 dark:text-amber-400 hover:underline no-underline"
+                    >
+                      Change Image {num}
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-3">
+            <button
+              type="submit"
+              name="submit"
+              disabled={submitting}
+              className="px-5 py-2.5 rounded-xl bg-lavender-600 hover:bg-lavender-700 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold inline-flex items-center gap-2 cursor-pointer disabled:opacity-60"
+            >
+              <Check className="w-4 h-4" />
+              <span>{submitting ? 'Saving...' : 'Save changes'}</span>
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }

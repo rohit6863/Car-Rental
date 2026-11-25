@@ -1,11 +1,14 @@
 {
   "name": "carrental-api",
   "version": "1.0.0",
-  "description": "WandarWheels Car Rental REST API",
+  "description": "WanderWheels Car Rental REST API",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "db:setup": "node src/db/setup.js",
+    "db:provision": "node scripts/provision-dev-databases.cjs",
+    "db:reset-demo": "node scripts/reset-demo.js",
     "seed": "node src/db/seed.js",
     "migrate": "node src/migrations/runner.js",
     "migrate:dryrun": "node src/migrations/005_date_migration_dryrun.js",

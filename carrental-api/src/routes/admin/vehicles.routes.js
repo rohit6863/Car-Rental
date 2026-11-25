@@ -9,6 +9,8 @@ const {
   vehicleFormSchema,
   vehicleIdParamSchema,
   vehicleImageNumParamSchema,
+  vehicleStatusUpdateSchema,
+  vehicleTelematicsUpdateSchema,
 } = require('../../validators/vehicle.validator');
 
 const router = express.Router();
@@ -50,6 +52,8 @@ router.post(
   adminVehiclesController.create
 );
 router.put('/:id', validate({ params: vehicleIdParamSchema, body: vehicleFormSchema }), adminVehiclesController.update);
+router.patch('/:id/status', validate({ params: vehicleIdParamSchema, body: vehicleStatusUpdateSchema }), adminVehiclesController.updateStatus);
+router.patch('/:id/telematics', validate({ params: vehicleIdParamSchema, body: vehicleTelematicsUpdateSchema }), adminVehiclesController.updateTelematics);
 router.put('/:id/image/:num', upload.single('img'), verifyUploadMagicBytes, validate({ params: vehicleImageNumParamSchema }), adminVehiclesController.updateImage);
 router.delete('/:id', validate({ params: vehicleIdParamSchema }), adminVehiclesController.delete);
 

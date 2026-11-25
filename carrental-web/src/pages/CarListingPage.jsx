@@ -25,6 +25,7 @@ export default function CarListingPage() {
   const [selectedFuel, setSelectedFuel] = useState(fuelParam);
 
   useEffect(() => {
+    let isMounted = true;
     async function loadData() {
       setLoading(true);
       try {
@@ -32,40 +33,41 @@ export default function CarListingPage() {
           api.get('/api/brands'),
           api.get('/api/vehicles/recent?limit=4'),
         ]);
-        setBrands(brandsRes.data);
-        setRecentCars(recentRes.data);
+        if (isMounted) {
+          setBrands(brandsRes.data || []);
+          setRecentCars(recentRes.data || []);
+        }
 
         let vRes;
         if (brandParam && fuelParam) {
-          // Legacy B9: Both brand and fuel required for filtered search
           vRes = await api.get(`/api/vehicles/search?brand=${brandParam}&fueltype=${encodeURIComponent(fuelParam)}`);
         } else {
           vRes = await api.get('/api/vehicles');
         }
 
-        let list = vRes.data;
+        let list = vRes.data || [];
         if (searchKeyword) {
           const kw = searchKeyword.toLowerCase();
           list = list.filter((c) =>
             c.VehiclesTitle.toLowerCase().includes(kw) ||
-            c.BrandName.toLowerCase().includes(kw)
+            (c.BrandName && c.BrandName.toLowerCase().includes(kw))
           );
         }
-        setVehicles(list);
+        if (isMounted) setVehicles(list);
       } catch (err) {
         console.error('Failed to load listing data', err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     }
 
     loadData();
+    return () => { isMounted = false; };
   }, [brandParam, fuelParam, searchKeyword]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (!selectedBrand || selectedBrand === 'Select Brand' || !selectedFuel || selectedFuel === 'Select Fuel Type') {
-      // Legacy behavior: both required
       navigate('/car-listing');
       return;
     }
@@ -73,180 +75,236 @@ export default function CarListingPage() {
   };
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col transition-colors">
       <Header />
 
-      {/* Page Header */}
-      <section className="page-header listing_page">
-        <div className="container">
-          <div className="page-header_wrap">
-            <div className="page-heading">
-              <h1>Car Listing</h1>
-            </div>
-            <ul className="coustom-breadcrumb">
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-              <li>Car Listing</li>
-            </ul>
+      <main className="flex-grow">
+        {/* Sub-Page Hero Banner */}
+        <section className="relative h-48 sm:h-56 bg-slate-950 flex items-center justify-center text-center overflow-hidden">
+          <div className="absolute inset-0 subbanner-overlay"></div>
+          <div className="relative z-10 px-4">
+            <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-white tracking-tight">
+              Car Listing
+            </h1>
+            <nav className="flex items-center justify-center gap-2 text-xs sm:text-sm text-slate-300 font-medium mt-2">
+              <Link to="/" className="hover:text-brand-red transition-colors">Home</Link>
+              <i className="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+              <span className="text-white font-semibold">Car Listing</span>
+            </nav>
           </div>
-        </div>
-        <div className="dark-overlay"></div>
-      </section>
-      {/* /Page Header */}
+        </section>
 
-      {/* Listing */}
-      <section className="listing-page">
-        <div className="container">
-          <div className="row">
-            <div className="col-md-9 col-md-push-3">
-              <div className="result-sorting-wrapper">
-                <div className="sorting-count">
-                  <p>
-                    <span>{vehicles.length} Listings</span>
-                  </p>
+        {/* Listing Page Body */}
+        <section className="py-12 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* LEFT SIDEBAR */}
+            <aside className="lg:col-span-4 xl:col-span-3 space-y-6">
+              
+              {/* Filter Widget */}
+              <div className="surface-card bg-white rounded-2xl border border-slate-200/90 shadow-card p-5 sm:p-6 transition-colors">
+                <div className="flex items-center gap-2.5 pb-4 mb-4 border-b border-slate-100">
+                  <i className="fa-solid fa-filter text-brand-red text-base"></i>
+                  <h2 className="text-adaptive-main font-display font-extrabold text-base text-slate-900">
+                    Find Your Car
+                  </h2>
                 </div>
-              </div>
 
-              {loading ? (
-                <div style={{ padding: '30px', textAlign: 'center' }}>Loading vehicles...</div>
-              ) : vehicles.length > 0 ? (
-                vehicles.map((v) => (
-                  <div className="product-listing-m gray-bg" key={v.id}>
-                    <div className="product-listing-img">
-                      <img
-                        src={getVehicleImageUrl(v.Vimage1)}
-                        className="img-responsive"
-                        alt="Image"
-                        style={{ width: '100%', height: '220px', objectFit: 'cover' }}
-                      />
-                    </div>
-                    <div className="product-listing-content">
-                      <h5>
-                        <Link to={`/vehical-details/${v.id}`}>
-                          {v.BrandName} , {v.VehiclesTitle}
-                        </Link>
-                      </h5>
-                      <p className="list-price">Rs.{v.PricePerDay} Per Day</p>
-                      <ul>
-                        <li>
-                          <i className="fa fa-user" aria-hidden="true"></i>
-                          {v.SeatingCapacity} seats
-                        </li>
-                        <li>
-                          <i className="fa fa-calendar" aria-hidden="true"></i>
-                          {v.ModelYear} model
-                        </li>
-                        <li>
-                          <i className="fa fa-car" aria-hidden="true"></i>
-                          {v.FuelType}
-                        </li>
-                      </ul>
-                      <Link to={`/vehical-details/${v.id}`} className="btn">
-                        View Details{' '}
-                        <span className="angle_arrow">
-                          <i className="fa fa-angle-right" aria-hidden="true"></i>
-                        </span>
-                      </Link>
-                    </div>
+                <form onSubmit={handleSearchSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                      Select Brand
+                    </label>
+                    <select
+                      className="w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-semibold text-xs rounded-xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-red transition-all cursor-pointer"
+                      name="brand"
+                      value={selectedBrand}
+                      onChange={(e) => setSelectedBrand(e.target.value)}
+                    >
+                      <option value="" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Select Brand</option>
+                      {brands.map((b) => (
+                        <option key={b.id} value={b.id} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+                          {b.BrandName}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                ))
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                      Select Fuel Type
+                    </label>
+                    <select
+                      className="w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-semibold text-xs rounded-xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-red transition-all cursor-pointer"
+                      name="fueltype"
+                      value={selectedFuel}
+                      onChange={(e) => setSelectedFuel(e.target.value)}
+                    >
+                      <option value="" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Select Fuel Type</option>
+                      <option value="Petrol" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Petrol</option>
+                      <option value="Diesel" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Diesel</option>
+                      <option value="CNG" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">CNG</option>
+                      <option value="Electric" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Electric</option>
+                      <option value="Hybrid" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Hybrid</option>
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-2.5 px-4 rounded-xl bg-brand-red hover:bg-brand-darkRed text-white font-bold text-xs uppercase tracking-wider shadow-sm transition-all flex items-center justify-center gap-2 min-h-[44px]"
+                  >
+                    <i className="fa-solid fa-magnifying-glass text-xs"></i>
+                    <span>Search Car</span>
+                  </button>
+                </form>
+              </div>
+
+              {/* Recently Listed Cars Widget */}
+              <div className="surface-card bg-white rounded-2xl border border-slate-200/90 shadow-card p-5 sm:p-6 transition-colors">
+                <div className="flex items-center gap-2.5 pb-4 mb-4 border-b border-slate-100">
+                  <i className="fa-solid fa-clock-rotate-left text-brand-red text-base"></i>
+                  <h3 className="text-adaptive-main font-display font-extrabold text-base text-slate-900">
+                    Recently Listed
+                  </h3>
+                </div>
+
+                <div className="space-y-3.5">
+                  {recentCars.map((rc) => (
+                    <div key={rc.id} className="flex items-center gap-3 group">
+                      <Link to={`/vehical-details/${rc.id}`} className="w-16 h-12 rounded-lg overflow-hidden bg-slate-900 flex-shrink-0">
+                        <img
+                          src={getVehicleImageUrl(rc.Vimage1)}
+                          alt={rc.VehiclesTitle}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                      </Link>
+                      <div className="overflow-hidden">
+                        <h4 className="font-display font-bold text-xs text-slate-900 dark:text-white group-hover:text-brand-red transition-colors truncate">
+                          <Link to={`/vehical-details/${rc.id}`} className="text-slate-900 dark:text-white hover:text-brand-red">
+                            {rc.BrandName ? `${rc.BrandName}, ` : ''}{rc.VehiclesTitle}
+                          </Link>
+                        </h4>
+                        <p className="text-[11px] font-extrabold text-brand-red mt-0.5">
+                          Rs. {rc.PricePerDay} <span className="text-[9px] text-slate-500 font-semibold">/ Day</span>
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </aside>
+
+            {/* RIGHT COLUMN: VEHICLE RESULTS */}
+            <div className="lg:col-span-8 xl:col-span-9 space-y-6">
+              
+              {/* Results Top Bar */}
+              <div className="surface-card bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex items-center justify-between transition-colors">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600">
+                  <span className="w-2 h-2 rounded-full bg-brand-emerald"></span>
+                  <span>{vehicles.length} Listings Available</span>
+                </div>
+              </div>
+
+              {/* Vehicle Cards List */}
+              {loading ? (
+                <div className="text-center py-16 text-slate-500 font-semibold">
+                  <i className="fa-solid fa-spinner fa-spin text-brand-red text-2xl mb-2 block"></i>
+                  <span>Loading available cars...</span>
+                </div>
+              ) : vehicles.length === 0 ? (
+                <div className="surface-card bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-500 space-y-3">
+                  <i className="fa-solid fa-car-tunnel text-4xl text-slate-300"></i>
+                  <p className="text-sm font-semibold">No vehicles found matching your criteria.</p>
+                  <Link to="/car-listing" className="inline-block text-xs font-bold text-brand-red hover:underline">
+                    Clear all filters
+                  </Link>
+                </div>
               ) : (
-                <div className="alert alert-info">No vehicles found matching your criteria.</div>
+                <div className="space-y-5">
+                  {vehicles.map((v) => (
+                    <div
+                      key={v.id}
+                      className="surface-card group bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-xl hover:border-slate-300 transition-all duration-300 overflow-hidden flex flex-col md:flex-row"
+                    >
+                      {/* Vehicle Image */}
+                      <div className="md:w-72 relative aspect-[16/10] md:aspect-auto bg-slate-900 flex-shrink-0 overflow-hidden">
+                        <Link to={`/vehical-details/${v.id}`} className="block w-full h-full">
+                          <img
+                            src={getVehicleImageUrl(v.Vimage1)}
+                            alt={v.VehiclesTitle}
+                            className="w-full h-full object-cover card-image-zoom"
+                          />
+                        </Link>
+                        <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-slate-950/80 backdrop-blur-md text-white font-extrabold text-[10px] uppercase tracking-wider border border-white/10">
+                          {v.BrandName}
+                        </span>
+                      </div>
+
+                      {/* Content & Specs */}
+                      <div className="p-5 flex flex-col justify-between flex-grow space-y-4">
+                        <div>
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <h3 className="font-display font-extrabold text-lg text-slate-900 dark:text-white group-hover:text-brand-red transition-colors">
+                              <Link to={`/vehical-details/${v.id}`} className="text-slate-900 dark:text-white hover:text-brand-red">
+                                {v.BrandName} , {v.VehiclesTitle}
+                              </Link>
+                            </h3>
+                            <span className="text-brand-red font-black text-base">
+                              Rs. {v.PricePerDay} <span className="text-xs font-bold text-slate-500 dark:text-slate-400">/ Day</span>
+                            </span>
+                          </div>
+                          
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">
+                            {v.VehiclesOverview || 'Verified luxury performance vehicle with premium safety features.'}
+                          </p>
+                        </div>
+
+                        {/* Specs Pills */}
+                        <div className="flex flex-wrap items-center gap-3 pt-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+                            <i className="fa-solid fa-gas-pump text-amber-500"></i>
+                            {v.FuelType}
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+                            <i className="fa-solid fa-calendar text-brand-red"></i>
+                            {v.ModelYear} model
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+                            <i className="fa-solid fa-user text-blue-500"></i>
+                            {v.SeatingCapacity} seats
+                          </span>
+                        </div>
+
+                        {/* Action Link */}
+                        <div className="pt-1 flex items-center justify-end">
+                          <Link
+                            to={`/vehical-details/${v.id}`}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-brand-red dark:bg-slate-800 dark:hover:bg-brand-red text-white hover:text-white font-bold text-xs uppercase tracking-wider transition-colors min-h-[44px]"
+                          >
+                            <span>View Details</span>
+                            <i className="fa-solid fa-arrow-right text-[10px]"></i>
+                          </Link>
+                        </div>
+
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
+
             </div>
 
-            {/* Side-Bar */}
-            <aside className="col-md-3 col-md-pull-9">
-              <div className="sidebar_widget">
-                <div className="widget_heading">
-                  <h5>
-                    <i className="fa fa-filter" aria-hidden="true"></i> Find Your Car{' '}
-                  </h5>
-                </div>
-                <div className="sidebar_filter">
-                  <form onSubmit={handleSearchSubmit}>
-                    <div className="form-group select">
-                      <select
-                        className="form-control"
-                        name="brand"
-                        value={selectedBrand}
-                        onChange={(e) => setSelectedBrand(e.target.value)}
-                      >
-                        <option value="">Select Brand</option>
-                        {brands.map((b) => (
-                          <option key={b.id} value={b.id}>
-                            {b.BrandName}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="form-group select">
-                      <select
-                        className="form-control"
-                        name="fueltype"
-                        value={selectedFuel}
-                        onChange={(e) => setSelectedFuel(e.target.value)}
-                      >
-                        <option value="">Select Fuel Type</option>
-                        <option value="Petrol">Petrol</option>
-                        <option value="Diesel">Diesel</option>
-                        <option value="CNG">CNG</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <button type="submit" className="btn btn-block">
-                        <i className="fa fa-search" aria-hidden="true"></i> Search Car
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-
-              <div className="sidebar_widget">
-                <div className="widget_heading">
-                  <h5>
-                    <i className="fa fa-car" aria-hidden="true"></i> Recently Listed Cars
-                  </h5>
-                </div>
-                <div className="recent_addedcars">
-                  <ul>
-                    {recentCars.map((rc) => (
-                      <li className="gray-bg" key={rc.id}>
-                        <div className="recent_post_img">
-                          <Link to={`/vehical-details/${rc.id}`}>
-                            <img src={getVehicleImageUrl(rc.Vimage1)} alt="image" />
-                          </Link>
-                        </div>
-                        <div className="recent_post_title">
-                          <Link to={`/vehical-details/${rc.id}`}>
-                            {rc.BrandName} , {rc.VehiclesTitle}
-                          </Link>
-                          <p className="widget_price">Rs.{rc.PricePerDay} Per Day</p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </aside>
-            {/* /Side-Bar */}
           </div>
-        </div>
-      </section>
-      {/* /Listing */}
+        </section>
+      </main>
 
       <Footer />
 
-      <div id="back-top" className="back-top">
-        <a href="#top" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-          <i className="fa fa-angle-up" aria-hidden="true"></i>
-        </a>
-      </div>
-
+      {/* Modals */}
       <LoginModal />
       <SignupModal />
       <ForgotPasswordModal />
-    </>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Headphones, Check } from 'lucide-react';
 import client from '../api/client';
 
 export default function AdminUpdateContactInfoPage() {
@@ -23,7 +24,7 @@ export default function AdminUpdateContactInfoPage() {
             contactno: res.data.ContactNo || '',
           });
         }
-      } catch (err) {
+      } catch {
         setError('Failed to load contact information');
       } finally {
         setLoading(false);
@@ -40,7 +41,7 @@ export default function AdminUpdateContactInfoPage() {
 
     try {
       await client.put('/api/admin/contact-info', formData);
-      setMsg('Info Updateed successfully'); // legacy copy phrasing
+      setMsg('Info Updated successfully');
     } catch (err) {
       if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
         setError(err.response.data.details.map((d) => d.message).join('. '));
@@ -56,100 +57,83 @@ export default function AdminUpdateContactInfoPage() {
   };
 
   return (
-    <div className="row">
-      <div className="col-md-12">
-        <h2 className="page-title">Update Contact Info</h2>
+    <div className="space-y-5 max-w-2xl">
+      <div>
+        <h2 className="page-title text-xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">Update Contact Info</h2>
+        <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">Configure public support email, helpline number, and office address</p>
+      </div>
 
-        <div className="row">
-          <div className="col-md-10">
-            <div className="panel panel-default">
-              <div className="panel-heading">Form fields</div>
-              <div className="panel-body">
-                {error && (
-                  <div className="errorWrap" style={{
-                    padding: '10px',
-                    margin: '0 0 20px 0',
-                    background: '#fff',
-                    borderLeft: '4px solid #dd3d36',
-                    boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-                  }}>
-                    <strong>ERROR</strong>: {error}
-                  </div>
-                )}
-                {msg && (
-                  <div className="succWrap" style={{
-                    padding: '10px',
-                    margin: '0 0 20px 0',
-                    background: '#fff',
-                    borderLeft: '4px solid #5cb85c',
-                    boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-                  }}>
-                    <strong>SUCCESS</strong>: {msg}
-                  </div>
-                )}
+      {error && <div className="errorWrap"><strong>ERROR</strong>: {error}</div>}
+      {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
 
-                {loading ? (
-                  <p>Loading contact information...</p>
-                ) : (
-                  <form className="form-horizontal" onSubmit={handleSubmit}>
-                    <div className="form-group">
-                      <label className="col-sm-4 control-label" htmlFor="address">Address</label>
-                      <div className="col-sm-8">
-                        <textarea
-                          className="form-control"
-                          name="address"
-                          id="address"
-                          value={formData.address}
-                          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                          required
-                        ></textarea>
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <label className="col-sm-4 control-label" htmlFor="email">Email id</label>
-                      <div className="col-sm-8">
-                        <input
-                          type="email"
-                          className="form-control"
-                          name="email"
-                          id="email"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <label className="col-sm-4 control-label" htmlFor="contactno">Contact Number</label>
-                      <div className="col-sm-8">
-                        <input
-                          type="text"
-                          className="form-control"
-                          name="contactno"
-                          id="contactno"
-                          value={formData.contactno}
-                          onChange={(e) => setFormData({ ...formData, contactno: e.target.value })}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="hr-dashed" style={{ borderTop: '1px dashed #e4e4e4', margin: '20px 0' }}></div>
-
-                    <div className="form-group">
-                      <div className="col-sm-8 col-sm-offset-4">
-                        <button className="btn btn-primary" name="submit" type="submit" disabled={submitting}>
-                          {submitting ? 'Updating...' : 'Update'}
-                        </button>
-                      </div>
-                    </div>
-                  </form>
-                )}
-              </div>
-            </div>
-          </div>
+      <div className="bento-card p-6">
+        <div className="flex items-center gap-2 pb-3 mb-4 border-b border-hairline dark:border-[#27272A]">
+          <Headphones className="w-4 h-4 text-lavender-600 dark:text-amber-400" />
+          <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Contact & Helpline Details</h3>
         </div>
+
+        {loading ? (
+          <p className="text-sm text-slate-500 dark:text-zinc-400">Loading contact information...</p>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="address" className="block text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1.5">
+                Address
+              </label>
+              <textarea
+                className="w-full bg-white dark:bg-[#1C1C1F] border border-slate-200 dark:border-[#27272A] focus:border-lavender-600 dark:focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-zinc-100 outline-none"
+                name="address"
+                id="address"
+                rows={3}
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1.5">
+                Email id
+              </label>
+              <input
+                type="email"
+                className="w-full bg-white dark:bg-[#1C1C1F] border border-slate-200 dark:border-[#27272A] focus:border-lavender-600 dark:focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-zinc-100 outline-none"
+                name="email"
+                id="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="contactno" className="block text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1.5">
+                Contact Number
+              </label>
+              <input
+                type="text"
+                className="w-full bg-white dark:bg-[#1C1C1F] border border-slate-200 dark:border-[#27272A] focus:border-lavender-600 dark:focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-zinc-100 outline-none"
+                name="contactno"
+                id="contactno"
+                value={formData.contactno}
+                onChange={(e) => setFormData({ ...formData, contactno: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                className="px-5 py-2.5 rounded-xl bg-lavender-600 hover:bg-lavender-700 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold inline-flex items-center gap-2 cursor-pointer disabled:opacity-60"
+                name="submit"
+                type="submit"
+                disabled={submitting}
+              >
+                <Check className="w-4 h-4" />
+                <span>{submitting ? 'Updating...' : 'Update'}</span>
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

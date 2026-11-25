@@ -34,8 +34,13 @@ class ForbiddenError extends AppError {
 }
 
 class NotFoundError extends AppError {
-  constructor(resource = 'Resource') {
-    super(`${resource} not found`, 404);
+  constructor(resourceOrMessage = 'Resource') {
+    const isFullMessage =
+      resourceOrMessage.endsWith('not found') ||
+      resourceOrMessage.includes('not configured') ||
+      resourceOrMessage.includes('is not');
+    const message = isFullMessage ? resourceOrMessage : `${resourceOrMessage} not found`;
+    super(message, 404);
   }
 }
 

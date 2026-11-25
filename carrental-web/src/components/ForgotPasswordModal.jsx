@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import api from '../api/client';
+import { useModal } from '../context/ModalContext';
+import useModalFocusTrap from '../hooks/useModalFocusTrap';
 
 const COMMON_PASSWORDS = new Set([
   'password',
@@ -19,6 +21,10 @@ const COMMON_PASSWORDS = new Set([
 ]);
 
 export default function ForgotPasswordModal() {
+  const { activeModal, openModal, closeModal } = useModal();
+  const isOpen = activeModal === 'forgot';
+  const dialogRef = useRef(null);
+
   const [step, setStep] = useState(1); // 1 = request reset, 2 = enter token & new password
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('');
@@ -28,6 +34,12 @@ export default function ForgotPasswordModal() {
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const handleClose = useCallback(() => {
+    closeModal('forgot');
+  }, [closeModal]);
+
+  useModalFocusTrap(isOpen, dialogRef, handleClose);
 
   const handleRequestReset = async (e) => {
     e.preventDefault();
@@ -87,10 +99,7 @@ export default function ForgotPasswordModal() {
       });
       setMsg(res.data.message || 'Your Password successfully changed');
       setTimeout(() => {
-        if (window.$) {
-          window.$('#forgotpassword').modal('hide');
-          window.$('#loginform').modal('show');
-        }
+        openModal('login');
         setStep(1);
         setEmail('');
         setToken('');
@@ -108,117 +117,185 @@ export default function ForgotPasswordModal() {
     }
   };
 
+  const switchToLogin = (e) => {
+    e.preventDefault();
+    openModal('login');
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <div className="modal fade" id="forgotpassword" tabIndex="-1" role="dialog">
-      <div className="modal-dialog" role="document">
-        <div className="modal-content">
-          <div className="modal-header">
-            <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
+    <div
+      ref={dialogRef}
+      className="modal in show fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4 overflow-y-auto"
+      id="forgotpassword"
+      data-testid="forgot-modal"
+      tabIndex={-1}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="forgot-modal-title"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleClose();
+      }}
+    >
+      <div className="modal-dialog max-w-md w-full mx-auto p-4" role="document">
+        <div className="modal-content surface-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden transition-colors">
+          
+          {/* Header */}
+          <div className="modal-header bg-brand-dark text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
+            <div>
+              <h3 id="forgot-modal-title" className="modal-title font-display font-extrabold text-lg text-white">Password Recovery</h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                {step === 1 ? 'Enter your email to receive recovery instructions' : 'Set your new password'}
+              </p>
+            </div>
+            <button
+              type="button"
+              data-testid="forgot-modal-close"
+              className="close w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
+              aria-label="Close"
+              onClick={handleClose}
+            >
+              <span aria-hidden="true" className="text-xl leading-none">&times;</span>
             </button>
-            <h3 className="modal-title">Password Recovery</h3>
           </div>
-          <div className="modal-body">
-            <div className="row">
-              <div className="forgotpassword_wrap">
-                <div className="col-md-12">
-                  {error && <div className="alert alert-danger">{error}</div>}
-                  {msg && <div className="alert alert-success">{msg}</div>}
 
-                  {step === 1 ? (
-                    <form name="chngpwd" onSubmit={handleRequestReset}>
-                      <div className="form-group">
-                        <input
-                          type="email"
-                          name="email"
-                          className="form-control"
-                          placeholder="Your Email address*"
-                          required
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="text"
-                          name="mobile"
-                          className="form-control"
-                          placeholder="Your Reg. Mobile*"
-                          value={mobile}
-                          onChange={(e) => setMobile(e.target.value)}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="submit"
-                          value={loading ? 'Please wait...' : 'Reset My Password'}
-                          name="update"
-                          className="btn btn-block"
-                          disabled={loading}
-                        />
-                      </div>
-                    </form>
-                  ) : (
-                    <form name="chngpwd2" onSubmit={handleResetPassword}>
-                      <div className="form-group">
-                        <input
-                          type="text"
-                          name="token"
-                          className="form-control"
-                          placeholder="Enter Reset Token*"
-                          required
-                          value={token}
-                          onChange={(e) => setToken(e.target.value)}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="password"
-                          name="newpassword"
-                          className="form-control"
-                          placeholder="New Password*"
-                          required
-                          value={newpassword}
-                          onChange={(e) => setNewpassword(e.target.value)}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="password"
-                          name="confirmpassword"
-                          className="form-control"
-                          placeholder="Confirm Password*"
-                          required
-                          value={confirmpassword}
-                          onChange={(e) => setConfirmpassword(e.target.value)}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <input
-                          type="submit"
-                          value={loading ? 'Updating...' : 'Set New Password'}
-                          name="update"
-                          className="btn btn-block"
-                          disabled={loading}
-                        />
-                      </div>
-                    </form>
-                  )}
-
-                  <div className="text-center">
-                    <p className="gray_text">
-                      For security reasons we don't store your password. Your password will be reset and a new one will be send.
-                    </p>
-                    <p>
-                      <a href="#loginform" data-toggle="modal" data-dismiss="modal">
-                        <i className="fa fa-angle-double-left" aria-hidden="true"></i> Back to Login
-                      </a>
-                    </p>
-                  </div>
+          {/* Body */}
+          <div className="modal-body p-6">
+            <div className="forgotpassword_wrap">
+              {error && (
+                <div className="alert alert-danger mb-4 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold leading-relaxed">
+                  <i className="fa-solid fa-triangle-exclamation mr-1.5 text-rose-500"></i>
+                  {error}
                 </div>
+              )}
+              {msg && (
+                <div className="alert alert-success mb-4 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold leading-relaxed">
+                  <i className="fa-solid fa-circle-check mr-1.5 text-emerald-500"></i>
+                  {msg}
+                </div>
+              )}
+
+              {step === 1 ? (
+                <form name="chngpwd" onSubmit={handleRequestReset} className="space-y-4">
+                  <div className="form-group">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      Email Address <span className="text-brand-red">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      className="form-control w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red focus:bg-white transition-all"
+                      placeholder="name@example.com"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      Registered Mobile (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      name="mobile"
+                      className="form-control w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red focus:bg-white transition-all"
+                      placeholder="10-digit mobile number"
+                      value={mobile}
+                      onChange={(e) => setMobile(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group pt-2">
+                    <input
+                      type="submit"
+                      value={loading ? 'Please wait...' : 'Reset My Password'}
+                      name="update"
+                      className="btn btn-block w-full py-3.5 px-4 rounded-xl bg-brand-red hover:bg-brand-darkRed text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-glow transition-all cursor-pointer"
+                      disabled={loading}
+                    />
+                  </div>
+                </form>
+              ) : (
+                <form name="chngpwd2" onSubmit={handleResetPassword} className="space-y-4">
+                  <div className="form-group">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      Reset Token <span className="text-brand-red">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="token"
+                      className="form-control w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red focus:bg-white transition-all font-mono"
+                      placeholder="Enter reset token"
+                      required
+                      value={token}
+                      onChange={(e) => setToken(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      New Password <span className="text-brand-red">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      name="newpassword"
+                      className="form-control w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red focus:bg-white transition-all"
+                      placeholder="Min. 8 characters"
+                      required
+                      value={newpassword}
+                      onChange={(e) => setNewpassword(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                      Confirm New Password <span className="text-brand-red">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      name="confirmpassword"
+                      className="form-control w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red focus:bg-white transition-all"
+                      placeholder="Re-enter new password"
+                      required
+                      value={confirmpassword}
+                      onChange={(e) => setConfirmpassword(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="form-group pt-2">
+                    <input
+                      type="submit"
+                      value={loading ? 'Updating...' : 'Set New Password'}
+                      name="update"
+                      className="btn btn-block w-full py-3.5 px-4 rounded-xl bg-brand-red hover:bg-brand-darkRed text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-glow transition-all cursor-pointer"
+                      disabled={loading}
+                    />
+                  </div>
+                </form>
+              )}
+
+              <div className="text-center mt-4">
+                <p className="text-xs text-slate-500">
+                  For security reasons, your password will be securely updated via verified token.
+                </p>
               </div>
             </div>
           </div>
+
+          {/* Footer */}
+          <div className="modal-footer bg-slate-50 border-t border-slate-200 px-6 py-4 text-center text-xs text-slate-600">
+            <a
+              href="#loginform"
+              data-testid="switch-to-login-from-forgot"
+              onClick={switchToLogin}
+              className="text-brand-red hover:underline font-bold inline-flex items-center gap-1.5"
+            >
+              <i className="fa-solid fa-angle-left" aria-hidden="true"></i> Back to Login
+            </a>
+          </div>
+
         </div>
       </div>
     </div>

@@ -13,16 +13,18 @@ require('dotenv').config();
 const path   = require('path');
 const fs     = require('fs');
 const mysql  = require('mysql2/promise');
+const { assertSafeTestDatabase } = require('../db/dbGuard');
 
 const MIGRATIONS_DIR = __dirname;
 
 async function getConn() {
+  const dbName = assertSafeTestDatabase(process.env.DB_NAME || 'wanderwheels_demo_test');
   const conn = await mysql.createConnection({
     host:     process.env.DB_HOST || 'localhost',
     port:     parseInt(process.env.DB_PORT || '3306', 10),
-    user:     process.env.DB_USER || 'root',
+    user:     process.env.DB_USER || '',
     password: process.env.DB_PASS || '',
-    database: process.env.DB_NAME || 'carrental',
+    database: dbName,
     multipleStatements: true,
   });
   // Relax sql_mode for legacy tables with 0000-00-00 timestamp defaults during schema alterations

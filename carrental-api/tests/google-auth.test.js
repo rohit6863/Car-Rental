@@ -7,7 +7,7 @@ const { generateCsrfToken } = require('../src/middleware/csrf');
 const googleAuthService = require('../src/services/googleAuth.service');
 const { verifyAccessToken } = require('../src/utils/jwt');
 
-describe('Phase 4: Customer Google OAuth Authentication & Pre-Hijacking Defense', () => {
+describe('Customer Google OAuth Authentication & Pre-Hijacking Defense', () => {
   const originalEnv = { ...process.env };
   const TEST_CLIENT_ID = 'test-google-client-id.apps.googleusercontent.com';
   const TEST_CLIENT_SECRET = 'test-google-client-secret-xyz';
@@ -478,11 +478,12 @@ describe('Phase 4: Customer Google OAuth Authentication & Pre-Hijacking Defense'
       const csrfToken = generateCsrfToken(csrfNonce);
 
       const startTime = Date.now();
+      const attemptPass = `AttemptPass!${crypto.randomBytes(6).toString('hex')}A1`;
       const res = await request(app)
         .post('/api/auth/login')
         .set('Cookie', [`csrf_nonce=${csrfNonce}`])
         .set('X-CSRF-Token', csrfToken)
-        .send({ email, password: 'AttemptedPassword123!' });
+        .send({ email, password: attemptPass });
       const duration = Date.now() - startTime;
 
       expect(res.status).toBe(401);

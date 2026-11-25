@@ -14,11 +14,13 @@ class MockGateway extends PaymentGateway {
       throw new Error('[FATAL SECURITY ERROR] MockGateway cannot be initialized in production environment.');
     }
 
-    if (dbName !== 'carrental_test' && !options.skipDbCheck) {
-      throw new Error(`[FATAL SECURITY ERROR] MockGateway requires DB_NAME to be 'carrental_test' (current: '${dbName}').`);
+    if (!options.skipDbCheck) {
+      if (!dbName || !dbName.endsWith('_test') || dbName.toLowerCase() === 'carrental') {
+        throw new Error(`[FATAL SECURITY ERROR] MockGateway requires DB_NAME to end with '_test' (current: '${dbName}').`);
+      }
     }
 
-    this.mockSecret = options.mockSecret || process.env.MOCK_GATEWAY_SECRET || 'carrental_mock_gateway_secret_2026';
+    this.mockSecret = options.mockSecret || process.env.MOCK_GATEWAY_SECRET || 'wanderwheels_mock_gateway_secret_2026';
     this.keyId = 'mock_key_rzp_test_123';
     this.mockOrders = new Map();
     this.mockPayments = new Map();
