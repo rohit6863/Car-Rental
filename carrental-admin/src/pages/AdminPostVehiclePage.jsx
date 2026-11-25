@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Car, Fuel, Sparkles, Shield, ImagePlus, Check } from 'lucide-react';
+import { Car, Fuel, Sparkles, Shield, ImagePlus, Check, MapPin } from 'lucide-react';
 import client from '../api/client';
 import {
   FUEL_TYPES,
@@ -84,13 +84,17 @@ export default function AdminPostVehiclePage() {
     }
   };
 
+  const inputCls =
+    'w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 outline-none';
+  const labelCls = 'block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5';
+
   const renderCheckboxGrid = (items) => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {items.map((item) => (
         <label
           key={item.id}
           htmlFor={item.id}
-          className="flex items-center gap-2.5 p-3 rounded-xl border border-hairline bg-slate-50/70 hover:bg-indigo-50/40 cursor-pointer transition select-none"
+          className="flex items-center gap-2.5 p-3 rounded-xl border border-hairline dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/60 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30 cursor-pointer transition select-none"
         >
           <input
             type="checkbox"
@@ -98,9 +102,9 @@ export default function AdminPostVehiclePage() {
             name={item.name}
             checked={formData[item.name] === 1}
             onChange={handleInputChange}
-            className="w-4 h-4 rounded text-lavender-600 focus:ring-lavender-600 border-slate-300 cursor-pointer"
+            className="w-4 h-4 rounded text-lavender-600 focus:ring-lavender-600 border-slate-300 dark:border-slate-600 cursor-pointer"
           />
-          <span className="text-xs font-semibold text-slate-700">{item.label}</span>
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">{item.label}</span>
         </label>
       ))}
     </div>
@@ -110,12 +114,14 @@ export default function AdminPostVehiclePage() {
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h2 className="page-title text-xl font-bold text-slate-900 tracking-tight">Post A Vehicle</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Onboard a new vehicle with powertrain specs, modern tech, and fleet imagery</p>
+          <h2 className="page-title text-xl font-bold text-slate-900 dark:text-white tracking-tight">Post A Vehicle</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Onboard a new vehicle with powertrain specs, modern tech, telemetry, and fleet imagery
+          </p>
         </div>
         <Link
           to="/manage-vehicles"
-          className="text-xs font-semibold text-slate-600 hover:text-lavender-600 no-underline"
+          className="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-lavender-600 dark:hover:text-indigo-400 no-underline"
         >
           &larr; Back to Manage Vehicles
         </Link>
@@ -127,14 +133,14 @@ export default function AdminPostVehiclePage() {
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
         {/* Core Specs */}
         <div className="bento-card p-6 space-y-4">
-          <div className="flex items-center gap-2 pb-3 border-b border-hairline">
-            <Car className="w-4 h-4 text-lavender-600" />
-            <h3 className="text-sm font-bold text-slate-900">Core Specifications</h3>
+          <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-slate-800">
+            <Car className="w-4 h-4 text-lavender-600 dark:text-indigo-400" />
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Core Specifications</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label className={labelCls}>
                 Vehicle Title <span className="text-rose-500">*</span>
               </label>
               <input
@@ -143,20 +149,20 @@ export default function AdminPostVehiclePage() {
                 value={formData.vehicletitle}
                 onChange={handleInputChange}
                 placeholder="e.g. Porsche 911 Carrera"
-                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
+                className={inputCls}
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label className={labelCls}>
                 Select Brand <span className="text-rose-500">*</span>
               </label>
               <select
                 name="brandname"
                 value={formData.brandname}
                 onChange={handleInputChange}
-                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
+                className={inputCls}
                 required
               >
                 <option value="">Select</option>
@@ -170,7 +176,7 @@ export default function AdminPostVehiclePage() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+            <label className={labelCls}>
               Vehicle Overview <span className="text-rose-500">*</span>
             </label>
             <textarea
@@ -179,14 +185,14 @@ export default function AdminPostVehiclePage() {
               value={formData.vehicalorcview}
               onChange={handleInputChange}
               placeholder="Describe performance, comfort, and key highlights..."
-              className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
+              className={inputCls}
               required
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label className={labelCls}>
                 Price Per Day (INR) <span className="text-rose-500">*</span>
               </label>
               <input
@@ -195,12 +201,12 @@ export default function AdminPostVehiclePage() {
                 value={formData.priceperday}
                 onChange={handleInputChange}
                 placeholder="3500"
-                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 tabular-nums outline-none"
+                className={`${inputCls} tabular-nums`}
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label className={labelCls}>
                 Model Year <span className="text-rose-500">*</span>
               </label>
               <input
@@ -209,12 +215,12 @@ export default function AdminPostVehiclePage() {
                 value={formData.modelyear}
                 onChange={handleInputChange}
                 placeholder="2024"
-                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 tabular-nums outline-none"
+                className={`${inputCls} tabular-nums`}
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label className={labelCls}>
                 Seating Capacity <span className="text-rose-500">*</span>
               </label>
               <input
@@ -223,7 +229,7 @@ export default function AdminPostVehiclePage() {
                 value={formData.seatingcapacity}
                 onChange={handleInputChange}
                 placeholder="5"
-                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 tabular-nums outline-none"
+                className={`${inputCls} tabular-nums`}
                 required
               />
             </div>
@@ -232,61 +238,97 @@ export default function AdminPostVehiclePage() {
 
         {/* Fuel & Powertrain */}
         <div className="bento-card p-6 space-y-4">
-          <div className="flex items-center gap-2 pb-3 border-b border-hairline">
-            <Fuel className="w-4 h-4 text-emerald-600" />
-            <h3 className="text-sm font-bold text-slate-900">Fuel & Powertrain</h3>
+          <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-slate-800">
+            <Fuel className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Fuel &amp; Powertrain</h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label className={labelCls}>
                 Select Fuel Type <span className="text-rose-500">*</span>
               </label>
               <select
                 name="fueltype"
                 value={formData.fueltype}
                 onChange={handleInputChange}
-                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
+                className={inputCls}
                 required
               >
                 <option value="">Select</option>
                 {FUEL_TYPES.map((f) => (
-                  <option key={f} value={f}>
-                    {f}
-                  </option>
+                  <option key={f} value={f}>{f}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Transmission</label>
-              <select
-                name="transmission"
-                value={formData.transmission}
-                onChange={handleInputChange}
-                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
-              >
+              <label className={labelCls}>Transmission</label>
+              <select name="transmission" value={formData.transmission} onChange={handleInputChange} className={inputCls}>
                 {TRANSMISSIONS.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
+                  <option key={t} value={t}>{t}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Body Category</label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleInputChange}
-                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
-              >
+              <label className={labelCls}>Body Category</label>
+              <select name="category" value={formData.category} onChange={handleInputChange} className={inputCls}>
                 {VEHICLE_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
+                  <option key={c} value={c}>{c}</option>
                 ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Fleet Ops & Telemetry (Optional) */}
+        <div className="bento-card p-6 space-y-4">
+          <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-slate-800">
+            <MapPin className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Fleet Telemetry &amp; Dispatch</h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label className={labelCls}>Registration Plate</label>
+              <input
+                type="text"
+                name="registrationplate"
+                value={formData.registrationplate}
+                onChange={handleInputChange}
+                placeholder="e.g. MH 12 WW 2026"
+                className={`${inputCls} uppercase`}
+              />
+            </div>
+            <div>
+              <label className={labelCls}>Assigned Hub</label>
+              <input
+                type="text"
+                name="hublocation"
+                value={formData.hublocation}
+                onChange={handleInputChange}
+                placeholder="Pune Koregaon Park"
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className={labelCls}>Odometer (km)</label>
+              <input
+                type="number"
+                min="0"
+                name="odometerkm"
+                value={formData.odometerkm}
+                onChange={handleInputChange}
+                className={`${inputCls} tabular-nums`}
+              />
+            </div>
+            <div>
+              <label className={labelCls}>Operational Status</label>
+              <select name="vehiclestatus" value={formData.vehiclestatus} onChange={handleInputChange} className={inputCls}>
+                <option value="Available">Available</option>
+                <option value="Rented">Rented</option>
+                <option value="Maintenance">Maintenance</option>
               </select>
             </div>
           </div>
@@ -294,32 +336,32 @@ export default function AdminPostVehiclePage() {
 
         {/* Modern Tech & Comfort */}
         <div className="bento-card p-6 space-y-4">
-          <div className="flex items-center gap-2 pb-3 border-b border-hairline">
+          <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-slate-800">
             <Sparkles className="w-4 h-4 text-amber-500" />
-            <h3 className="text-sm font-bold text-slate-900">Modern Tech & Comfort Features</h3>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Modern Tech &amp; Comfort Features</h3>
           </div>
           {renderCheckboxGrid(MODERN_FEATURES)}
         </div>
 
         {/* Safety & Legacy Compatibility */}
         <div className="bento-card p-6 space-y-4">
-          <div className="flex items-center gap-2 pb-3 border-b border-hairline">
-            <Shield className="w-4 h-4 text-indigo-600" />
-            <h3 className="text-sm font-bold text-slate-900">Safety & Core Equipment</h3>
+          <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-slate-800">
+            <Shield className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Safety &amp; Core Equipment</h3>
           </div>
           {renderCheckboxGrid(CORE_ACCESSORIES)}
         </div>
 
         {/* Vehicle Images */}
         <div className="bento-card p-6 space-y-4">
-          <div className="flex items-center gap-2 pb-3 border-b border-hairline">
-            <ImagePlus className="w-4 h-4 text-sky-600" />
-            <h3 className="text-sm font-bold text-slate-900">Upload Images</h3>
+          <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-slate-800">
+            <ImagePlus className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Upload Images</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5].map((num) => (
-              <div key={num} className="p-3 rounded-xl border border-dashed border-slate-300 bg-slate-50/50">
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              <div key={num} className="p-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1.5">
                   Image {num} {num <= 2 && <span className="text-rose-500">*</span>}
                 </label>
                 <input
@@ -328,7 +370,7 @@ export default function AdminPostVehiclePage() {
                   onChange={handleFileChange}
                   accept="image/*"
                   required={num <= 2}
-                  className="w-full text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-lavender-50 file:text-lavender-600 hover:file:bg-lavender-100 cursor-pointer"
+                  className="w-full text-xs text-slate-600 dark:text-slate-300 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-lavender-50 dark:file:bg-indigo-500/20 file:text-lavender-600 dark:file:text-indigo-300 hover:file:bg-lavender-100 cursor-pointer"
                 />
               </div>
             ))}
@@ -339,7 +381,7 @@ export default function AdminPostVehiclePage() {
           <button
             type="reset"
             onClick={() => setFormData(INITIAL_VEHICLE_FORM)}
-            className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 cursor-pointer"
+            className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 cursor-pointer"
           >
             Cancel
           </button>

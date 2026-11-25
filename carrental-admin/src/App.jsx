@@ -21,6 +21,9 @@ import AdminRegUsersPage from './pages/AdminRegUsersPage';
 import AdminManagePagesPage from './pages/AdminManagePagesPage';
 import AdminUpdateContactInfoPage from './pages/AdminUpdateContactInfoPage';
 import AdminManageSubscribersPage from './pages/AdminManageSubscribersPage';
+import AdminMaintenancePage from './pages/AdminMaintenancePage';
+import AdminPricingPage from './pages/AdminPricingPage';
+import AdminTelematicsPage from './pages/AdminTelematicsPage';
 
 export default function App() {
   return (
@@ -280,6 +283,39 @@ export default function App() {
           <AdminProtectedRoute>
             <AdminLayout>
               <AdminManageSubscribersPage />
+            </AdminLayout>
+          </AdminProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/maintenance"
+        element={
+          <AdminProtectedRoute>
+            <AdminLayout>
+              <AdminMaintenancePage />
+            </AdminLayout>
+          </AdminProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/pricing"
+        element={
+          <AdminProtectedRoute>
+            <AdminLayout>
+              <AdminPricingPage />
+            </AdminLayout>
+          </AdminProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/telematics"
+        element={
+          <AdminProtectedRoute>
+            <AdminLayout>
+              <AdminTelematicsPage />
             </AdminLayout>
           </AdminProtectedRoute>
         }
