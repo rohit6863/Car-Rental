@@ -37,19 +37,19 @@ export function ToastProvider({ children }) {
   const getToneStyle = (tone) => {
     if (tone === 'emerald') {
       return {
-        border: 'border-emerald-200 dark:border-emerald-800',
+        border: 'border-emerald-200 dark:border-emerald-500/30',
         icon: <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />,
       };
     }
     if (tone === 'rose') {
       return {
-        border: 'border-rose-200 dark:border-rose-800',
+        border: 'border-rose-200 dark:border-rose-500/30',
         icon: <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />,
       };
     }
     return {
-      border: 'border-indigo-200 dark:border-indigo-800',
-      icon: <Info className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />,
+      border: 'border-indigo-200 dark:border-amber-500/30',
+      icon: <Info className="w-4 h-4 text-indigo-600 dark:text-amber-400 shrink-0" />,
     };
   };
 
@@ -65,7 +65,7 @@ export function ToastProvider({ children }) {
           return (
             <div
               key={t.id}
-              className={`pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border ${style.border} shadow-lg text-xs font-semibold text-slate-800 dark:text-slate-100 transition-all`}
+              className={`pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl bg-white dark:bg-[#141416] border ${style.border} shadow-lg text-xs font-semibold text-slate-800 dark:text-zinc-100 transition-all`}
             >
               {style.icon}
               <span className="flex-1">{t.message}</span>

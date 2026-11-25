@@ -143,8 +143,8 @@ export default function AdminManagePaymentsPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="page-title text-xl font-bold text-slate-900 dark:text-white tracking-tight">Manage Payments</h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+        <h2 className="page-title text-xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">Manage Payments</h2>
+        <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
           Monitor gateway settlements, reconcile pending transactions, manage approvals, and issue GST invoices
         </p>
       </div>
@@ -155,59 +155,59 @@ export default function AdminManagePaymentsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bento-card p-5 flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
               Settled Rental Volume
             </div>
-            <div className="text-2xl font-extrabold text-slate-900 dark:text-white mt-1 tabular-nums">
+            <div className="text-2xl font-extrabold text-slate-900 dark:text-zinc-100 mt-1 tabular-nums">
               Rs. {summary.settled.toLocaleString('en-IN')}
             </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
             <IndianRupee className="w-5 h-5" />
           </div>
         </div>
 
         <div className="bento-card p-5 flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
               Pending / Escrow Volume
             </div>
-            <div className="text-2xl font-extrabold text-slate-900 dark:text-white mt-1 tabular-nums">
+            <div className="text-2xl font-extrabold text-slate-900 dark:text-zinc-100 mt-1 tabular-nums">
               Rs. {summary.pending.toLocaleString('en-IN')}
             </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center">
             <Clock className="w-5 h-5" />
           </div>
         </div>
 
         <div className="bento-card p-5 flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
               GST Collected (18%)
             </div>
-            <div className="text-2xl font-extrabold text-slate-900 dark:text-white mt-1 tabular-nums">
+            <div className="text-2xl font-extrabold text-slate-900 dark:text-zinc-100 mt-1 tabular-nums">
               Rs. {summary.gst.toLocaleString('en-IN')}
             </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-lavender-50 dark:bg-indigo-950/60 text-lavender-600 dark:text-indigo-400 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-lavender-50 dark:bg-amber-500/15 text-lavender-600 dark:text-amber-400 flex items-center justify-center">
             <FileCheck2 className="w-5 h-5" />
           </div>
         </div>
       </div>
 
       <div className="bento-card overflow-hidden">
-        <div className="px-5 py-4 border-b border-hairline dark:border-slate-800 flex items-center justify-between">
-          <span className="text-sm font-bold text-slate-900 dark:text-white">Payment Details</span>
+        <div className="px-5 py-4 border-b border-hairline dark:border-[#27272A] flex items-center justify-between">
+          <span className="text-sm font-bold text-slate-900 dark:text-zinc-100">Payment Details</span>
           <span className="text-xs text-slate-400 tabular-nums">{filteredPayments.length} transactions</span>
         </div>
 
         <div className="overflow-x-auto">
           {loading ? (
-            <p className="p-6 text-sm text-slate-500 dark:text-slate-400">Loading payments...</p>
+            <p className="p-6 text-sm text-slate-500 dark:text-zinc-400">Loading payments...</p>
           ) : (
             <table id="zctb" className="w-full text-left text-xs">
-              <thead className="bg-slate-50/80 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-hairline dark:border-slate-800">
+              <thead className="bg-slate-50/80 dark:bg-[#1C1C1F] text-slate-500 dark:text-zinc-400 uppercase tracking-wider border-b border-hairline dark:border-[#27272A]">
                 <tr>
                   <th className="px-3.5 py-3 font-semibold">#</th>
                   <th className="px-3.5 py-3 font-semibold">Booking ID</th>
@@ -223,7 +223,7 @@ export default function AdminManagePaymentsPage() {
                   <th className="px-3.5 py-3 font-semibold">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-hairline dark:divide-slate-800">
+              <tbody className="divide-y divide-hairline dark:divide-[#27272A]">
                 {filteredPayments.length === 0 ? (
                   <tr>
                     <td colSpan={12} className="px-4 py-8 text-center text-slate-400">
@@ -238,37 +238,37 @@ export default function AdminManagePaymentsPage() {
                       : 'Manual';
 
                     return (
-                      <tr key={p.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
-                        <td className="px-3.5 py-3 tabular-nums text-slate-500 dark:text-slate-400">{idx + 1}</td>
-                        <td className="px-3.5 py-3 tabular-nums font-semibold text-slate-900 dark:text-white">{p.booking_id}</td>
-                        <td className="px-3.5 py-3 text-slate-800 dark:text-slate-200">{p.FullName}</td>
-                        <td className="px-3.5 py-3 text-slate-700 dark:text-slate-300">{p.VehiclesTitle}</td>
-                        <td className="px-3.5 py-3 font-semibold text-slate-900 dark:text-white tabular-nums">Rs. {p.amount}</td>
+                      <tr key={p.id} className="hover:bg-slate-50/60 dark:hover:bg-[#1C1C1F]/70">
+                        <td className="px-3.5 py-3 tabular-nums text-slate-500 dark:text-zinc-400">{idx + 1}</td>
+                        <td className="px-3.5 py-3 tabular-nums font-semibold text-slate-900 dark:text-zinc-100">{p.booking_id}</td>
+                        <td className="px-3.5 py-3 text-slate-800 dark:text-zinc-200">{p.FullName}</td>
+                        <td className="px-3.5 py-3 text-slate-700 dark:text-zinc-300">{p.VehiclesTitle}</td>
+                        <td className="px-3.5 py-3 font-semibold text-slate-900 dark:text-zinc-100 tabular-nums">Rs. {p.amount}</td>
                         <td className="px-3.5 py-3">
                           <span
                             className={`label px-2 py-0.5 rounded-md text-[11px] font-semibold ${
                               isAutomated
-                                ? 'label-info bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800'
-                                : 'label-default bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                                ? 'label-info bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/30'
+                                : 'label-default bg-slate-100 text-slate-700 dark:bg-[#1C1C1F] dark:text-zinc-300'
                             }`}
                           >
                             {gatewayName}
                           </span>
                         </td>
-                        <td className="px-3.5 py-3 font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                        <td className="px-3.5 py-3 font-mono text-[11px] text-slate-500 dark:text-zinc-400">
                           {p.gateway_order_id || '-'}
                         </td>
-                        <td className="px-3.5 py-3 font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                        <td className="px-3.5 py-3 font-mono text-[11px] text-slate-500 dark:text-zinc-400">
                           {p.gateway_payment_id || p.transaction_id || '-'}
                         </td>
-                        <td className="px-3.5 py-3 text-slate-600 dark:text-slate-300">{p.payment_method || '-'}</td>
-                        <td className="px-3.5 py-3 tabular-nums text-slate-500 dark:text-slate-400">
+                        <td className="px-3.5 py-3 text-slate-600 dark:text-zinc-300">{p.payment_method || '-'}</td>
+                        <td className="px-3.5 py-3 tabular-nums text-slate-500 dark:text-zinc-400">
                           {p.payment_date ? new Date(p.payment_date).toLocaleString() : ''}
                         </td>
                         <td className="px-3.5 py-3">
                           {p.payment_status === 'needs_refund' ? (
                             <div>
-                              <span className="label label-danger inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800">
+                              <span className="label label-danger inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30">
                                 Needs Refund
                               </span>
                               {p.failure_reason && (
@@ -276,16 +276,16 @@ export default function AdminManagePaymentsPage() {
                               )}
                             </div>
                           ) : p.payment_status === 'confirmed' ? (
-                            <span className="label label-success inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">
+                            <span className="label label-success inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30">
                               Confirmed
                             </span>
                           ) : p.payment_status === 'failed' ? (
                             <div>
-                              <span className="label label-default inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
+                              <span className="label label-default inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200 dark:bg-[#1C1C1F] dark:text-zinc-300 dark:border-[#27272A]">
                                 Failed
                               </span>
                               {p.failure_reason && (
-                                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">{p.failure_reason}</div>
+                                <div className="text-[11px] text-slate-500 dark:text-zinc-400 mt-1">{p.failure_reason}</div>
                               )}
                             </div>
                           ) : (
@@ -293,7 +293,7 @@ export default function AdminManagePaymentsPage() {
                           )}
                           {p.booking_status === 2 && p.payment_status !== 'needs_refund' && (
                             <div className="mt-1">
-                              <span className="label label-warning inline-block px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800">
+                              <span className="label label-warning inline-block px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30">
                                 Booking Cancelled
                               </span>
                             </div>
@@ -311,7 +311,7 @@ export default function AdminManagePaymentsPage() {
                                     e.preventDefault();
                                     handleReconcile(p.id);
                                   }}
-                                  className="px-2.5 py-1 rounded-lg bg-lavender-50 dark:bg-indigo-950/60 text-lavender-600 dark:text-indigo-300 hover:bg-lavender-100 dark:hover:bg-indigo-900/60 font-semibold no-underline"
+                                  className="px-2.5 py-1 rounded-lg bg-lavender-50 dark:bg-amber-500/15 text-lavender-600 dark:text-amber-400 hover:bg-lavender-100 dark:hover:bg-amber-500/25 font-semibold no-underline"
                                 >
                                   Reconcile
                                 </a>
@@ -326,7 +326,7 @@ export default function AdminManagePaymentsPage() {
                                     e.preventDefault();
                                     handleConfirm(p.id);
                                   }}
-                                  className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 font-semibold no-underline"
+                                  className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 font-semibold no-underline"
                                 >
                                   Confirm
                                 </a>
@@ -336,19 +336,19 @@ export default function AdminManagePaymentsPage() {
                                     e.preventDefault();
                                     handleReject(p.id);
                                   }}
-                                  className="px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 hover:bg-rose-100 font-semibold no-underline"
+                                  className="px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 hover:bg-rose-100 font-semibold no-underline"
                                 >
                                   Reject
                                 </a>
                               </>
                             ) : (
-                              <span className="capitalize text-slate-500 dark:text-slate-400">{p.payment_status}</span>
+                              <span className="capitalize text-slate-500 dark:text-zinc-400">{p.payment_status}</span>
                             )}
 
                             <button
                               type="button"
                               onClick={() => handleOpenInvoice(p.booking_id)}
-                              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-hairline dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-[11px] font-semibold transition cursor-pointer"
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-hairline dark:border-[#27272A] text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-[#1C1C1F] text-[11px] font-semibold transition cursor-pointer"
                               title="View / Print GST Tax Invoice"
                             >
                               <Receipt className="w-3 h-3" />
@@ -375,88 +375,88 @@ export default function AdminManagePaymentsPage() {
         className="gst-invoice-printable"
       >
         {invoiceLoading || !invoiceData ? (
-          <p className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">Generating tax invoice...</p>
+          <p className="py-8 text-center text-sm text-slate-500 dark:text-zinc-400">Generating tax invoice...</p>
         ) : (
           <div className="space-y-5 text-xs">
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-hairline dark:border-slate-800">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-hairline dark:border-[#27272A]">
               <div>
-                <div className="text-sm font-bold text-slate-900 dark:text-white">{invoiceData.supplier?.legalName}</div>
-                <div className="text-slate-500 dark:text-slate-400 mt-0.5">{invoiceData.supplier?.address}</div>
-                <div className="text-slate-600 dark:text-slate-300 font-mono mt-1">
+                <div className="text-sm font-bold text-slate-900 dark:text-zinc-100">{invoiceData.supplier?.legalName}</div>
+                <div className="text-slate-500 dark:text-zinc-400 mt-0.5">{invoiceData.supplier?.address}</div>
+                <div className="text-slate-600 dark:text-zinc-300 font-mono mt-1">
                   GSTIN: {invoiceData.supplier?.gstin} &bull; SAC: {invoiceData.supplier?.sacCode}
                 </div>
               </div>
               <div className="sm:text-right">
-                <div className="font-mono font-bold text-lavender-600 dark:text-indigo-400 text-sm">
+                <div className="font-mono font-bold text-lavender-600 dark:text-amber-400 text-sm">
                   {invoiceData.invoiceNumber}
                 </div>
-                <div className="text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">
+                <div className="text-slate-500 dark:text-zinc-400 mt-0.5 tabular-nums">
                   Date: {invoiceData.invoiceDate ? new Date(invoiceData.invoiceDate).toLocaleDateString() : '-'}
                 </div>
-                <div className="text-slate-500 dark:text-slate-400 tabular-nums">
+                <div className="text-slate-500 dark:text-zinc-400 tabular-nums">
                   Booking #{invoiceData.rental?.bookingId}
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-hairline dark:border-slate-700 space-y-1">
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#1C1C1F] border border-hairline dark:border-[#27272A] space-y-1">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Billed To</div>
-                <div className="font-semibold text-slate-900 dark:text-white">{invoiceData.customer?.name}</div>
-                <div className="text-slate-600 dark:text-slate-300">{invoiceData.customer?.email}</div>
-                <div className="text-slate-600 dark:text-slate-300">{invoiceData.customer?.phone || '-'}</div>
-                <div className="text-slate-500 dark:text-slate-400">{invoiceData.customer?.address || '-'}</div>
+                <div className="font-semibold text-slate-900 dark:text-zinc-100">{invoiceData.customer?.name}</div>
+                <div className="text-slate-600 dark:text-zinc-300">{invoiceData.customer?.email}</div>
+                <div className="text-slate-600 dark:text-zinc-300">{invoiceData.customer?.phone || '-'}</div>
+                <div className="text-slate-500 dark:text-zinc-400">{invoiceData.customer?.address || '-'}</div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-hairline dark:border-slate-700 space-y-1">
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#1C1C1F] border border-hairline dark:border-[#27272A] space-y-1">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Rental Details</div>
-                <div className="font-semibold text-slate-900 dark:text-white">{invoiceData.rental?.vehicle}</div>
-                <div className="font-mono text-slate-600 dark:text-slate-300">
+                <div className="font-semibold text-slate-900 dark:text-zinc-100">{invoiceData.rental?.vehicle}</div>
+                <div className="font-mono text-slate-600 dark:text-zinc-300">
                   Plate: {invoiceData.rental?.registrationPlate || 'Unassigned'}
                 </div>
-                <div className="text-slate-600 dark:text-slate-300 tabular-nums">
+                <div className="text-slate-600 dark:text-zinc-300 tabular-nums">
                   {invoiceData.rental?.fromDate} to {invoiceData.rental?.toDate} ({invoiceData.rental?.durationDays} days)
                 </div>
-                <div className="text-slate-500 dark:text-slate-400 tabular-nums">
+                <div className="text-slate-500 dark:text-zinc-400 tabular-nums">
                   Rate: Rs. {invoiceData.rental?.ratePerDay}/day
                 </div>
               </div>
             </div>
 
-            <div className="border border-hairline dark:border-slate-700 rounded-xl overflow-hidden">
+            <div className="border border-hairline dark:border-[#27272A] rounded-xl overflow-hidden">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                <thead className="bg-slate-50 dark:bg-[#1C1C1F] text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
                   <tr>
                     <th className="px-4 py-2.5 font-semibold">Tax Breakdown</th>
                     <th className="px-4 py-2.5 font-semibold text-right">Amount</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-hairline dark:divide-slate-800">
+                <tbody className="divide-y divide-hairline dark:divide-[#27272A]">
                   <tr>
-                    <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">Taxable Rental Value</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums font-medium text-slate-900 dark:text-white">
+                    <td className="px-4 py-2.5 text-slate-700 dark:text-zinc-300">Taxable Rental Value</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums font-medium text-slate-900 dark:text-zinc-100">
                       Rs. {Number(invoiceData.tax?.taxableValue || 0).toLocaleString('en-IN')}
                     </td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">
+                    <td className="px-4 py-2.5 text-slate-700 dark:text-zinc-300">
                       CGST ({invoiceData.tax?.cgstRate || 9}%)
                     </td>
-                    <td className="px-4 py-2.5 text-right tabular-nums font-medium text-slate-900 dark:text-white">
+                    <td className="px-4 py-2.5 text-right tabular-nums font-medium text-slate-900 dark:text-zinc-100">
                       Rs. {Number(invoiceData.tax?.cgstAmount || 0).toLocaleString('en-IN')}
                     </td>
                   </tr>
                   <tr>
-                    <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">
+                    <td className="px-4 py-2.5 text-slate-700 dark:text-zinc-300">
                       SGST ({invoiceData.tax?.sgstRate || 9}%)
                     </td>
-                    <td className="px-4 py-2.5 text-right tabular-nums font-medium text-slate-900 dark:text-white">
+                    <td className="px-4 py-2.5 text-right tabular-nums font-medium text-slate-900 dark:text-zinc-100">
                       Rs. {Number(invoiceData.tax?.sgstAmount || 0).toLocaleString('en-IN')}
                     </td>
                   </tr>
-                  <tr className="bg-slate-50 dark:bg-slate-800/80 font-bold">
-                    <td className="px-4 py-3 text-slate-900 dark:text-white">Grand Total (Incl. GST)</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-sm text-lavender-600 dark:text-indigo-400">
+                  <tr className="bg-slate-50 dark:bg-[#1C1C1F] font-bold">
+                    <td className="px-4 py-3 text-slate-900 dark:text-zinc-100">Grand Total (Incl. GST)</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-sm text-lavender-600 dark:text-amber-400">
                       Rs. {Number(invoiceData.tax?.grandTotal || 0).toLocaleString('en-IN')}
                     </td>
                   </tr>
@@ -465,14 +465,14 @@ export default function AdminManagePaymentsPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+              <div className="text-[11px] text-slate-500 dark:text-zinc-400 font-mono">
                 Gateway: {invoiceData.payment?.gateway || 'manual'} &bull; Txn: {invoiceData.payment?.transactionId || '-'}
               </div>
               <div className="no-print flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-semibold transition cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-lavender-600 hover:bg-lavender-700 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold transition cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>Print Tax Invoice</span>

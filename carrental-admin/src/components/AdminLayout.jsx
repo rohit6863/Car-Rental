@@ -15,13 +15,13 @@ export default function AdminLayout({ children }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-canvas dark:bg-slate-950 transition-colors">
+    <div className="min-h-screen flex flex-col bg-[#F4F7FE] dark:bg-[#0C0C0E] transition-colors">
       <AdminHeader onToggleSidebar={handleToggleSidebar} />
       <div className="ts-main-content flex-1 flex relative">
         {mobileOpen && (
           <div
             onClick={() => setMobileOpen(false)}
-            className="no-print fixed inset-0 z-20 bg-slate-900/40 backdrop-blur-[1px] lg:hidden"
+            className="no-print fixed inset-0 z-20 bg-black/50 backdrop-blur-[1px] lg:hidden"
             aria-hidden="true"
           />
         )}

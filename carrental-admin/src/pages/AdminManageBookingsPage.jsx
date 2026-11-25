@@ -86,25 +86,25 @@ export default function AdminManageBookingsPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="page-title text-xl font-bold text-slate-900 dark:text-white tracking-tight">Manage Bookings</h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Approve pending reservations, resolve date conflicts, or cancel bookings</p>
+        <h2 className="page-title text-xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">Manage Bookings</h2>
+        <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">Approve pending reservations, resolve date conflicts, or cancel bookings</p>
       </div>
 
       {error && <div className="errorWrap"><strong>ERROR</strong>: {error}</div>}
       {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
 
       <div className="bento-card overflow-hidden">
-        <div className="px-5 py-4 border-b border-hairline dark:border-slate-800 flex items-center justify-between">
-          <span className="text-sm font-bold text-slate-900 dark:text-white">Booking Details</span>
+        <div className="px-5 py-4 border-b border-hairline dark:border-[#27272A] flex items-center justify-between">
+          <span className="text-sm font-bold text-slate-900 dark:text-zinc-100">Booking Details</span>
           <span className="text-xs text-slate-400 tabular-nums">{filteredBookings.length} total</span>
         </div>
 
         <div className="overflow-x-auto">
           {loading ? (
-            <p className="p-6 text-sm text-slate-500 dark:text-slate-400">Loading bookings...</p>
+            <p className="p-6 text-sm text-slate-500 dark:text-zinc-400">Loading bookings...</p>
           ) : (
             <table id="zctb" className="w-full text-left text-xs">
-              <thead className="bg-slate-50/80 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-hairline dark:border-slate-800">
+              <thead className="bg-slate-50/80 dark:bg-[#1C1C1F] text-slate-500 dark:text-zinc-400 uppercase tracking-wider border-b border-hairline dark:border-[#27272A]">
                 <tr>
                   <th className="px-4 py-3 font-semibold">#</th>
                   <th className="px-4 py-3 font-semibold">Name</th>
@@ -117,7 +117,7 @@ export default function AdminManageBookingsPage() {
                   <th className="px-4 py-3 font-semibold">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-hairline dark:divide-slate-800">
+              <tbody className="divide-y divide-hairline dark:divide-[#27272A]">
                 {filteredBookings.length === 0 ? (
                   <tr>
                     <td colSpan={9} className="px-4 py-8 text-center text-slate-400">
@@ -126,35 +126,35 @@ export default function AdminManageBookingsPage() {
                   </tr>
                 ) : (
                   filteredBookings.map((b, idx) => (
-                    <tr key={b.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
-                      <td className="px-4 py-3 tabular-nums text-slate-500 dark:text-slate-400">{idx + 1}</td>
-                      <td className="px-4 py-3 font-semibold text-slate-900 dark:text-white">{b.FullName}</td>
+                    <tr key={b.id} className="hover:bg-slate-50/60 dark:hover:bg-[#1C1C1F]/70">
+                      <td className="px-4 py-3 tabular-nums text-slate-500 dark:text-zinc-400">{idx + 1}</td>
+                      <td className="px-4 py-3 font-semibold text-slate-900 dark:text-zinc-100">{b.FullName}</td>
                       <td className="px-4 py-3">
-                        <Link to={`/edit-vehicle/${b.vid}`} className="text-lavender-600 dark:text-indigo-400 hover:underline font-medium no-underline">
+                        <Link to={`/edit-vehicle/${b.vid}`} className="text-lavender-600 dark:text-amber-400 hover:underline font-medium no-underline">
                           {b.BrandName}, {b.VehiclesTitle}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 tabular-nums text-slate-600 dark:text-slate-300">{b.FromDate}</td>
-                      <td className="px-4 py-3 tabular-nums text-slate-600 dark:text-slate-300">{b.ToDate}</td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 max-w-[200px] truncate">{b.message}</td>
+                      <td className="px-4 py-3 tabular-nums text-slate-600 dark:text-zinc-300">{b.FromDate}</td>
+                      <td className="px-4 py-3 tabular-nums text-slate-600 dark:text-zinc-300">{b.ToDate}</td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-zinc-300 max-w-[200px] truncate">{b.message}</td>
                       <td className="px-4 py-3">
                         {b.Status === 0 && (
-                          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800">
+                          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30">
                             Not Confirmed
                           </span>
                         )}
                         {b.Status === 1 && (
-                          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">
+                          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30">
                             Confirmed
                           </span>
                         )}
                         {b.Status === 2 && (
-                          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800">
+                          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30">
                             Cancelled
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 tabular-nums text-slate-500 dark:text-slate-400">
+                      <td className="px-4 py-3 tabular-nums text-slate-500 dark:text-zinc-400">
                         {b.PostingDate ? new Date(b.PostingDate).toLocaleString() : ''}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
@@ -169,7 +169,7 @@ export default function AdminManageBookingsPage() {
                                   e.preventDefault();
                                   handleConfirm(b.id);
                                 }}
-                                className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 font-semibold no-underline"
+                                className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 font-semibold no-underline"
                               >
                                 Confirm
                               </a>
@@ -181,7 +181,7 @@ export default function AdminManageBookingsPage() {
                                   e.preventDefault();
                                   handleCancel(b.id);
                                 }}
-                                className="px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 hover:bg-rose-100 font-semibold no-underline"
+                                className="px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 hover:bg-rose-100 font-semibold no-underline"
                               >
                                 Cancel
                               </a>

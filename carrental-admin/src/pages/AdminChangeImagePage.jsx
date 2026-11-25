@@ -71,8 +71,8 @@ export default function AdminChangeImagePage({ fixedNum }) {
   return (
     <div className="space-y-5 max-w-2xl">
       <div>
-        <h2 className="page-title text-xl font-bold text-slate-900 dark:text-white tracking-tight">Vehicle Image {num}</h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Replace vehicle gallery image #{num}</p>
+        <h2 className="page-title text-xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">Vehicle Image {num}</h2>
+        <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">Replace vehicle gallery image #{num}</p>
       </div>
 
       {error && <div className="errorWrap"><strong>ERROR</strong>: {error}</div>}
@@ -80,26 +80,26 @@ export default function AdminChangeImagePage({ fixedNum }) {
 
       <div className="bento-card p-6">
         {loading ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400">Loading image...</p>
+          <p className="text-sm text-slate-500 dark:text-zinc-400">Loading image...</p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-2">Current Image {num}</label>
+              <label className="block text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-2">Current Image {num}</label>
               {currentImage ? (
                 <img
                   src={getVehicleImageUrl(currentImage)}
                   alt={`Image ${num}`}
-                  className="w-72 h-48 object-cover rounded-xl border border-hairline dark:border-slate-700"
+                  className="w-72 h-48 object-cover rounded-xl border border-hairline dark:border-[#27272A]"
                 />
               ) : (
-                <div className="w-72 h-48 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center text-xs text-slate-400">
+                <div className="w-72 h-48 rounded-xl border border-dashed border-slate-300 dark:border-[#27272A] flex items-center justify-center text-xs text-slate-400">
                   No current image
                 </div>
               )}
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5" htmlFor="img">
+              <label className="block text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1.5" htmlFor="img">
                 Upload New Image {num} <span className="text-rose-500">*</span>
               </label>
               <input
@@ -109,19 +109,19 @@ export default function AdminChangeImagePage({ fixedNum }) {
                 accept="image/*"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
                 required
-                className="w-full text-xs text-slate-600 dark:text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-lavender-50 dark:file:bg-indigo-950/60 file:text-lavender-600 dark:file:text-indigo-300 hover:file:bg-lavender-100 cursor-pointer"
+                className="w-full text-xs text-slate-600 dark:text-zinc-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-lavender-50 dark:file:bg-amber-500/15 file:text-lavender-600 dark:file:text-amber-400 hover:file:bg-lavender-100 cursor-pointer"
               />
             </div>
 
-            <div className="flex items-center gap-3 pt-3 border-t border-hairline dark:border-slate-800">
+            <div className="flex items-center gap-3 pt-3 border-t border-hairline dark:border-[#27272A]">
               <Link
                 to={`/edit-vehicle/${id}`}
-                className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 no-underline"
+                className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-[#27272A] bg-white dark:bg-[#1C1C1F] hover:bg-slate-50 dark:hover:bg-[#27272A] text-xs font-semibold text-slate-700 dark:text-zinc-200 no-underline"
               >
                 Back to Vehicle
               </Link>
               <button
-                className="px-5 py-2.5 rounded-xl bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-semibold inline-flex items-center gap-2 cursor-pointer disabled:opacity-60"
+                className="px-5 py-2.5 rounded-xl bg-lavender-600 hover:bg-lavender-700 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold inline-flex items-center gap-2 cursor-pointer disabled:opacity-60"
                 name="update"
                 type="submit"
                 disabled={submitting}

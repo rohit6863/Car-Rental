@@ -111,8 +111,8 @@ export default function AdminEditVehiclePage() {
   };
 
   const inputCls =
-    'w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 outline-none';
-  const labelCls = 'block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5';
+    'w-full bg-white dark:bg-[#1C1C1F] border border-slate-200 dark:border-[#27272A] focus:border-lavender-600 dark:focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-zinc-100 placeholder-slate-400 outline-none';
+  const labelCls = 'block text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1.5';
 
   const renderCheckboxGrid = (items) => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -120,7 +120,7 @@ export default function AdminEditVehiclePage() {
         <label
           key={item.id}
           htmlFor={item.id}
-          className="flex items-center gap-2.5 p-3 rounded-xl border border-hairline dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/60 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30 cursor-pointer transition select-none"
+          className="flex items-center gap-2.5 p-3 rounded-xl border border-hairline dark:border-[#27272A] bg-slate-50/70 dark:bg-[#1C1C1F] hover:bg-indigo-50/40 dark:hover:bg-amber-500/10 cursor-pointer transition select-none"
         >
           <input
             type="checkbox"
@@ -128,9 +128,9 @@ export default function AdminEditVehiclePage() {
             name={item.name}
             checked={formData[item.name] === 1}
             onChange={handleInputChange}
-            className="w-4 h-4 rounded text-lavender-600 focus:ring-lavender-600 border-slate-300 dark:border-slate-600 cursor-pointer"
+            className="w-4 h-4 rounded text-lavender-600 focus:ring-lavender-600 dark:focus:ring-amber-500 border-slate-300 dark:border-[#3F3F46] cursor-pointer"
           />
-          <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">{item.label}</span>
+          <span className="text-xs font-semibold text-slate-700 dark:text-zinc-200">{item.label}</span>
         </label>
       ))}
     </div>
@@ -140,14 +140,14 @@ export default function AdminEditVehiclePage() {
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h2 className="page-title text-xl font-bold text-slate-900 dark:text-white tracking-tight">Edit Vehicle</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <h2 className="page-title text-xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">Edit Vehicle</h2>
+          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
             Update vehicle specifications, powertrain, telemetry, features, and gallery images
           </p>
         </div>
         <Link
           to="/manage-vehicles"
-          className="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-lavender-600 dark:hover:text-indigo-400 no-underline"
+          className="text-xs font-semibold text-slate-600 dark:text-zinc-300 hover:text-lavender-600 dark:hover:text-amber-300 no-underline"
         >
           &larr; Back to Manage Vehicles
         </Link>
@@ -157,14 +157,14 @@ export default function AdminEditVehiclePage() {
       {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
 
       {loading ? (
-        <div className="bento-card p-6 text-sm text-slate-500 dark:text-slate-400">Loading vehicle data...</div>
+        <div className="bento-card p-6 text-sm text-slate-500 dark:text-zinc-400">Loading vehicle data...</div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Core Specs */}
           <div className="bento-card p-6 space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-slate-800">
-              <Car className="w-4 h-4 text-lavender-600 dark:text-indigo-400" />
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Core Specifications</h3>
+            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-[#27272A]">
+              <Car className="w-4 h-4 text-lavender-600 dark:text-amber-400" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Core Specifications</h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -256,9 +256,9 @@ export default function AdminEditVehiclePage() {
 
           {/* Fuel & Powertrain */}
           <div className="bento-card p-6 space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-slate-800">
+            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-[#27272A]">
               <Fuel className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Fuel &amp; Powertrain</h3>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Fuel &amp; Powertrain</h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -296,9 +296,9 @@ export default function AdminEditVehiclePage() {
 
           {/* Fleet Telemetry */}
           <div className="bento-card p-6 space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-slate-800">
-              <MapPin className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Fleet Telemetry &amp; Dispatch</h3>
+            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-[#27272A]">
+              <MapPin className="w-4 h-4 text-sky-600 dark:text-amber-400" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Fleet Telemetry &amp; Dispatch</h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -346,49 +346,49 @@ export default function AdminEditVehiclePage() {
 
           {/* Modern Tech & Comfort */}
           <div className="bento-card p-6 space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-slate-800">
+            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-[#27272A]">
               <Sparkles className="w-4 h-4 text-amber-500" />
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Modern Tech &amp; Comfort Features</h3>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Modern Tech &amp; Comfort Features</h3>
             </div>
             {renderCheckboxGrid(MODERN_FEATURES)}
           </div>
 
           {/* Safety & Legacy Compatibility */}
           <div className="bento-card p-6 space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-slate-800">
-              <Shield className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Safety &amp; Core Equipment</h3>
+            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-[#27272A]">
+              <Shield className="w-4 h-4 text-indigo-600 dark:text-amber-400" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Safety &amp; Core Equipment</h3>
             </div>
             {renderCheckboxGrid(CORE_ACCESSORIES)}
           </div>
 
           {/* Vehicle Images */}
           <div className="bento-card p-6 space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-slate-800">
-              <ImageIcon className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Vehicle Images</h3>
+            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-[#27272A]">
+              <ImageIcon className="w-4 h-4 text-sky-600 dark:text-amber-400" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Vehicle Images</h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3, 4, 5].map((num) => {
                 const imgVal = images[`vimage${num}`];
                 return (
-                  <div key={num} className="p-3 rounded-xl border border-hairline dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 space-y-2">
-                    <div className="text-xs font-semibold text-slate-700 dark:text-slate-200">Image {num}</div>
+                  <div key={num} className="p-3 rounded-xl border border-hairline dark:border-[#27272A] bg-slate-50/50 dark:bg-[#1C1C1F] space-y-2">
+                    <div className="text-xs font-semibold text-slate-700 dark:text-zinc-200">Image {num}</div>
                     {imgVal ? (
                       <img
                         src={getVehicleImageUrl(imgVal)}
                         alt={`Image ${num}`}
-                        className="w-full h-36 object-cover rounded-lg border border-hairline dark:border-slate-700"
+                        className="w-full h-36 object-cover rounded-lg border border-hairline dark:border-[#27272A]"
                       />
                     ) : (
-                      <div className="w-full h-36 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center text-xs text-slate-400">
+                      <div className="w-full h-36 rounded-lg border border-dashed border-slate-300 dark:border-[#27272A] flex items-center justify-center text-xs text-slate-400">
                         No image uploaded
                       </div>
                     )}
                     <Link
                       to={`/change-image/${id}/${num}`}
-                      className="inline-block text-xs font-semibold text-lavender-600 dark:text-indigo-400 hover:underline no-underline"
+                      className="inline-block text-xs font-semibold text-lavender-600 dark:text-amber-400 hover:underline no-underline"
                     >
                       Change Image {num}
                     </Link>
@@ -403,7 +403,7 @@ export default function AdminEditVehiclePage() {
               type="submit"
               name="submit"
               disabled={submitting}
-              className="px-5 py-2.5 rounded-xl bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-semibold inline-flex items-center gap-2 cursor-pointer disabled:opacity-60"
+              className="px-5 py-2.5 rounded-xl bg-lavender-600 hover:bg-lavender-700 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold inline-flex items-center gap-2 cursor-pointer disabled:opacity-60"
             >
               <Check className="w-4 h-4" />
               <span>{submitting ? 'Saving...' : 'Save changes'}</span>

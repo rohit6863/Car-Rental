@@ -93,17 +93,17 @@ export default function AdminMaintenancePage() {
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="page-title text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+          <h1 className="page-title text-xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">
             Maintenance &amp; Service Schedule
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
             Preventive inspection, sanitization, and insurance renewal logs
           </p>
         </div>
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-semibold transition cursor-pointer self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-lavender-600 hover:bg-lavender-700 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold transition cursor-pointer self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Schedule Service</span>
@@ -115,25 +115,25 @@ export default function AdminMaintenancePage() {
       {/* Summary Badges */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bento-card p-4">
-          <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Open Service Tasks</div>
-          <div className="text-2xl font-extrabold text-slate-900 dark:text-white tabular-nums mt-1">
+          <div className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Open Service Tasks</div>
+          <div className="text-2xl font-extrabold text-slate-900 dark:text-zinc-100 tabular-nums mt-1">
             {pendingCount}
           </div>
           <StatusPill status="Pending" className="mt-2" />
         </div>
         <div className="bento-card p-4">
-          <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Completed Inspections</div>
-          <div className="text-2xl font-extrabold text-slate-900 dark:text-white tabular-nums mt-1">
+          <div className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Completed Inspections</div>
+          <div className="text-2xl font-extrabold text-slate-900 dark:text-zinc-100 tabular-nums mt-1">
             {completedCount}
           </div>
           <StatusPill status="Completed" className="mt-2" />
         </div>
         <div className="bento-card p-4">
-          <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Scheduled Cost Budget</div>
-          <div className="text-2xl font-extrabold text-slate-900 dark:text-white tabular-nums mt-1">
+          <div className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Scheduled Cost Budget</div>
+          <div className="text-2xl font-extrabold text-slate-900 dark:text-zinc-100 tabular-nums mt-1">
             ₹{totalEstCost.toLocaleString('en-IN')}
           </div>
-          <span className="inline-flex items-center gap-1 mt-2 text-[11px] font-semibold text-lavender-600 dark:text-indigo-400">
+          <span className="inline-flex items-center gap-1 mt-2 text-[11px] font-semibold text-lavender-600 dark:text-amber-400">
             <Wrench className="w-3 h-3" /> All Hubs
           </span>
         </div>
@@ -142,10 +142,10 @@ export default function AdminMaintenancePage() {
       <div className="bento-card overflow-hidden">
         <div className="overflow-x-auto">
           {loading ? (
-            <p className="p-6 text-sm text-slate-500 dark:text-slate-400">Loading maintenance records...</p>
+            <p className="p-6 text-sm text-slate-500 dark:text-zinc-400">Loading maintenance records...</p>
           ) : (
             <table className="w-full text-left border-collapse text-xs">
-              <thead className="bg-slate-50/80 dark:bg-slate-800/70 text-slate-500 dark:text-slate-300 uppercase tracking-wider border-b border-hairline dark:border-slate-800">
+              <thead className="bg-slate-50/80 dark:bg-[#1C1C1F] text-slate-500 dark:text-zinc-300 uppercase tracking-wider border-b border-hairline dark:border-[#27272A]">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Service ID</th>
                   <th className="px-4 py-3 font-semibold">Vehicle</th>
@@ -156,7 +156,7 @@ export default function AdminMaintenancePage() {
                   <th className="px-4 py-3 font-semibold text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-hairline dark:divide-slate-800">
+              <tbody className="divide-y divide-hairline dark:divide-[#27272A]">
                 {tasks.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-8 text-center text-slate-400">
@@ -165,23 +165,23 @@ export default function AdminMaintenancePage() {
                   </tr>
                 ) : (
                   tasks.map((m) => (
-                    <tr key={m.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
-                      <td className="px-4 py-3.5 font-bold text-slate-900 dark:text-white tabular-nums">
+                    <tr key={m.id} className="hover:bg-slate-50/60 dark:hover:bg-[#1C1C1F]/70">
+                      <td className="px-4 py-3.5 font-bold text-slate-900 dark:text-zinc-100 tabular-nums">
                         SRV-{String(m.id).padStart(3, '0')}
                       </td>
                       <td className="px-4 py-3.5">
-                        <div className="font-semibold text-lavender-600 dark:text-indigo-400">
+                        <div className="font-semibold text-lavender-600 dark:text-amber-400">
                           {m.BrandName ? `${m.BrandName} ` : ''}{m.VehiclesTitle}
                         </div>
                         <div className="text-[11px] text-slate-400 tabular-nums">
                           {m.RegistrationPlate || ''}
                         </div>
                       </td>
-                      <td className="px-4 py-3.5 text-slate-700 dark:text-slate-200">{m.TaskTitle}</td>
-                      <td className="px-4 py-3.5 tabular-nums text-slate-500 dark:text-slate-400">
+                      <td className="px-4 py-3.5 text-slate-700 dark:text-zinc-200">{m.TaskTitle}</td>
+                      <td className="px-4 py-3.5 tabular-nums text-slate-500 dark:text-zinc-400">
                         {m.DueDate ? new Date(m.DueDate).toLocaleDateString('en-GB') : '-'}
                       </td>
-                      <td className="px-4 py-3.5 font-bold text-slate-900 dark:text-white tabular-nums">
+                      <td className="px-4 py-3.5 font-bold text-slate-900 dark:text-zinc-100 tabular-nums">
                         ₹{Number(m.EstimatedCost || 0).toLocaleString('en-IN')}
                       </td>
                       <td className="px-4 py-3.5">
@@ -193,7 +193,7 @@ export default function AdminMaintenancePage() {
                             <button
                               type="button"
                               onClick={() => handleMarkDone(m)}
-                              className="px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/60 cursor-pointer inline-flex items-center gap-1"
+                              className="px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/60 cursor-pointer inline-flex items-center gap-1"
                             >
                               <CheckCircle2 className="w-3.5 h-3.5" />
                               Mark Done
@@ -229,14 +229,14 @@ export default function AdminMaintenancePage() {
       >
         <form onSubmit={handleCreate} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1.5">
               Select Vehicle *
             </label>
             <select
               value={form.vehicleId}
               onChange={(e) => setForm({ ...form, vehicleId: e.target.value })}
               required
-              className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white outline-none focus:border-lavender-600"
+              className="w-full bg-white dark:bg-[#1C1C1F] border border-slate-200 dark:border-[#27272A] rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-zinc-100 outline-none focus:border-lavender-600 dark:focus:border-amber-500"
             >
               {vehicles.map((v) => (
                 <option key={v.id} value={v.id}>
@@ -246,7 +246,7 @@ export default function AdminMaintenancePage() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1.5">
               Inspection / Task Description *
             </label>
             <input
@@ -255,12 +255,12 @@ export default function AdminMaintenancePage() {
               onChange={(e) => setForm({ ...form, taskTitle: e.target.value })}
               placeholder="e.g. Brake Pad & Synthetic Oil Service"
               required
-              className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white outline-none focus:border-lavender-600"
+              className="w-full bg-white dark:bg-[#1C1C1F] border border-slate-200 dark:border-[#27272A] rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-zinc-100 outline-none focus:border-lavender-600 dark:focus:border-amber-500"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1.5">
                 Due Date *
               </label>
               <input
@@ -268,11 +268,11 @@ export default function AdminMaintenancePage() {
                 value={form.dueDate}
                 onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
                 required
-                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white outline-none focus:border-lavender-600"
+                className="w-full bg-white dark:bg-[#1C1C1F] border border-slate-200 dark:border-[#27272A] rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-zinc-100 outline-none focus:border-lavender-600 dark:focus:border-amber-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1.5">
                 Est. Cost (INR)
               </label>
               <input
@@ -280,7 +280,7 @@ export default function AdminMaintenancePage() {
                 min="0"
                 value={form.estimatedCost}
                 onChange={(e) => setForm({ ...form, estimatedCost: e.target.value })}
-                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white tabular-nums outline-none focus:border-lavender-600"
+                className="w-full bg-white dark:bg-[#1C1C1F] border border-slate-200 dark:border-[#27272A] rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-zinc-100 tabular-nums outline-none focus:border-lavender-600 dark:focus:border-amber-500"
               />
             </div>
           </div>
@@ -288,14 +288,14 @@ export default function AdminMaintenancePage() {
             <button
               type="button"
               onClick={() => setModalOpen(false)}
-              className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 cursor-pointer"
+              className="px-4 py-2 rounded-xl border border-slate-200 dark:border-[#27272A] text-xs font-semibold text-slate-700 dark:text-zinc-200 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-4 py-2 rounded-xl bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-semibold cursor-pointer disabled:opacity-60"
+              className="px-4 py-2 rounded-xl bg-lavender-600 hover:bg-lavender-700 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold cursor-pointer disabled:opacity-60"
             >
               {submitting ? 'Saving...' : 'Schedule Task'}
             </button>

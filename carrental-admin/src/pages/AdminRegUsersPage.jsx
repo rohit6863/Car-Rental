@@ -73,8 +73,8 @@ export default function AdminRegUsersPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="page-title text-xl font-bold text-slate-900 dark:text-white tracking-tight">Registered Users</h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+        <h2 className="page-title text-xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">Registered Users</h2>
+        <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
           Customer accounts, trip activity, and driving license KYC verification
         </p>
       </div>
@@ -82,17 +82,17 @@ export default function AdminRegUsersPage() {
       {error && <div className="errorWrap"><strong>ERROR</strong>: {error}</div>}
 
       <div className="bento-card overflow-hidden">
-        <div className="px-5 py-4 border-b border-hairline dark:border-slate-800 flex items-center justify-between">
-          <span className="text-sm font-bold text-slate-900 dark:text-white">Reg Users</span>
+        <div className="px-5 py-4 border-b border-hairline dark:border-[#27272A] flex items-center justify-between">
+          <span className="text-sm font-bold text-slate-900 dark:text-zinc-100">Reg Users</span>
           <span className="text-xs text-slate-400 tabular-nums">{filteredUsers.length} total</span>
         </div>
 
         <div className="overflow-x-auto">
           {loading ? (
-            <p className="p-6 text-sm text-slate-500 dark:text-slate-400">Loading registered users...</p>
+            <p className="p-6 text-sm text-slate-500 dark:text-zinc-400">Loading registered users...</p>
           ) : (
             <table id="zctb" className="w-full text-left text-xs">
-              <thead className="bg-slate-50/80 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-hairline dark:border-slate-800">
+              <thead className="bg-slate-50/80 dark:bg-[#1C1C1F] text-slate-500 dark:text-zinc-400 uppercase tracking-wider border-b border-hairline dark:border-[#27272A]">
                 <tr>
                   <th className="px-3.5 py-3 font-semibold">#</th>
                   <th className="px-3.5 py-3 font-semibold">Name</th>
@@ -108,7 +108,7 @@ export default function AdminRegUsersPage() {
                   <th className="px-3.5 py-3 font-semibold">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-hairline dark:divide-slate-800">
+              <tbody className="divide-y divide-hairline dark:divide-[#27272A]">
                 {filteredUsers.length === 0 ? (
                   <tr>
                     <td colSpan={12} className="px-4 py-8 text-center text-slate-400">
@@ -117,22 +117,22 @@ export default function AdminRegUsersPage() {
                   </tr>
                 ) : (
                   filteredUsers.map((u, idx) => (
-                    <tr key={u.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
-                      <td className="px-3.5 py-3 tabular-nums text-slate-500 dark:text-slate-400">{idx + 1}</td>
+                    <tr key={u.id} className="hover:bg-slate-50/60 dark:hover:bg-[#1C1C1F]/70">
+                      <td className="px-3.5 py-3 tabular-nums text-slate-500 dark:text-zinc-400">{idx + 1}</td>
                       <td className="px-3.5 py-3">
-                        <div className="font-semibold text-slate-900 dark:text-white">{u.FullName}</div>
+                        <div className="font-semibold text-slate-900 dark:text-zinc-100">{u.FullName}</div>
                         <div className="text-[11px] text-slate-400 tabular-nums">{u.tripCount || 0} trips</div>
                       </td>
-                      <td className="px-3.5 py-3 text-slate-700 dark:text-slate-300">{u.EmailId}</td>
-                      <td className="px-3.5 py-3 tabular-nums text-slate-600 dark:text-slate-300">{u.ContactNo}</td>
-                      <td className="px-3.5 py-3 tabular-nums text-slate-600 dark:text-slate-300">{u.dob || '-'}</td>
-                      <td className="px-3.5 py-3 text-slate-600 dark:text-slate-300">{u.Address || '-'}</td>
-                      <td className="px-3.5 py-3 text-slate-600 dark:text-slate-300">{u.City || '-'}</td>
-                      <td className="px-3.5 py-3 text-slate-600 dark:text-slate-300">{u.Country || '-'}</td>
-                      <td className="px-3.5 py-3 tabular-nums text-slate-500 dark:text-slate-400">
+                      <td className="px-3.5 py-3 text-slate-700 dark:text-zinc-300">{u.EmailId}</td>
+                      <td className="px-3.5 py-3 tabular-nums text-slate-600 dark:text-zinc-300">{u.ContactNo}</td>
+                      <td className="px-3.5 py-3 tabular-nums text-slate-600 dark:text-zinc-300">{u.dob || '-'}</td>
+                      <td className="px-3.5 py-3 text-slate-600 dark:text-zinc-300">{u.Address || '-'}</td>
+                      <td className="px-3.5 py-3 text-slate-600 dark:text-zinc-300">{u.City || '-'}</td>
+                      <td className="px-3.5 py-3 text-slate-600 dark:text-zinc-300">{u.Country || '-'}</td>
+                      <td className="px-3.5 py-3 tabular-nums text-slate-500 dark:text-zinc-400">
                         {u.RegDate ? new Date(u.RegDate).toLocaleDateString() : ''}
                       </td>
-                      <td className="px-3.5 py-3 font-mono text-[11px] text-slate-700 dark:text-slate-300">
+                      <td className="px-3.5 py-3 font-mono text-[11px] text-slate-700 dark:text-zinc-300">
                         {u.DrivingLicenseNo || 'Not Provided'}
                       </td>
                       <td className="px-3.5 py-3">
@@ -142,7 +142,7 @@ export default function AdminRegUsersPage() {
                         <button
                           type="button"
                           onClick={() => openKycModal(u)}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-lavender-50 dark:bg-indigo-950/60 text-lavender-600 dark:text-indigo-300 hover:bg-lavender-100 dark:hover:bg-indigo-900/60 font-semibold transition cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-lavender-50 dark:bg-amber-500/15 text-lavender-600 dark:text-amber-400 hover:bg-lavender-100 dark:hover:bg-amber-500/25 font-semibold transition cursor-pointer"
                         >
                           <ShieldCheck className="w-3.5 h-3.5" />
                           <span>{u.KycStatus === 'Verified' ? 'Review KYC' : 'Approve KYC'}</span>
@@ -165,9 +165,9 @@ export default function AdminRegUsersPage() {
       >
         {selectedUser && (
           <form onSubmit={handleSaveKyc} className="space-y-4">
-            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-hairline dark:border-slate-700 text-xs space-y-1">
-              <div className="font-semibold text-slate-900 dark:text-white">{selectedUser.FullName}</div>
-              <div className="text-slate-500 dark:text-slate-400">
+            <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#1C1C1F] border border-hairline dark:border-[#27272A] text-xs space-y-1">
+              <div className="font-semibold text-slate-900 dark:text-zinc-100">{selectedUser.FullName}</div>
+              <div className="text-slate-500 dark:text-zinc-400">
                 Phone: {selectedUser.ContactNo || '-'} &bull; Trips: {selectedUser.tripCount || 0}
               </div>
             </div>
@@ -175,7 +175,7 @@ export default function AdminRegUsersPage() {
             <div>
               <label
                 htmlFor="kyc-dl"
-                className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5"
+                className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-300 mb-1.5"
               >
                 Driving License Number
               </label>
@@ -185,14 +185,14 @@ export default function AdminRegUsersPage() {
                 value={dlNumber}
                 onChange={(e) => setDlNumber(e.target.value)}
                 placeholder="e.g. MH12-20190012345"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-hairline dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-lavender-600"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-hairline dark:border-[#27272A] bg-white dark:bg-[#1C1C1F] text-slate-900 dark:text-zinc-100 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-lavender-600 dark:focus:ring-amber-500"
               />
             </div>
 
             <div>
               <label
                 htmlFor="kyc-status"
-                className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5"
+                className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-300 mb-1.5"
               >
                 KYC Decision
               </label>
@@ -200,7 +200,7 @@ export default function AdminRegUsersPage() {
                 id="kyc-status"
                 value={kycStatus}
                 onChange={(e) => setKycStatus(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-hairline dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-lavender-600"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-hairline dark:border-[#27272A] bg-white dark:bg-[#1C1C1F] text-slate-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-lavender-600 dark:focus:ring-amber-500"
               >
                 <option value="Verified">Verified</option>
                 <option value="Pending">Pending</option>
@@ -212,14 +212,14 @@ export default function AdminRegUsersPage() {
               <button
                 type="button"
                 onClick={() => setSelectedUser(null)}
-                className="px-4 py-2 rounded-xl border border-hairline dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-hairline dark:border-[#27272A] text-xs font-semibold text-slate-600 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-[#1C1C1F] cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="px-4 py-2 rounded-xl bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-semibold transition cursor-pointer disabled:opacity-60"
+                className="px-4 py-2 rounded-xl bg-lavender-600 hover:bg-lavender-700 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold transition cursor-pointer disabled:opacity-60"
               >
                 {saving ? 'Saving...' : 'Save KYC Decision'}
               </button>

@@ -99,23 +99,23 @@ export default function AdminHeader({ onToggleSidebar }) {
   };
 
   return (
-    <header className="no-print sticky top-0 z-40 h-16 bg-white dark:bg-slate-900 border-b border-hairline dark:border-slate-800 px-4 lg:px-6 flex items-center justify-between transition-colors">
+    <header className="no-print sticky top-0 z-40 h-16 bg-white dark:bg-[#141416] border-b border-hairline dark:border-[#27272A] px-4 lg:px-6 flex items-center justify-between transition-colors">
       <div className="flex items-center gap-3">
         <div className="brand flex items-center lg:w-[216px]">
           <Link
             to="/dashboard"
-            className="flex items-center gap-2.5 text-slate-900 dark:text-white no-underline focus:outline-none"
+            className="flex items-center gap-2.5 text-slate-900 dark:text-zinc-100 no-underline focus:outline-none"
           >
-            <div className="p-0.5 rounded-lg bg-white border border-hairline dark:border-slate-700 shrink-0 shadow-xs">
+            <div className="p-0.5 rounded-lg bg-white border border-hairline dark:border-[#27272A] shrink-0 shadow-xs">
               <img
                 src="/img/logo.JPG"
                 alt="WanderWheels"
                 className="w-8 h-8 rounded-md object-cover block"
               />
             </div>
-            <span className="font-extrabold text-[16px] tracking-tight text-slate-900 dark:text-white whitespace-nowrap">
-              Wander<span className="text-rose-600">Wheels</span>
-              <span className="hidden xl:inline text-[11px] font-semibold text-slate-400 dark:text-slate-400 ml-1.5">
+            <span className="font-extrabold text-[16px] tracking-tight text-slate-900 dark:text-zinc-100 whitespace-nowrap">
+              Wander<span className="text-rose-600 dark:text-rose-500">Wheels</span>
+              <span className="hidden xl:inline text-[11px] font-semibold text-slate-400 dark:text-zinc-500 ml-1.5">
                 | Admin Panel
               </span>
             </span>
@@ -127,14 +127,14 @@ export default function AdminHeader({ onToggleSidebar }) {
           onClick={onToggleSidebar}
           aria-label="Toggle Navigation"
           title="Toggle Sidebar"
-          className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+          className="p-2 rounded-lg text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-[#1C1C1F] transition cursor-pointer"
         >
           <Menu className="w-4 h-4" />
         </button>
 
         {/* Global Search Bar */}
         <div className="hidden md:flex items-center relative ml-1">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 absolute left-3 pointer-events-none" />
           <input
             ref={searchInputRef}
             type="text"
@@ -142,14 +142,14 @@ export default function AdminHeader({ onToggleSidebar }) {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search fleet, bookings, plates..."
             aria-label="Global Admin Search"
-            className="w-56 lg:w-72 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-lavender-600 rounded-lg pl-8 pr-7 py-1.5 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none transition"
+            className="w-56 lg:w-72 bg-slate-50 dark:bg-[#1C1C1F] border border-slate-200 dark:border-[#27272A] focus:bg-white dark:focus:bg-[#1C1C1F] focus:border-lavender-600 dark:focus:border-amber-500 rounded-lg pl-8 pr-7 py-1.5 text-xs text-slate-800 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 outline-none transition"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery('')}
               aria-label="Clear search"
-              className="absolute right-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+              className="absolute right-2 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -158,7 +158,38 @@ export default function AdminHeader({ onToggleSidebar }) {
       </div>
 
       {/* Right Utility Cluster */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2.5">
+        {/* Prominent Light / Dark Pill Switch */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          data-testid="admin-theme-toggle"
+          className="relative inline-flex items-center h-9 px-1 rounded-full bg-slate-100 dark:bg-[#1C1C1F] border border-hairline dark:border-[#27272A] cursor-pointer transition-all hover:border-indigo-400 dark:hover:border-amber-500 select-none"
+        >
+          <span
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all ${
+              !isDark
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <Sun className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Light</span>
+          </span>
+          <span
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all ${
+              isDark
+                ? 'bg-amber-500 text-zinc-950 shadow-xs'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <Moon className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Dark</span>
+          </span>
+        </button>
+
         {/* Notification Bell */}
         <div className="relative" ref={alertsRef}>
           <button
@@ -169,25 +200,25 @@ export default function AdminHeader({ onToggleSidebar }) {
             }}
             aria-label="Fleet Alerts"
             aria-expanded={alertsOpen}
-            className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 relative transition cursor-pointer"
+            className="p-2 rounded-lg text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-[#1C1C1F] relative transition cursor-pointer"
           >
             <Bell className="w-4 h-4" />
             {alertsData.totalCount > 0 && (
-              <span className="w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900 absolute top-1.5 right-1.5" />
+              <span className="w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#141416] absolute top-1.5 right-1.5" />
             )}
           </button>
 
           {alertsOpen && (
-            <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 border border-hairline dark:border-slate-800 rounded-xl shadow-lg p-3 z-50">
-              <div className="flex items-center justify-between pb-2 border-b border-hairline dark:border-slate-800">
-                <span className="text-xs font-bold text-slate-900 dark:text-white">Fleet & Operations Alerts</span>
-                <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/15 px-2 py-0.5 rounded-full tabular-nums">
+            <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#141416] border border-hairline dark:border-[#27272A] rounded-xl shadow-xl p-3 z-50">
+              <div className="flex items-center justify-between pb-2 border-b border-hairline dark:border-[#27272A]">
+                <span className="text-xs font-bold text-slate-900 dark:text-zinc-100">Fleet &amp; Operations Alerts</span>
+                <span className="text-[11px] font-semibold text-indigo-600 dark:text-amber-400 bg-indigo-50 dark:bg-amber-500/15 px-2 py-0.5 rounded-full tabular-nums">
                   {alertsData.totalCount} Open
                 </span>
               </div>
-              <div className="divide-y divide-slate-100 dark:divide-slate-800 mt-1 max-h-72 overflow-y-auto text-xs">
+              <div className="divide-y divide-slate-100 dark:divide-[#27272A] mt-1 max-h-72 overflow-y-auto text-xs">
                 {alertsData.alerts.length === 0 ? (
-                  <div className="py-5 text-center text-slate-400">All operations caught up</div>
+                  <div className="py-5 text-center text-slate-400 dark:text-zinc-500">All operations caught up</div>
                 ) : (
                   alertsData.alerts.map((alert) => (
                     <button
@@ -197,10 +228,10 @@ export default function AdminHeader({ onToggleSidebar }) {
                         setAlertsOpen(false);
                         navigate(alert.route);
                       }}
-                      className="w-full text-left py-2.5 px-2 hover:bg-slate-50 dark:hover:bg-slate-800/80 rounded-lg cursor-pointer transition"
+                      className="w-full text-left py-2.5 px-2 hover:bg-slate-50 dark:hover:bg-[#1C1C1F] rounded-lg cursor-pointer transition"
                     >
-                      <p className="font-semibold text-slate-800 dark:text-slate-100">{alert.title}</p>
-                      <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">{alert.subtitle}</p>
+                      <p className="font-semibold text-slate-800 dark:text-zinc-100">{alert.title}</p>
+                      <p className="text-slate-500 dark:text-zinc-400 text-[11px] mt-0.5">{alert.subtitle}</p>
                     </button>
                   ))
                 )}
@@ -209,25 +240,13 @@ export default function AdminHeader({ onToggleSidebar }) {
           )}
         </div>
 
-        {/* Light/Dark Theme Toggle */}
-        <button
-          type="button"
-          onClick={toggleTheme}
-          aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          data-testid="admin-theme-toggle"
-          className="p-2 rounded-lg text-slate-500 dark:text-amber-400 hover:text-slate-900 dark:hover:text-amber-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-        >
-          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-        </button>
-
         {/* Fullscreen Toggle */}
         <button
           type="button"
           onClick={toggleFullscreen}
           title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
           aria-label="Toggle Fullscreen"
-          className="hidden sm:flex p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+          className="hidden sm:flex p-2 rounded-lg text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-[#1C1C1F] transition cursor-pointer"
         >
           {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
         </button>
@@ -237,12 +256,12 @@ export default function AdminHeader({ onToggleSidebar }) {
           to="/update-contactinfo"
           title="Contact & Helpline Settings"
           aria-label="Contact Settings"
-          className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+          className="p-2 rounded-lg text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-[#1C1C1F] transition"
         >
           <Settings className="w-4 h-4" />
         </Link>
 
-        <div className="h-5 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
+        <div className="h-5 w-px bg-slate-200 dark:bg-[#27272A] mx-1" />
 
         {/* Admin Account Dropdown */}
         <div className="ts-account relative" ref={accountRef}>
@@ -253,31 +272,31 @@ export default function AdminHeader({ onToggleSidebar }) {
               setAlertsOpen(false);
             }}
             aria-expanded={accountOpen}
-            className="flex items-center gap-2.5 pl-1.5 pr-2.5 py-1 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 border border-transparent hover:border-hairline dark:hover:border-slate-700 transition cursor-pointer"
+            className="flex items-center gap-2.5 pl-1.5 pr-2.5 py-1 rounded-lg hover:bg-slate-50 dark:hover:bg-[#1C1C1F] border border-transparent hover:border-hairline dark:hover:border-[#27272A] transition cursor-pointer"
           >
             <img
               src="/img/admin-avatar.svg"
-              className="w-8 h-8 rounded-full border border-hairline dark:border-slate-700 bg-indigo-50 dark:bg-slate-800"
+              className="w-8 h-8 rounded-full border border-hairline dark:border-[#27272A] bg-indigo-50 dark:bg-[#1C1C1F]"
               alt="Admin"
             />
             <div className="hidden sm:block text-left">
-              <div className="text-xs font-bold text-slate-900 dark:text-white leading-tight">Account</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">Fleet Ops</div>
+              <div className="text-xs font-bold text-slate-900 dark:text-zinc-100 leading-tight">Account</div>
+              <div className="text-[11px] text-slate-500 dark:text-zinc-400 leading-tight">Fleet Ops</div>
             </div>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500" />
           </button>
 
           {accountOpen && (
-            <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-slate-900 border border-hairline dark:border-slate-800 rounded-xl shadow-lg p-1.5 z-50 text-xs">
+            <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-[#141416] border border-hairline dark:border-[#27272A] rounded-xl shadow-xl p-1.5 z-50 text-xs">
               <Link
                 to="/change-password"
                 onClick={() => setAccountOpen(false)}
-                className="w-full text-left px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium flex items-center gap-2 no-underline"
+                className="w-full text-left px-3 py-2 rounded-lg text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-[#1C1C1F] font-medium flex items-center gap-2 no-underline"
               >
-                <KeyRound className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <KeyRound className="w-3.5 h-3.5 text-indigo-600 dark:text-amber-400" />
                 <span>Change Password</span>
               </Link>
-              <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
+              <div className="my-1 border-t border-slate-100 dark:border-[#27272A]" />
               <a
                 href="#logout"
                 onClick={handleLogout}

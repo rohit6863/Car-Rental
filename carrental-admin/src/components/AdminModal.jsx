@@ -25,25 +25,25 @@ export default function AdminModal({
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[80] bg-slate-900/50 dark:bg-slate-950/75 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto"
+      className="fixed inset-0 z-[80] bg-slate-900/50 dark:bg-black/75 backdrop-blur-[2px] flex items-center justify-center p-4 overflow-y-auto"
     >
       <div
-        className={`w-full ${maxWidth} bg-white dark:bg-slate-900 border border-hairline dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-auto ${className}`}
+        className={`w-full ${maxWidth} bg-white dark:bg-[#141416] border border-hairline dark:border-[#27272A] rounded-2xl shadow-2xl overflow-hidden my-auto ${className}`}
       >
-        <div className="no-print px-6 py-4 border-b border-hairline dark:border-slate-800 flex items-center justify-between gap-3">
+        <div className="no-print px-6 py-4 border-b border-hairline dark:border-[#27272A] flex items-center justify-between gap-3">
           <div>
             {subtitle && (
-              <span className="text-[10px] font-bold uppercase tracking-wider text-lavender-600 dark:text-indigo-400 block">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-lavender-600 dark:text-amber-400 block">
                 {subtitle}
               </span>
             )}
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">{title}</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-zinc-100">{title}</h3>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="p-2 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="p-2 rounded-lg text-slate-400 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-[#1C1C1F] transition cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>

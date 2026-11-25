@@ -67,31 +67,31 @@ export default function AdminPricingPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="page-title text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+        <h1 className="page-title text-xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">
           Dynamic Pricing &amp; Tariff Simulator
         </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+        <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
           Configure weekend and peak-holiday surge multipliers and simulate rental totals
         </p>
       </div>
 
       {loading ? (
-        <div className="bento-card p-6 text-sm text-slate-500 dark:text-slate-400">Loading pricing engine...</div>
+        <div className="bento-card p-6 text-sm text-slate-500 dark:text-zinc-400">Loading pricing engine...</div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {/* Rules Config */}
           <div className="lg:col-span-2 bento-card p-6 space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-slate-800">
-              <Sliders className="w-4 h-4 text-lavender-600 dark:text-indigo-400" />
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Surge Multiplier Rules</h3>
+            <div className="flex items-center gap-2 pb-3 border-b border-hairline dark:border-[#27272A]">
+              <Sliders className="w-4 h-4 text-lavender-600 dark:text-amber-400" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Surge Multiplier Rules</h3>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 dark:bg-[#1C1C1F] border border-slate-100 dark:border-[#27272A]">
               <div>
-                <div className="text-sm font-bold text-slate-900 dark:text-white">
+                <div className="text-sm font-bold text-slate-900 dark:text-zinc-100">
                   Weekend Surge Pricing (+{rules.weekendSurgePct}%)
                 </div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                <div className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
                   Applies Friday 6:00 PM through Sunday 11:59 PM
                 </div>
               </div>
@@ -102,7 +102,7 @@ export default function AdminPricingPage() {
                   max="100"
                   value={rules.weekendSurgePct}
                   onChange={(e) => setRules({ ...rules, weekendSurgePct: Number(e.target.value) })}
-                  className="w-20 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold tabular-nums text-slate-900 dark:text-white outline-none"
+                  className="w-20 bg-white dark:bg-[#141416] border border-slate-200 dark:border-[#27272A] rounded-lg px-2.5 py-1.5 text-xs font-bold tabular-nums text-slate-900 dark:text-zinc-100 outline-none"
                 />
                 <input
                   type="checkbox"
@@ -114,12 +114,12 @@ export default function AdminPricingPage() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 dark:bg-[#1C1C1F] border border-slate-100 dark:border-[#27272A]">
               <div>
-                <div className="text-sm font-bold text-slate-900 dark:text-white">
+                <div className="text-sm font-bold text-slate-900 dark:text-zinc-100">
                   Peak Holiday Multiplier (+{rules.holidaySurgePct}%)
                 </div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                <div className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
                   Triggers when regional fleet utilization exceeds 80%
                 </div>
               </div>
@@ -130,7 +130,7 @@ export default function AdminPricingPage() {
                   max="100"
                   value={rules.holidaySurgePct}
                   onChange={(e) => setRules({ ...rules, holidaySurgePct: Number(e.target.value) })}
-                  className="w-20 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold tabular-nums text-slate-900 dark:text-white outline-none"
+                  className="w-20 bg-white dark:bg-[#141416] border border-slate-200 dark:border-[#27272A] rounded-lg px-2.5 py-1.5 text-xs font-bold tabular-nums text-slate-900 dark:text-zinc-100 outline-none"
                 />
                 <input
                   type="checkbox"
@@ -145,16 +145,16 @@ export default function AdminPricingPage() {
 
           {/* Interactive Tariff Simulator */}
           <div className="bento-card p-6 space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Checkout Rate Preview</h3>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">Checkout Rate Preview</h3>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1.5">
                 Base Vehicle
               </label>
               <select
                 value={selectedVehicleId}
                 onChange={(e) => setSelectedVehicleId(e.target.value)}
-                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 dark:text-white outline-none"
+                className="w-full bg-white dark:bg-[#1C1C1F] border border-slate-200 dark:border-[#27272A] rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 dark:text-zinc-100 outline-none"
               >
                 {vehicles.map((v) => (
                   <option key={v.id} value={v.id}>
@@ -165,7 +165,7 @@ export default function AdminPricingPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1.5">
                 Rental Duration: <span className="tabular-nums font-bold">{simDays} Day{simDays > 1 ? 's' : ''}</span>
               </label>
               <input
@@ -178,14 +178,14 @@ export default function AdminPricingPage() {
               />
             </div>
 
-            <div className="p-4 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900 space-y-1.5">
-              <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-300">
+            <div className="p-4 rounded-xl bg-indigo-50/70 dark:bg-amber-500/15 border border-indigo-100 dark:border-amber-500/30 space-y-1.5">
+              <div className="flex items-center justify-between text-xs text-slate-600 dark:text-zinc-300">
                 <span>Simulated Daily Rate</span>
                 <span className="font-bold tabular-nums">₹{simulatedDaily.toLocaleString('en-IN')}/day</span>
               </div>
-              <div className="flex items-center justify-between pt-1.5 border-t border-indigo-100 dark:border-indigo-900">
-                <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">Dynamic Total</span>
-                <span className="text-lg font-extrabold text-lavender-600 dark:text-indigo-300 tabular-nums">
+              <div className="flex items-center justify-between pt-1.5 border-t border-indigo-100 dark:border-amber-500/30">
+                <span className="text-xs font-semibold text-slate-700 dark:text-zinc-200">Dynamic Total</span>
+                <span className="text-lg font-extrabold text-lavender-600 dark:text-amber-400 tabular-nums">
                   ₹{simulatedTotal.toLocaleString('en-IN')}
                 </span>
               </div>
@@ -195,7 +195,7 @@ export default function AdminPricingPage() {
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="w-full py-2.5 rounded-xl bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition cursor-pointer disabled:opacity-60"
+              className="w-full py-2.5 rounded-xl bg-lavender-600 hover:bg-lavender-700 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition cursor-pointer disabled:opacity-60"
             >
               <Check className="w-4 h-4" />
               <span>{saving ? 'Saving...' : 'Publish Pricing Rules'}</span>
