@@ -56,9 +56,9 @@ for (const [name, p] of pkgs.entries()) {
   }
 }
 
-// Public vendor CSS and webfonts
+// Public vendor CSS and webfonts (carrental-admin)
 md += '## Font Awesome (v4.7.0)\n\n' +
-  '- **Asset Path:** `carrental-web/public/assets/fonts/fontawesome-webfont*`, `carrental-admin/public/fonts/fontawesome-webfont*`\n' +
+  '- **Asset Path:** `carrental-admin/public/fonts/fontawesome-webfont*`\n' +
   '- **Author:** Dave Gandy (http://fontawesome.io)\n' +
   '- **License:** SIL OFL 1.1 (Fonts) / MIT License (CSS)\n\n' +
   '```text\n' +
@@ -67,7 +67,7 @@ md += '## Font Awesome (v4.7.0)\n\n' +
   '```\n\n---\n\n';
 
 md += '## Bootstrap (v3.3.7 / Bootswatch)\n\n' +
-  '- **Asset Path:** `carrental-web/public/assets/css/bootstrap.min.css`, `carrental-admin/public/css/bootstrap.min.css`, Glyphicons\n' +
+  '- **Asset Path:** `carrental-admin/public/css/bootstrap.min.css`, Glyphicons\n' +
   '- **Authors:** Twitter, Inc. / Thomas Park\n' +
   '- **License:** MIT License\n\n' +
   '```text\n' +
@@ -90,22 +90,6 @@ md += '## Social Buttons for Bootstrap\n\n' +
   '```text\n' +
   'Copyright 2013-2015 Panayiotis Lipiridis\n' +
   'Licensed under the MIT License (https://github.com/lipis/bootstrap-social)\n' +
-  '```\n\n---\n\n';
-
-md += '## Owl Carousel (v1.3.3)\n\n' +
-  '- **Asset Path:** `carrental-web/public/assets/css/owl.carousel.css`, `owl.transitions.css`\n' +
-  '- **License:** MIT License\n\n' +
-  '```text\n' +
-  'Owl Carousel v1.3.3 / Owl Transitions v1.3.2\n' +
-  'Licensed under MIT License\n' +
-  '```\n\n---\n\n';
-
-md += '## Slick Carousel\n\n' +
-  '- **Asset Path:** `carrental-web/public/assets/css/slick.css`\n' +
-  '- **License:** MIT License\n\n' +
-  '```text\n' +
-  'Copyright (c) 2013-2016 Ken Wheeler\n' +
-  'Licensed under the MIT License\n' +
   '```\n';
 
 fs.writeFileSync(path.join(root, 'THIRD_PARTY_NOTICES.md'), md);

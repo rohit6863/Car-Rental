@@ -1055,37 +1055,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ---
 
-## bootstrap (v3.4.1)
-
-- **Package:** `bootstrap`
-- **License:** MIT
-
-```text
-The MIT License (MIT)
-
-Copyright (c) 2011-2019 Twitter, Inc.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-```
-
----
-
 ## dompurify (v3.4.17)
 
 - **Package:** `dompurify`
@@ -1328,36 +1297,6 @@ SOFTWARE.
 
 ---
 
-## jquery (v3.7.1)
-
-- **Package:** `jquery`
-- **License:** MIT
-
-```text
-Copyright OpenJS Foundation and other contributors, https://openjsf.org/
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-```
-
----
-
 ## react (v18.3.1)
 
 - **Package:** `react`
@@ -1484,6 +1423,67 @@ SOFTWARE.
 
 ---
 
+## bootstrap (v3.4.1)
+
+- **Package:** `bootstrap`
+- **License:** MIT
+
+```text
+The MIT License (MIT)
+
+Copyright (c) 2011-2019 Twitter, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+```
+
+---
+
+## jquery (v3.7.1)
+
+- **Package:** `jquery`
+- **License:** MIT
+
+```text
+Copyright OpenJS Foundation and other contributors, https://openjsf.org/
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
+
+---
+
 ## quill (v2.0.3)
 
 - **Package:** `quill`
@@ -1527,7 +1527,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## Font Awesome (v4.7.0)
 
-- **Asset Path:** `carrental-web/public/assets/fonts/fontawesome-webfont*`, `carrental-admin/public/fonts/fontawesome-webfont*`
+- **Asset Path:** `carrental-admin/public/fonts/fontawesome-webfont*`
 - **Author:** Dave Gandy (http://fontawesome.io)
 - **License:** SIL OFL 1.1 (Fonts) / MIT License (CSS)
 
@@ -1540,7 +1540,7 @@ License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
 
 ## Bootstrap (v3.3.7 / Bootswatch)
 
-- **Asset Path:** `carrental-web/public/assets/css/bootstrap.min.css`, `carrental-admin/public/css/bootstrap.min.css`, Glyphicons
+- **Asset Path:** `carrental-admin/public/css/bootstrap.min.css`, Glyphicons
 - **Authors:** Twitter, Inc. / Thomas Park
 - **License:** MIT License
 
@@ -1572,28 +1572,4 @@ Licensed under MIT (https://github.com/silviomoreto/bootstrap-select/blob/master
 ```text
 Copyright 2013-2015 Panayiotis Lipiridis
 Licensed under the MIT License (https://github.com/lipis/bootstrap-social)
-```
-
----
-
-## Owl Carousel (v1.3.3)
-
-- **Asset Path:** `carrental-web/public/assets/css/owl.carousel.css`, `owl.transitions.css`
-- **License:** MIT License
-
-```text
-Owl Carousel v1.3.3 / Owl Transitions v1.3.2
-Licensed under MIT License
-```
-
----
-
-## Slick Carousel
-
-- **Asset Path:** `carrental-web/public/assets/css/slick.css`
-- **License:** MIT License
-
-```text
-Copyright (c) 2013-2016 Ken Wheeler
-Licensed under the MIT License
 ```

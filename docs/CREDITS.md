@@ -39,16 +39,14 @@ All retained third-party software, fonts, and stylesheets have been verified aga
 
 | Asset / Package | Category | Version | Author / Organization | Verified License |
 | :--- | :--- | :--- | :--- | :--- |
-| Font Awesome | Web Fonts & Icons | 4.7.0 | Dave Gandy | SIL OFL 1.1 (Fonts) / MIT (CSS) |
-| Bootstrap | UI Framework & Glyphicons | 3.3.7 | Twitter, Inc. / Thomas Park | MIT License |
-| Bootstrap Select | Select Dropdowns | 1.7.2 | Silvio Moreto | MIT License |
-| Bootstrap Social | Social Button Styles | 4.9.0 | Panayiotis Lipiridis | MIT License |
-| Awesome Bootstrap Checkbox | Form Controls | 0.3.7 | Flatlogic | MIT License |
-| Bootstrap Slider | Range Slider UI | 9.7.2 | seiyria | MIT License |
-| Owl Carousel | Carousel Layout | 1.3.3 | Bartosz Wojciechowski | MIT License |
-| Slick Carousel | Carousel Styles | 1.6.0 | Ken Wheeler | MIT License |
-| DataTables Bootstrap | Data Table Styling | 1.10.x | SpryMedia Ltd | MIT License |
-| `@fontsource/lato` | Web Font | 5.x | Google Fonts / Lukasz Dziedzic | SIL OFL 1.1 |
+| Font Awesome (`@fortawesome/fontawesome-free` in `carrental-web`; v4.7.0 in `carrental-admin`) | Web Fonts & Icons | 6.x / 4.7.0 | Fonticons, Inc. / Dave Gandy | SIL OFL 1.1 (Fonts) / MIT (CSS) |
+| Bootstrap (`carrental-admin` only; removed from `carrental-web`) | UI Framework & Glyphicons | 3.3.7 | Twitter, Inc. / Thomas Park | MIT License |
+| Bootstrap Select (`carrental-admin`) | Select Dropdowns | 1.7.2 | Silvio Moreto | MIT License |
+| Bootstrap Social (`carrental-admin`) | Social Button Styles | 4.9.0 | Panayiotis Lipiridis | MIT License |
+| Awesome Bootstrap Checkbox (`carrental-admin`) | Form Controls | 0.3.7 | Flatlogic | MIT License |
+| DataTables Bootstrap (`carrental-admin`) | Data Table Styling | 1.10.x | SpryMedia Ltd | MIT License |
+| `@fontsource/outfit` & `@fontsource/plus-jakarta-sans` (`carrental-web`) | Web Fonts | 5.x | Google Fonts / Fontsource | SIL OFL 1.1 |
+| `tailwindcss` (`carrental-web`) | Utility CSS Framework | 4.x | Tailwind Labs | MIT License |
 | `react` & `react-dom` | Frontend Framework | 18.3.1 | Meta Platforms, Inc. | MIT License |
 | `react-router-dom` | Client Routing | 6.x | Remix Software | MIT License |
 | `axios` | HTTP Client | 1.21.0 | Matt Zabriskie | MIT License |
@@ -72,20 +70,9 @@ All retained third-party software, fonts, and stylesheets have been verified aga
 > The legacy theme CSS files described below originate from an unverified legacy HTML template (`CarForYou - Responsive Car Dealer HTML5 Template`, Author: `WMD Team`, Version 1.0) and an unverified admin dashboard stylesheet.
 > **The repository should remain PRIVATE until a comprehensive UI redesign replaces these legacy stylesheets.**
 
-### Retained CSS Sections in `carrental-web/public/assets/css/style.css`
+### `carrental-web/public/assets/css/style.css` (Removed)
 
-All raster image backgrounds in `style.css` have been replaced with CSS gradients. The remaining structure contains legacy layout rules from the original template:
-
-1. **Section 1 (General Code, lines 89–1060):** Typography resets, `.btn` button styling, `.dark-overlay`, spacing margin/padding helpers, form controls, table helpers, tab panels, and modal dialog wrappers.
-2. **Section 2 (Header, lines 1061–1062):** Navigation bar layouts, dropdown hover animations, and mobile hamburger navigation wrappers.
-3. **Section 3 (Home Page Layout, lines 1063–2240):** Hero banner container (`.banner-section`), filter box layout, about-us snippet container, recent vehicle cards grid (`.recent-car-list`), fun-facts counter circles (`.fun-facts-section`), testimonial cards carousel (`.testimonial-section`), brand logos strip, and footer widget grid.
-4. **Section 5 & 6 (Inner Page Headings & Breadcrumbs, lines 2257–2330):** Header banner wrapper (`.page-header`, `.page-heading`) and custom breadcrumb list (`.coustom-breadcrumb`).
-5. **Section 7 & 8 (Listing Pages, lines 2331–2795):** Vehicle listing card layout, sidebar filter widgets, vehicle compare bar, and grid/list view toggles.
-6. **Section 9 (Listing Detail, lines 2796–2874):** Detail view header, vehicle specification tabs, pricing summary badge, and booking widget sidebar.
-7. **Section 10 & 11 (Contact Us & FAQs, lines 2875–2960):** Contact form grid, contact information widgets, and accordion FAQ panels (`.knowledge_base_faq`, `.about_services_faq`, `.support_faq`).
-8. **Section 12, 13 & 14 (About Us, 404, Services, lines 2961–3220):** About us feature columns, 404 error layout (`.page_404`), and services card grid.
-9. **Section 16 (User Profile & Account, lines 3625–3790):** Profile header, tabbed profile navigation, profile settings form, and booking history table wrapper.
-10. **Section 21 (Responsive CSS, lines 4135–5446):** Media queries (`@media (max-width: 991px)`, `@media (max-width: 767px)`) handling responsive breakpoints.
+All legacy Class-C template stylesheets (`style.css`, `bootstrap.min.css`, `owl.carousel.css`, `owl.transitions.css`, `slick.css`, `bootstrap-slider.min.css`, `font-awesome.min.css`) and Bootstrap/jQuery JS packages have been removed from `carrental-web` and replaced with Tailwind CSS v4, self-hosted `@fontsource` fonts, and pure React components.
 
 ### Retained CSS Sections in `carrental-admin/public/css/style.css`
 
