@@ -1,0 +1,186 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+  --font-display: "Outfit", sans-serif;
+
+  --color-brand-red: #E11D48;
+  --color-brand-dark-red: #BE123C;
+  --color-brand-darkRed: #BE123C;
+  --color-brand-amber: #F59E0B;
+  --color-brand-dark: #0F172A;
+  --color-brand-darker: #090D16;
+  --color-brand-slate: #1E293B;
+  --color-brand-light: #F8FAFC;
+  --color-brand-emerald: #10B981;
+
+  --shadow-glow: 0 10px 30px -5px rgba(225, 29, 72, 0.4);
+  --shadow-card: 0 18px 38px -15px rgba(15, 23, 42, 0.08);
+  --shadow-amber-glow: 0 10px 25px -5px rgba(245, 158, 11, 0.35);
+}
+
+/* Base Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  color: inherit;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0F172A;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #E11D48;
+}
+
+/* Reference Visual Elements */
+.glass-nav {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.hero-gradient {
+  background: linear-gradient(90deg, rgba(9, 13, 22, 0.94) 0%, rgba(9, 13, 22, 0.76) 55%, rgba(9, 13, 22, 0.48) 100%);
+}
+
+.subbanner-overlay {
+  background: linear-gradient(180deg, rgba(9, 13, 22, 0.78) 0%, rgba(15, 23, 42, 0.9) 100%);
+}
+
+.card-image-zoom {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.group:hover .card-image-zoom {
+  transform: scale(1.06);
+}
+
+/* Dark Atmosphere Showroom Mode */
+body.dark-atmosphere {
+  background-color: #090D16;
+  color: #F8FAFC;
+}
+
+body.dark-atmosphere .surface-card {
+  background-color: #111827 !important;
+  border-color: #1F2937 !important;
+  color: #F8FAFC !important;
+}
+
+body.dark-atmosphere .surface-muted {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+  color: #E2E8F0 !important;
+}
+
+body.dark-atmosphere .text-adaptive-main {
+  color: #F8FAFC !important;
+}
+
+body.dark-atmosphere .text-adaptive-sub {
+  color: #94A3B8 !important;
+}
+
+/* Modal & Backdrop Styling with Bootstrap 3 compatibility */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  outline: 0;
+  padding: 1rem;
+}
+
+.modal.in,
+.modal.show {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.fade {
+  opacity: 0;
+  transition: opacity 0.15s linear;
+}
+
+.modal.fade.in,
+.modal.fade.show {
+  opacity: 1;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1040;
+  background-color: #090D16;
+}
+
+.modal-backdrop.fade {
+  opacity: 0;
+  transition: opacity 0.15s linear;
+}
+
+.modal-backdrop.in {
+  opacity: 0.7;
+}
+
+.modal-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 32rem;
+  margin: auto;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+body.dark-atmosphere .modal-content {
+  background-color: #111827;
+  border-color: #1f2937;
+  color: #f8fafc;
+}
+
+/* Payment Modal Overlay */
+.payment-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(9, 13, 22, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 1rem;
+  overflow-y: auto;
+}

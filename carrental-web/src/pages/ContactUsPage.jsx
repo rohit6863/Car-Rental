@@ -56,134 +56,181 @@ export default function ContactUsPage() {
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-brand-light dark:bg-brand-darker text-slate-800 dark:text-slate-100 flex flex-col font-sans transition-colors duration-300">
       <Header />
 
-      <section className="page-header contactus_page">
-        <div className="container">
+      {/* Subbanner */}
+      <section className="page-header contactus_page relative subbanner-overlay py-12 md:py-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-darker via-brand-dark to-brand-slate opacity-95"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="page-header_wrap">
             <div className="page-heading">
-              <h1>Contact Us</h1>
+              <h1 className="font-display text-3xl md:text-4xl font-extrabold text-white tracking-tight">Contact Us</h1>
             </div>
-            <ul className="coustom-breadcrumb">
+            <ul className="coustom-breadcrumb flex items-center gap-2 text-xs md:text-sm text-slate-300 mt-2 font-medium">
               <li>
-                <Link to="/">Home</Link>
+                <Link to="/" className="text-slate-300 hover:text-white transition-colors">Home</Link>
               </li>
-              <li>Contact Us</li>
+              <li className="text-slate-400">/</li>
+              <li className="text-brand-amber font-semibold">Contact Us</li>
             </ul>
           </div>
         </div>
         <div className="dark-overlay"></div>
       </section>
 
-      <section className="contact_us section-padding">
-        <div className="container">
-          <div className="row">
-            <div className="col-md-6">
-              <h3>Get in touch using the form below</h3>
-              {error && (
-                <div className="errorWrap" style={{ padding: '10px', margin: '0 0 20px 0', background: '#fff', borderLeft: '4px solid #dd3d36' }}>
-                  <strong>ERROR</strong>: {error}
+      {/* Contact Section */}
+      <section className="contact_us section-padding flex-1 py-12 md:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Contact Form */}
+            <div className="lg:col-span-7">
+              <div className="bg-white dark:bg-brand-slate border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm transition-colors">
+                <h3 className="font-display text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                  Get in touch using the form below
+                </h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                  Have a question about our fleet, rates, or bookings? Send us a message and our team will get back to you promptly.
+                </p>
+
+                {error && (
+                  <div className="errorWrap mb-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border-l-4 border-rose-500 text-rose-800 dark:text-rose-300 text-sm shadow-xs">
+                    <strong>ERROR</strong>: {error}
+                  </div>
+                )}
+                {msg && (
+                  <div className="succWrap mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border-l-4 border-emerald-500 text-emerald-800 dark:text-emerald-300 text-sm shadow-xs">
+                    <strong>SUCCESS</strong>: {msg}
+                  </div>
+                )}
+
+                <div className="contact_form gray-bg">
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="form-group">
+                      <label className="control-label text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 block">
+                        Full Name <span className="text-brand-red">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="fullname"
+                        className="form-control white_bg w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-brand-dark text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-red focus:border-transparent transition-all"
+                        required
+                        value={formData.fullname}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <div className="form-group">
+                        <label className="control-label text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 block">
+                          Email Address <span className="text-brand-red">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          className="form-control white_bg w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-brand-dark text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-red focus:border-transparent transition-all"
+                          required
+                          value={formData.email}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="control-label text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 block">
+                          Phone Number <span className="text-brand-red">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="contactno"
+                          className="form-control white_bg w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-brand-dark text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-red focus:border-transparent transition-all"
+                          required
+                          value={formData.contactno}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="control-label text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 block">
+                        Message <span className="text-brand-red">*</span>
+                      </label>
+                      <textarea
+                        className="form-control white_bg w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-brand-dark text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-red focus:border-transparent transition-all"
+                        name="message"
+                        rows="4"
+                        required
+                        value={formData.message}
+                        onChange={handleChange}
+                      ></textarea>
+                    </div>
+
+                    <div className="form-group pt-2">
+                      <button
+                        className="btn px-6 py-3 bg-brand-red hover:bg-brand-darkRed text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-glow flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                        type="submit"
+                        disabled={loading}
+                      >
+                        <span>{loading ? 'Sending...' : 'Send Message'}</span>
+                        <span className="angle_arrow">
+                          <i className="fa fa-angle-right" aria-hidden="true"></i>
+                        </span>
+                      </button>
+                    </div>
+                  </form>
                 </div>
-              )}
-              {msg && (
-                <div className="succWrap" style={{ padding: '10px', margin: '0 0 20px 0', background: '#fff', borderLeft: '4px solid #5cb85c' }}>
-                  <strong>SUCCESS</strong>: {msg}
-                </div>
-              )}
-              <div className="contact_form gray-bg">
-                <form onSubmit={handleSubmit}>
-                  <div className="form-group">
-                    <label className="control-label">
-                      Full Name <span>*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="fullname"
-                      className="form-control white_bg"
-                      required
-                      value={formData.fullname}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="control-label">
-                      Email Address <span>*</span>
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      className="form-control white_bg"
-                      required
-                      value={formData.email}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="control-label">
-                      Phone Number <span>*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="contactno"
-                      className="form-control white_bg"
-                      required
-                      value={formData.contactno}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="control-label">
-                      Message <span>*</span>
-                    </label>
-                    <textarea
-                      className="form-control white_bg"
-                      name="message"
-                      rows="4"
-                      required
-                      value={formData.message}
-                      onChange={handleChange}
-                    ></textarea>
-                  </div>
-                  <div className="form-group">
-                    <button className="btn" type="submit" disabled={loading}>
-                      {loading ? 'Sending...' : 'Send Message'}{' '}
-                      <span className="angle_arrow">
-                        <i className="fa fa-angle-right" aria-hidden="true"></i>
-                      </span>
-                    </button>
-                  </div>
-                </form>
               </div>
             </div>
 
-            <div className="col-md-6">
-              <h3>Contact Info</h3>
-              <div className="contact_detail">
-                <ul>
-                  <li>
-                    <div className="icon_wrap">
-                      <i className="fa fa-map-marker" aria-hidden="true"></i>
-                    </div>
-                    <div className="contact_info_m">{contactInfo.Address}</div>
-                  </li>
-                  <li>
-                    <div className="icon_wrap">
-                      <i className="fa fa-phone" aria-hidden="true"></i>
-                    </div>
-                    <div className="contact_info_m">
-                      <a href={`tel:${contactInfo.ContactNo}`}>{contactInfo.ContactNo}</a>
-                    </div>
-                  </li>
-                  <li>
-                    <div className="icon_wrap">
-                      <i className="fa fa-envelope-o" aria-hidden="true"></i>
-                    </div>
-                    <div className="contact_info_m">
-                      <a href={`mailto:${contactInfo.EmailId}`}>{contactInfo.EmailId}</a>
-                    </div>
-                  </li>
-                </ul>
+            {/* Contact Details Card */}
+            <div className="lg:col-span-5">
+              <div className="bg-white dark:bg-brand-slate border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm transition-colors">
+                <h3 className="font-display text-2xl font-bold text-slate-900 dark:text-white mb-6">
+                  Contact Info
+                </h3>
+                <div className="contact_detail">
+                  <ul className="space-y-6">
+                    <li className="flex items-start gap-4">
+                      <div className="icon_wrap w-11 h-11 rounded-xl bg-brand-red/10 text-brand-red flex items-center justify-center flex-shrink-0 text-lg">
+                        <i className="fa fa-map-marker" aria-hidden="true"></i>
+                      </div>
+                      <div className="contact_info_m flex-1 pt-1 text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
+                        {contactInfo.Address}
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-4">
+                      <div className="icon_wrap w-11 h-11 rounded-xl bg-brand-red/10 text-brand-red flex items-center justify-center flex-shrink-0 text-lg">
+                        <i className="fa fa-phone" aria-hidden="true"></i>
+                      </div>
+                      <div className="contact_info_m flex-1 pt-2 text-sm">
+                        <a href={`tel:${contactInfo.ContactNo}`} className="text-slate-700 dark:text-slate-300 hover:text-brand-red dark:hover:text-brand-red transition-colors font-semibold">
+                          {contactInfo.ContactNo}
+                        </a>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-4">
+                      <div className="icon_wrap w-11 h-11 rounded-xl bg-brand-red/10 text-brand-red flex items-center justify-center flex-shrink-0 text-lg">
+                        <i className="fa fa-envelope-o" aria-hidden="true"></i>
+                      </div>
+                      <div className="contact_info_m flex-1 pt-2 text-sm">
+                        <a href={`mailto:${contactInfo.EmailId}`} className="text-slate-700 dark:text-slate-300 hover:text-brand-red dark:hover:text-brand-red transition-colors font-semibold">
+                          {contactInfo.EmailId}
+                        </a>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Additional Hub / Support Information */}
+                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 space-y-2">
+                  <p className="flex items-center gap-2">
+                    <i className="fa fa-clock-o text-brand-amber"></i>
+                    <span>Operational Hours: 24/7 Fleet Dispatch & Customer Care</span>
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <i className="fa fa-shield text-brand-emerald"></i>
+                    <span>Verified Insurance & Roadside Assistance Available</span>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -192,15 +239,20 @@ export default function ContactUsPage() {
 
       <Footer />
 
-      <div id="back-top" className="back-top">
-        <a href="#top" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-          <i className="fa fa-angle-up" aria-hidden="true"></i>
+      <div id="back-top" className="back-top fixed bottom-6 right-6 z-40">
+        <a
+          href="#top"
+          onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          className="w-11 h-11 rounded-xl bg-brand-red hover:bg-brand-darkRed text-white flex items-center justify-center shadow-lg transition-all"
+          aria-label="Back to top"
+        >
+          <i className="fa fa-angle-up text-lg" aria-hidden="true"></i>
         </a>
       </div>
 
       <LoginModal />
       <SignupModal />
       <ForgotPasswordModal />
-    </>
+    </div>
   );
 }

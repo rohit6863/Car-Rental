@@ -39,9 +39,9 @@ export default function SignupModal() {
     try {
       const res = await api.get(`/api/auth/check-email?email=${encodeURIComponent(formData.emailid)}`);
       if (res.data.available) {
-        setEmailStatus({ text: 'Email Available for Registration.', color: 'green' });
+        setEmailStatus({ text: 'Email Available for Registration.', color: '#10B981' });
       } else {
-        setEmailStatus({ text: 'Email already exists. Please choose another.', color: 'red' });
+        setEmailStatus({ text: 'Email already exists. Please choose another.', color: '#E11D48' });
       }
     } catch {
       setEmailStatus({ text: '', color: '' });
@@ -100,146 +100,197 @@ export default function SignupModal() {
     }
   };
 
-  return (
-    <div className="modal fade" id="signupform" tabIndex="-1" role="dialog">
-      <div className="modal-dialog" role="document">
-        <div className="modal-content">
-          <div className="modal-header">
-            <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-            <h3 className="modal-title">Sign Up</h3>
-          </div>
-          <div className="modal-body">
-            <div className="row">
-              <div className="signup_wrap">
-                <div className="col-md-12 col-sm-6">
-                  {error && <div className="alert alert-danger">{error}</div>}
-                  {success && <div className="alert alert-success">{success}</div>}
-                  <form method="post" name="signup" onSubmit={handleSubmit}>
-                    <div className="form-group">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="fullname"
-                        placeholder="Full Name"
-                        required="required"
-                        value={formData.fullname}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="mobileno"
-                        placeholder="Mobile Number"
-                        maxLength="10"
-                        required="required"
-                        value={formData.mobileno}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <input
-                        type="email"
-                        className="form-control"
-                        name="emailid"
-                        id="emailid"
-                        onBlur={checkEmailAvailability}
-                        placeholder="Email Address"
-                        required="required"
-                        value={formData.emailid}
-                        onChange={handleChange}
-                      />
-                      {emailStatus.text && (
-                        <span id="user-availability-status" style={{ fontSize: '12px', color: emailStatus.color }}>
-                          {emailStatus.text}
-                        </span>
-                      )}
-                    </div>
-                    <div className="form-group">
-                      <input
-                        type="password"
-                        className="form-control"
-                        name="password"
-                        placeholder="Password"
-                        required="required"
-                        value={formData.password}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <input
-                        type="password"
-                        className="form-control"
-                        name="confirmpassword"
-                        placeholder="Confirm Password"
-                        required="required"
-                        value={formData.confirmpassword}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="form-group checkbox">
-                      <input type="checkbox" id="terms_agree" required="required" defaultChecked />
-                      <label htmlFor="terms_agree">
-                        I Agree with <a href="/page/terms">Terms and Conditions</a>
-                      </label>
-                    </div>
-                    <div className="form-group">
-                      <input
-                        type="submit"
-                        value={loading ? 'Signing Up...' : 'Sign Up'}
-                        name="signup"
-                        id="submit"
-                        className="btn btn-block"
-                        disabled={loading}
-                      />
-                    </div>
-                  </form>
+  const handleClose = () => {
+    if (window.$) {
+      window.$('#signupform').modal('hide');
+    }
+  };
 
-                  {providers?.google && (
-                    <>
-                      <div style={{ display: 'flex', alignItems: 'center', margin: '15px 0' }}>
-                        <div style={{ flex: 1, borderTop: '1px solid #e4e4e4' }}></div>
-                        <span style={{ padding: '0 10px', color: '#888', fontSize: '13px', textTransform: 'uppercase' }}>or</span>
-                        <div style={{ flex: 1, borderTop: '1px solid #e4e4e4' }}></div>
-                      </div>
-                      <div className="form-group">
-                        <a
-                          href="/api/auth/google"
-                          className="btn btn-block"
-                          style={{
-                            backgroundColor: '#fff',
-                            color: '#333',
-                            border: '1px solid #ccc',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            fontWeight: 600,
-                            textDecoration: 'none',
-                            padding: '10px 16px',
-                          }}
-                        >
-                          <img src={googleLogo} alt="Google" width="18" height="18" style={{ display: 'inline-block' }} />
-                          <span>Continue with Google</span>
-                        </a>
-                      </div>
-                    </>
+  const switchToLogin = (e) => {
+    e.preventDefault();
+    if (window.$) {
+      window.$('#signupform').modal('hide');
+      window.$('#loginform').modal('show');
+    }
+  };
+
+  return (
+    <div className="modal fade" id="signupform" tabIndex="-1" role="dialog" aria-hidden="true">
+      <div className="modal-dialog max-w-md w-full mx-auto p-4" role="document">
+        <div className="modal-content surface-card bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden transition-colors">
+          
+          {/* Header */}
+          <div className="modal-header bg-brand-dark text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
+            <div>
+              <h3 className="modal-title font-display font-extrabold text-lg text-white">Create an Account</h3>
+              <p className="text-xs text-slate-400 mt-0.5">Join WanderWheels in seconds</p>
+            </div>
+            <button
+              type="button"
+              className="close w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true" className="text-xl leading-none">&times;</span>
+            </button>
+          </div>
+
+          {/* Body */}
+          <div className="modal-body p-6">
+            <div className="signup_wrap">
+              {error && (
+                <div className="alert alert-danger mb-4 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold leading-relaxed">
+                  <i className="fa-solid fa-triangle-exclamation mr-1.5 text-rose-500"></i>
+                  {error}
+                </div>
+              )}
+              {success && (
+                <div className="alert alert-success mb-4 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold leading-relaxed">
+                  <i className="fa-solid fa-circle-check mr-1.5 text-emerald-500"></i>
+                  {success}
+                </div>
+              )}
+
+              <form method="post" name="signup" onSubmit={handleSubmit} className="space-y-3.5">
+                <div className="form-group">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Full Name <span className="text-brand-red">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red focus:bg-white transition-all"
+                    name="fullname"
+                    placeholder="e.g. John Doe"
+                    required
+                    value={formData.fullname}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Mobile Number <span className="text-brand-red">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red focus:bg-white transition-all"
+                    name="mobileno"
+                    placeholder="10-digit mobile number"
+                    maxLength="10"
+                    required
+                    value={formData.mobileno}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Email Address <span className="text-brand-red">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    className="form-control w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red focus:bg-white transition-all"
+                    name="emailid"
+                    id="emailid"
+                    onBlur={checkEmailAvailability}
+                    placeholder="name@example.com"
+                    required
+                    value={formData.emailid}
+                    onChange={handleChange}
+                  />
+                  {emailStatus.text && (
+                    <span id="user-availability-status" className="block text-xs font-semibold mt-1" style={{ color: emailStatus.color }}>
+                      {emailStatus.text}
+                    </span>
                   )}
                 </div>
-              </div>
+
+                <div className="form-group">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Password <span className="text-brand-red">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red focus:bg-white transition-all"
+                    name="password"
+                    placeholder="Min. 8 characters"
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                    Confirm Password <span className="text-brand-red">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red focus:bg-white transition-all"
+                    name="confirmpassword"
+                    placeholder="Re-enter password"
+                    required
+                    value={formData.confirmpassword}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="form-group checkbox flex items-center gap-2 pt-1 text-xs text-slate-600">
+                  <input type="checkbox" id="terms_agree" required defaultChecked className="rounded text-brand-red focus:ring-brand-red" />
+                  <label htmlFor="terms_agree" className="cursor-pointer">
+                    I agree with <a href="/page/terms" className="text-brand-red underline font-medium">Terms and Conditions</a>
+                  </label>
+                </div>
+
+                <div className="form-group pt-2">
+                  <input
+                    type="submit"
+                    value={loading ? 'Signing Up...' : 'Sign Up'}
+                    name="signup"
+                    id="submit"
+                    className="btn btn-block w-full py-3.5 px-4 rounded-xl bg-brand-red hover:bg-brand-darkRed text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-glow transition-all cursor-pointer"
+                    disabled={loading}
+                  />
+                </div>
+              </form>
+
+              {providers?.google && (
+                <div className="mt-4">
+                  <div className="relative flex py-2 items-center">
+                    <div className="flex-grow border-t border-slate-200"></div>
+                    <span className="flex-shrink mx-4 text-slate-400 text-[11px] font-bold uppercase tracking-wider">or</span>
+                    <div className="flex-grow border-t border-slate-200"></div>
+                  </div>
+
+                  <div className="form-group mt-2">
+                    <a
+                      href="/api/auth/google"
+                      className="btn btn-block w-full py-2.5 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs flex items-center justify-center gap-3 shadow-sm transition-all text-center"
+                    >
+                      <img src={googleLogo} alt="Google" width="18" height="18" className="inline-block" />
+                      <span>Continue with Google</span>
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-          <div className="modal-footer text-center">
+
+          {/* Footer */}
+          <div className="modal-footer bg-slate-50 border-t border-slate-200 px-6 py-4 text-center text-xs text-slate-600">
             <p>
               Already got an account?{' '}
-              <a href="#loginform" data-toggle="modal" data-dismiss="modal">
-                Login Here
+              <a
+                href="#loginform"
+                data-toggle="modal"
+                data-dismiss="modal"
+                className="text-brand-red hover:underline font-bold"
+              >
+                Login here
               </a>
             </p>
           </div>
+
         </div>
       </div>
     </div>
