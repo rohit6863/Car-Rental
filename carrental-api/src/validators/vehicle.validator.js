@@ -4,6 +4,8 @@ const { z } = require('zod');
 const vehicleSearchSchema = z.object({
   brand: z.string().trim().max(100).optional(),
   fueltype: z.string().trim().max(50).optional(),
+  transmission: z.string().trim().max(30).optional(),
+  category: z.string().trim().max(50).optional(),
 });
 
 const vehicleIdParamSchema = z.object({
@@ -55,13 +57,33 @@ const vehicleOverviewField = z.preprocess((val) => {
   .min(5, 'Vehicle overview must be at least 5 characters')
   .max(5000, 'Vehicle overview must not exceed 5000 characters'));
 
+const ALLOWED_FUEL_TYPES = ['Petrol', 'Diesel', 'Electric', 'CNG', 'Hybrid'];
+const ALLOWED_TRANSMISSIONS = ['Automatic', 'Manual'];
+const ALLOWED_CATEGORIES = ['Sedan', 'SUV', 'Hatchback', 'Luxury', 'Sports', 'EV'];
+
 const fuelTypeField = z.preprocess((val) => {
   if (val === undefined || val === null || val === '') return undefined;
   return String(val).trim();
 }, z.union([
-  z.string().refine((v) => ['Petrol', 'Diesel', 'CNG'].includes(v), { message: 'Fuel type must be Petrol, Diesel, or CNG' }),
+  z.string().refine((v) => ALLOWED_FUEL_TYPES.includes(v), {
+    message: 'Fuel type must be Petrol, Diesel, Electric, CNG, or Hybrid',
+  }),
   z.undefined().refine(() => false, { message: 'Fuel type is required' }),
 ]));
+
+const transmissionField = z.preprocess((val) => {
+  if (val === undefined || val === null || val === '') return 'Automatic';
+  return String(val).trim();
+}, z.string().refine((v) => ALLOWED_TRANSMISSIONS.includes(v), {
+  message: 'Transmission must be Automatic or Manual',
+}));
+
+const categoryField = z.preprocess((val) => {
+  if (val === undefined || val === null || val === '') return 'Sedan';
+  return String(val).trim();
+}, z.string().refine((v) => ALLOWED_CATEGORIES.includes(v), {
+  message: 'Category must be Sedan, SUV, Hatchback, Luxury, Sports, or EV',
+}));
 
 const checkboxField = z.preprocess((val) => {
   if (val === '1' || val === 1 || val === 'on' || val === true || val === 'true') return 1;
@@ -74,6 +96,8 @@ const vehicleFormSchema = z.object({
   vehicalorcview: vehicleOverviewField,
   priceperday: makeNumberField('Price per day', 1, 10000000, true),
   fueltype: fuelTypeField,
+  transmission: transmissionField,
+  category: categoryField,
   modelyear: makeNumberField('Model year', 1990, 2050),
   seatingcapacity: makeNumberField('Seating capacity', 1, 20),
   airconditioner: checkboxField,
@@ -88,6 +112,13 @@ const vehicleFormSchema = z.object({
   centrallocking: checkboxField,
   crashcensor: checkboxField,
   leatherseats: checkboxField,
+  sunroof: checkboxField,
+  applecarplay: checkboxField,
+  reversecamera: checkboxField,
+  cruisecontrol: checkboxField,
+  keylessentry: checkboxField,
+  gpsnavigation: checkboxField,
+  fastcharging: checkboxField,
 });
 
 module.exports = {

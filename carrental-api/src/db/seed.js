@@ -69,6 +69,8 @@ async function seed() {
       overview: 'The Toyota Supra is a high-performance sports car known for its sleek design, responsive handling, and powerful turbocharged engine. Ideal for enthusiasts who crave speed and style.',
       price: 30000,
       fuel: 'Petrol',
+      transmission: 'Automatic',
+      category: 'Sports',
       year: 2020,
       seats: 2,
       img1: 'toyota-fortuner-1.png',
@@ -77,13 +79,16 @@ async function seed() {
       img4: '',
       img5: '',
       vehicle_status: 'Available',
+      modern: { sunroof: 0, applecarplay: 1, reversecamera: 1, cruisecontrol: 1, keylessentry: 1, gpsnavigation: 1, fastcharging: 0 },
     },
     {
       title: '5 Series',
       brand: brandMap['BMW'] || 2,
       overview: 'The BMW 5 Series is a premium executive sedan that blends luxury, comfort, and dynamic performance seamlessly. Designed for business and leisure travel.',
       price: 10000,
-      fuel: 'Petrol',
+      fuel: 'Hybrid',
+      transmission: 'Automatic',
+      category: 'Luxury',
       year: 2022,
       seats: 5,
       img1: 'bmw-5-series-1.png',
@@ -92,6 +97,7 @@ async function seed() {
       img4: '',
       img5: '',
       vehicle_status: 'Available',
+      modern: { sunroof: 1, applecarplay: 1, reversecamera: 1, cruisecontrol: 1, keylessentry: 1, gpsnavigation: 1, fastcharging: 0 },
     },
     {
       title: 'Urus',
@@ -99,6 +105,8 @@ async function seed() {
       overview: 'The Lamborghini Urus is the world first Super Sport Utility Vehicle, fusing the soul of a super sports car with the practical functionality of an SUV.',
       price: 25000,
       fuel: 'Petrol',
+      transmission: 'Automatic',
+      category: 'SUV',
       year: 2024,
       seats: 4,
       img1: 'mercedes-c-class-1.png',
@@ -107,14 +115,17 @@ async function seed() {
       img4: '',
       img5: '',
       vehicle_status: 'Available',
+      modern: { sunroof: 1, applecarplay: 1, reversecamera: 1, cruisecontrol: 1, keylessentry: 1, gpsnavigation: 1, fastcharging: 0 },
     },
     {
       title: 'R8',
       brand: brandMap['Audi'] || 3,
       overview: 'The Audi R8 is a breathtaking supercar that blends iconic design with motorsport performance, featuring a roaring V10 engine and Quattro all-wheel drive.',
       price: 8000,
-      fuel: 'Petrol',
-      year: 2018,
+      fuel: 'Electric',
+      transmission: 'Automatic',
+      category: 'EV',
+      year: 2024,
       seats: 2,
       img1: 'audi-a4-1.png',
       img2: 'audi-a4-2.png',
@@ -122,6 +133,7 @@ async function seed() {
       img4: '',
       img5: '',
       vehicle_status: 'Available',
+      modern: { sunroof: 0, applecarplay: 1, reversecamera: 1, cruisecontrol: 1, keylessentry: 1, gpsnavigation: 1, fastcharging: 1 },
     },
     {
       title: 'Land Cruiser',
@@ -129,6 +141,8 @@ async function seed() {
       overview: 'The Toyota Land Cruiser is a legendary full-size SUV known for its rugged off-road capability, peerless reliability, and refined interior luxury.',
       price: 11000,
       fuel: 'Petrol',
+      transmission: 'Automatic',
+      category: 'SUV',
       year: 2020,
       seats: 5,
       img1: 'toyota-fortuner-1.png',
@@ -137,6 +151,7 @@ async function seed() {
       img4: '',
       img5: '',
       vehicle_status: 'Available',
+      modern: { sunroof: 1, applecarplay: 1, reversecamera: 1, cruisecontrol: 1, keylessentry: 1, gpsnavigation: 1, fastcharging: 0 },
     },
     {
       title: 'GTR',
@@ -144,6 +159,8 @@ async function seed() {
       overview: 'The Nissan GT-R is a legendary high-performance sports car that combines cutting-edge twin-turbo power with precision all-wheel drive technology.',
       price: 22000,
       fuel: 'Diesel',
+      transmission: 'Automatic',
+      category: 'Sports',
       year: 2017,
       seats: 2,
       img1: 'honda-city-1.png',
@@ -152,6 +169,7 @@ async function seed() {
       img4: '',
       img5: '',
       vehicle_status: 'Available',
+      modern: { sunroof: 0, applecarplay: 1, reversecamera: 1, cruisecontrol: 1, keylessentry: 1, gpsnavigation: 1, fastcharging: 0 },
     },
   ];
 
@@ -165,24 +183,34 @@ async function seed() {
       [v.title, v.brand]
     );
 
+    const m = v.modern || {};
     if (existing.length === 0) {
       await conn.execute(`
         INSERT INTO tblvehicles (
           VehiclesTitle, VehiclesBrand, VehiclesOverview, PricePerDay, FuelType,
+          Transmission, Category,
           ModelYear, SeatingCapacity, Vimage1, Vimage2, Vimage3, Vimage4, Vimage5,
           AirConditioner, PowerDoorLocks, AntiLockBrakingSystem, BrakeAssist,
           PowerSteering, DriverAirbag, PassengerAirbag, PowerWindows, CDPlayer,
-          CentralLocking, CrashSensor, LeatherSeats, vehicle_status
+          CentralLocking, CrashSensor, LeatherSeats,
+          Sunroof, AppleCarPlay, ReverseCamera, CruiseControl, KeylessEntry, GPSNavigation, FastCharging,
+          vehicle_status
         ) VALUES (
           ?, ?, ?, ?, ?,
+          ?, ?,
           ?, ?, ?, ?, ?, ?, ?,
           1, 1, 1, 1,
-          1, 1, 1, 1, 1,
-          1, 1, 1, ?
+          1, 1, 1, 1, 0,
+          1, 1, 1,
+          ?, ?, ?, ?, ?, ?, ?,
+          ?
         )
       `, [
         v.title, v.brand, v.overview, v.price, v.fuel,
+        v.transmission || 'Automatic', v.category || 'Sedan',
         v.year, v.seats, v.img1, v.img2, v.img3, v.img4, v.img5,
+        m.sunroof || 0, m.applecarplay || 0, m.reversecamera || 0, m.cruisecontrol || 0,
+        m.keylessentry || 0, m.gpsnavigation || 0, m.fastcharging || 0,
         v.vehicle_status
       ]);
       console.log(`  + Seeded vehicle: ${v.title}`);
@@ -190,9 +218,19 @@ async function seed() {
       await conn.execute(`
         UPDATE tblvehicles SET
           Vimage1 = ?, Vimage2 = ?, Vimage3 = ?, Vimage4 = ?, Vimage5 = ?,
-          PricePerDay = ?, FuelType = ?, ModelYear = ?, SeatingCapacity = ?
+          PricePerDay = ?, FuelType = ?, Transmission = ?, Category = ?,
+          ModelYear = ?, SeatingCapacity = ?,
+          Sunroof = ?, AppleCarPlay = ?, ReverseCamera = ?, CruiseControl = ?,
+          KeylessEntry = ?, GPSNavigation = ?, FastCharging = ?
         WHERE id = ?
-      `, [v.img1, v.img2, v.img3, v.img4, v.img5, v.price, v.fuel, v.year, v.seats, existing[0].id]);
+      `, [
+        v.img1, v.img2, v.img3, v.img4, v.img5,
+        v.price, v.fuel, v.transmission || 'Automatic', v.category || 'Sedan',
+        v.year, v.seats,
+        m.sunroof || 0, m.applecarplay || 0, m.reversecamera || 0, m.cruisecontrol || 0,
+        m.keylessentry || 0, m.gpsnavigation || 0, m.fastcharging || 0,
+        existing[0].id
+      ]);
       console.log(`  ~ Updated vehicle images & specs: ${v.title}`);
     }
   }
