@@ -112,7 +112,7 @@ body.dark-atmosphere .text-adaptive-sub {
   color: #94A3B8 !important;
 }
 
-/* Modal & Backdrop Styling with Bootstrap 3 compatibility */
+/* Modal & Backdrop Styling (pure React modal system) */
 .modal {
   position: fixed;
   inset: 0;

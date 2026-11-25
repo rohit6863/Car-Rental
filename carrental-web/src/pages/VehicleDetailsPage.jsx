@@ -7,6 +7,7 @@ import LoginModal from '../components/LoginModal';
 import SignupModal from '../components/SignupModal';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import { useAuth } from '../context/AuthContext';
+import { useModal } from '../context/ModalContext';
 import api, { getVehicleImageUrl } from '../api/client';
 
 /**
@@ -70,6 +71,7 @@ export default function VehicleDetailsPage() {
   const id = paramId || searchParams.get('vhid') || searchParams.get('id');
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { openModal } = useModal();
 
   const [vehicle, setVehicle] = useState(null);
   const [similarCars, setSimilarCars] = useState([]);
@@ -396,9 +398,7 @@ export default function VehicleDetailsPage() {
     setBookingSuccess('');
 
     if (!user) {
-      if (window.$) {
-        window.$('#loginform').modal('show');
-      }
+      openModal('login');
       return;
     }
 
@@ -903,11 +903,11 @@ export default function VehicleDetailsPage() {
                     <div className="form-group pt-1">
                       <a
                         href="#loginform"
+                        data-testid="vehicle-login-btn"
                         className="btn btn-xs uppercase w-full py-3.5 px-4 rounded-xl bg-slate-900 hover:bg-brand-red text-white font-bold text-xs tracking-wider transition-colors block text-center min-h-[44px] flex items-center justify-center"
-                        data-toggle="modal"
-                        data-dismiss="modal"
                         onClick={(e) => {
-                          if (window.$) window.$('#loginform').modal('show');
+                          e.preventDefault();
+                          openModal('login', e.currentTarget);
                         }}
                       >
                         Login For Book

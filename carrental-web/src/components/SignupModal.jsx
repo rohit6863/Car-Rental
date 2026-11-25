@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import { useModal } from '../context/ModalContext';
+import useModalFocusTrap from '../hooks/useModalFocusTrap';
 import googleLogo from '../assets/google-logo.svg';
-import { hideModal } from '../utils/modal';
 
 const COMMON_PASSWORDS = new Set([
   'password',
@@ -23,6 +24,10 @@ const COMMON_PASSWORDS = new Set([
 
 export default function SignupModal() {
   const { register, providers, user } = useAuth();
+  const { activeModal, openModal, closeModal } = useModal();
+  const isOpen = activeModal === 'signup';
+  const dialogRef = useRef(null);
+
   const [formData, setFormData] = useState({
     fullname: '',
     mobileno: '',
@@ -35,26 +40,18 @@ export default function SignupModal() {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const handleClose = useCallback(() => {
+    closeModal('signup');
+  }, [closeModal]);
+
   // Auto-close signup modal whenever user becomes authenticated
   useEffect(() => {
-    if (user) {
-      hideModal('#signupform');
+    if (user && isOpen) {
+      closeModal('signup');
     }
-  }, [user]);
+  }, [user, isOpen, closeModal]);
 
-  // Close on Escape key
-  useEffect(() => {
-    const onKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        const el = document.getElementById('signupform');
-        if (el && (el.classList.contains('in') || el.classList.contains('show'))) {
-          hideModal('#signupform');
-        }
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, []);
+  useModalFocusTrap(isOpen, dialogRef, handleClose);
 
   const checkEmailAvailability = async () => {
     if (!formData.emailid || !formData.emailid.includes('@')) return;
@@ -103,7 +100,7 @@ export default function SignupModal() {
     setLoading(true);
     try {
       await register(formData);
-      hideModal('#signupform');
+      closeModal('signup');
       setSuccess('');
     } catch (err) {
       if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
@@ -117,25 +114,23 @@ export default function SignupModal() {
     }
   };
 
-  const handleClose = () => {
-    hideModal('#signupform');
-  };
-
   const switchToLogin = (e) => {
     e.preventDefault();
-    if (window.$) {
-      window.$('#signupform').modal('hide');
-      window.$('#loginform').modal('show');
-    }
+    openModal('login');
   };
+
+  if (!isOpen) return null;
 
   return (
     <div
-      className="modal fade"
+      ref={dialogRef}
+      className="modal in show fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4 overflow-y-auto"
       id="signupform"
-      tabIndex="-1"
+      data-testid="signup-modal"
+      tabIndex={-1}
       role="dialog"
-      aria-hidden="true"
+      aria-modal="true"
+      aria-labelledby="signup-modal-title"
       onClick={(e) => {
         if (e.target === e.currentTarget) handleClose();
       }}
@@ -146,11 +141,12 @@ export default function SignupModal() {
           {/* Header */}
           <div className="modal-header bg-brand-dark text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
             <div>
-              <h3 className="modal-title font-display font-extrabold text-lg text-white">Create an Account</h3>
+              <h3 id="signup-modal-title" className="modal-title font-display font-extrabold text-lg text-white">Create an Account</h3>
               <p className="text-xs text-slate-400 mt-0.5">Join WanderWheels in seconds</p>
             </div>
             <button
               type="button"
+              data-testid="signup-modal-close"
               className="close w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
               aria-label="Close"
               onClick={handleClose}
@@ -306,8 +302,8 @@ export default function SignupModal() {
               Already got an account?{' '}
               <a
                 href="#loginform"
-                data-toggle="modal"
-                data-dismiss="modal"
+                data-testid="switch-to-login-from-signup"
+                onClick={switchToLogin}
                 className="text-brand-red hover:underline font-bold"
               >
                 Login here

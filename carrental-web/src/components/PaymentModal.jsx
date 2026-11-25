@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import client from '../api/client';
+import useModalFocusTrap from '../hooks/useModalFocusTrap';
 
 export default function PaymentModal({ booking, onClose, onSuccess }) {
   const [config, setConfig] = useState(null);
@@ -11,8 +12,38 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [pollCount, setPollCount] = useState(0);
   const pollTimerRef = useRef(null);
+  const dialogRef = useRef(null);
+  const openerRef = useRef(null);
 
   const isProd = import.meta.env.PROD;
+  const isOpen = Boolean(booking);
+
+  const handleSafeClose = useCallback(() => {
+    if (step !== 'preparing' && step !== 'verifying') {
+      onClose();
+    }
+  }, [step, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    openerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    document.body.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      const opener = openerRef.current;
+      openerRef.current = null;
+      if (opener && opener.isConnected && typeof opener.focus === 'function') {
+        requestAnimationFrame(() => {
+          if (opener.isConnected) opener.focus();
+        });
+      }
+    };
+  }, [isOpen]);
+
+  useModalFocusTrap(isOpen, dialogRef, handleSafeClose);
 
   useEffect(() => {
     let isMounted = true;
@@ -241,12 +272,14 @@ export default function PaymentModal({ booking, onClose, onSuccess }) {
 
   return (
     <div
+      ref={dialogRef}
+      tabIndex={-1}
       className="modal payment-modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto overflow-x-hidden"
       role="dialog"
       aria-modal="true"
       onClick={(e) => {
-        if (e.target === e.currentTarget && step !== 'preparing' && step !== 'verifying') {
-          onClose();
+        if (e.target === e.currentTarget) {
+          handleSafeClose();
         }
       }}
     >

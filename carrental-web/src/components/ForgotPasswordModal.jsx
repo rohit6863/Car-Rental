@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import api from '../api/client';
-import { hideModal } from '../utils/modal';
+import { useModal } from '../context/ModalContext';
+import useModalFocusTrap from '../hooks/useModalFocusTrap';
 
 const COMMON_PASSWORDS = new Set([
   'password',
@@ -20,6 +21,10 @@ const COMMON_PASSWORDS = new Set([
 ]);
 
 export default function ForgotPasswordModal() {
+  const { activeModal, openModal, closeModal } = useModal();
+  const isOpen = activeModal === 'forgot';
+  const dialogRef = useRef(null);
+
   const [step, setStep] = useState(1); // 1 = request reset, 2 = enter token & new password
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('');
@@ -30,19 +35,11 @@ export default function ForgotPasswordModal() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Close on Escape key
-  useEffect(() => {
-    const onKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        const el = document.getElementById('forgotpassword');
-        if (el && (el.classList.contains('in') || el.classList.contains('show'))) {
-          hideModal('#forgotpassword');
-        }
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, []);
+  const handleClose = useCallback(() => {
+    closeModal('forgot');
+  }, [closeModal]);
+
+  useModalFocusTrap(isOpen, dialogRef, handleClose);
 
   const handleRequestReset = async (e) => {
     e.preventDefault();
@@ -102,12 +99,7 @@ export default function ForgotPasswordModal() {
       });
       setMsg(res.data.message || 'Your Password successfully changed');
       setTimeout(() => {
-        if (window.$) {
-          window.$('#forgotpassword').modal('hide');
-          window.$('#forgotpassword').removeClass('in show').hide();
-          window.$('.modal-backdrop').remove();
-          window.$('#loginform').modal('show');
-        }
+        openModal('login');
         setStep(1);
         setEmail('');
         setToken('');
@@ -125,25 +117,23 @@ export default function ForgotPasswordModal() {
     }
   };
 
-  const handleClose = () => {
-    hideModal('#forgotpassword');
-  };
-
   const switchToLogin = (e) => {
     e.preventDefault();
-    if (window.$) {
-      window.$('#forgotpassword').modal('hide');
-      window.$('#loginform').modal('show');
-    }
+    openModal('login');
   };
+
+  if (!isOpen) return null;
 
   return (
     <div
-      className="modal fade"
+      ref={dialogRef}
+      className="modal in show fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4 overflow-y-auto"
       id="forgotpassword"
-      tabIndex="-1"
+      data-testid="forgot-modal"
+      tabIndex={-1}
       role="dialog"
-      aria-hidden="true"
+      aria-modal="true"
+      aria-labelledby="forgot-modal-title"
       onClick={(e) => {
         if (e.target === e.currentTarget) handleClose();
       }}
@@ -154,13 +144,14 @@ export default function ForgotPasswordModal() {
           {/* Header */}
           <div className="modal-header bg-brand-dark text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
             <div>
-              <h3 className="modal-title font-display font-extrabold text-lg text-white">Password Recovery</h3>
+              <h3 id="forgot-modal-title" className="modal-title font-display font-extrabold text-lg text-white">Password Recovery</h3>
               <p className="text-xs text-slate-400 mt-0.5">
                 {step === 1 ? 'Enter your email to receive recovery instructions' : 'Set your new password'}
               </p>
             </div>
             <button
               type="button"
+              data-testid="forgot-modal-close"
               className="close w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
               aria-label="Close"
               onClick={handleClose}
@@ -297,8 +288,8 @@ export default function ForgotPasswordModal() {
           <div className="modal-footer bg-slate-50 border-t border-slate-200 px-6 py-4 text-center text-xs text-slate-600">
             <a
               href="#loginform"
-              data-toggle="modal"
-              data-dismiss="modal"
+              data-testid="switch-to-login-from-forgot"
+              onClick={switchToLogin}
               className="text-brand-red hover:underline font-bold inline-flex items-center gap-1.5"
             >
               <i className="fa-solid fa-angle-left" aria-hidden="true"></i> Back to Login

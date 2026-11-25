@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useModal } from '../context/ModalContext';
 import api from '../api/client';
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const { openModal } = useModal();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,9 +92,8 @@ export default function Header() {
   };
 
   const openLoginModal = (e) => {
-    if (window.$) {
-      window.$('#loginform').modal('show');
-    }
+    if (e?.preventDefault) e.preventDefault();
+    openModal('login', e?.currentTarget || null);
   };
 
   return (
@@ -216,9 +217,8 @@ export default function Header() {
                 <a
                   href="#loginform"
                   onClick={openLoginModal}
+                  data-testid="header-login-btn"
                   className="bg-brand-red hover:bg-brand-darkRed text-white font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-lg shadow-sm transition-all inline-block text-center cursor-pointer"
-                  data-toggle="modal"
-                  data-dismiss="modal"
                 >
                   Login / Register
                 </a>
@@ -320,6 +320,7 @@ export default function Header() {
               <div className="user_login relative">
                 <button
                   type="button"
+                  data-testid="header-account-btn"
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                   className="h-10 px-3 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-white border border-slate-700 flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors focus:outline-none"
                   aria-expanded={userDropdownOpen}
@@ -374,27 +375,24 @@ export default function Header() {
                       <>
                         <a
                           href="#loginform"
-                          data-toggle="modal"
-                          data-dismiss="modal"
-                          onClick={() => { setUserDropdownOpen(false); openLoginModal(); }}
+                          data-testid="header-dropdown-profile"
+                          onClick={(e) => { setUserDropdownOpen(false); openLoginModal(e); }}
                           className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 hover:bg-slate-800 transition-colors block text-slate-200"
                         >
                           <i className="fa-solid fa-user-gear text-brand-red w-4"></i> Profile Settings
                         </a>
                         <a
                           href="#loginform"
-                          data-toggle="modal"
-                          data-dismiss="modal"
-                          onClick={() => { setUserDropdownOpen(false); openLoginModal(); }}
+                          data-testid="header-dropdown-password"
+                          onClick={(e) => { setUserDropdownOpen(false); openLoginModal(e); }}
                           className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 hover:bg-slate-800 transition-colors block text-slate-200"
                         >
                           <i className="fa-solid fa-key text-amber-400 w-4"></i> Update Password
                         </a>
                         <a
                           href="#loginform"
-                          data-toggle="modal"
-                          data-dismiss="modal"
-                          onClick={() => { setUserDropdownOpen(false); openLoginModal(); }}
+                          data-testid="header-dropdown-booking"
+                          onClick={(e) => { setUserDropdownOpen(false); openLoginModal(e); }}
                           className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 hover:bg-slate-800 transition-colors block text-slate-200"
                         >
                           <i className="fa-solid fa-calendar-check text-emerald-400 w-4"></i> My Booking
@@ -402,9 +400,8 @@ export default function Header() {
                         <div className="border-t border-slate-800 my-1"></div>
                         <a
                           href="#loginform"
-                          data-toggle="modal"
-                          data-dismiss="modal"
-                          onClick={() => { setUserDropdownOpen(false); openLoginModal(); }}
+                          data-testid="header-dropdown-login"
+                          onClick={(e) => { setUserDropdownOpen(false); openLoginModal(e); }}
                           className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-brand-red hover:bg-slate-800 font-bold transition-colors block"
                         >
                           <i className="fa-solid fa-arrow-right-to-bracket w-4"></i> Login / Register

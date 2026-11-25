@@ -1,35 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useModal } from '../context/ModalContext';
+import useModalFocusTrap from '../hooks/useModalFocusTrap';
 import googleLogo from '../assets/google-logo.svg';
-import { hideModal, showModal } from '../utils/modal';
 
 export default function LoginModal() {
   const { login, providers, user } = useAuth();
+  const { activeModal, openModal, closeModal } = useModal();
+  const isOpen = activeModal === 'login';
+  const dialogRef = useRef(null);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const handleClose = useCallback(() => {
+    closeModal('login');
+  }, [closeModal]);
+
   // Auto-close login modal whenever user becomes authenticated
   useEffect(() => {
-    if (user) {
-      hideModal('#loginform');
+    if (user && isOpen) {
+      closeModal('login');
     }
-  }, [user]);
+  }, [user, isOpen, closeModal]);
 
-  // Close on Escape key
-  useEffect(() => {
-    const onKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        const el = document.getElementById('loginform');
-        if (el && (el.classList.contains('in') || el.classList.contains('show'))) {
-          hideModal('#loginform');
-        }
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, []);
+  useModalFocusTrap(isOpen, dialogRef, handleClose);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -43,11 +40,11 @@ export default function LoginModal() {
         } else {
           setError('Google sign-in failed. Please try again.');
         }
-        showModal('#loginform');
+        openModal('login');
         window.history.replaceState({}, '', window.location.pathname);
       }
     }
-  }, []);
+  }, [openModal]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,7 +52,7 @@ export default function LoginModal() {
     setLoading(true);
     try {
       await login(email, password);
-      hideModal('#loginform');
+      closeModal('login');
       setEmail('');
       setPassword('');
     } catch (err) {
@@ -75,17 +72,18 @@ export default function LoginModal() {
     }
   };
 
-  const handleClose = () => {
-    hideModal('#loginform');
-  };
+  if (!isOpen) return null;
 
   return (
     <div
-      className="modal fade"
+      ref={dialogRef}
+      className="modal in show fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4 overflow-y-auto"
       id="loginform"
-      tabIndex="-1"
+      data-testid="login-modal"
+      tabIndex={-1}
       role="dialog"
-      aria-hidden="true"
+      aria-modal="true"
+      aria-labelledby="login-modal-title"
       onClick={(e) => {
         if (e.target === e.currentTarget) handleClose();
       }}
@@ -96,11 +94,12 @@ export default function LoginModal() {
           {/* Header */}
           <div className="modal-header bg-brand-dark text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
             <div>
-              <h3 className="modal-title font-display font-extrabold text-lg text-white">Login to Account</h3>
+              <h3 id="login-modal-title" className="modal-title font-display font-extrabold text-lg text-white">Login to Account</h3>
               <p className="text-xs text-slate-400 mt-0.5">Welcome back to WanderWheels</p>
             </div>
             <button
               type="button"
+              data-testid="login-modal-close"
               className="close w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
               aria-label="Close"
               onClick={handleClose}
@@ -157,8 +156,11 @@ export default function LoginModal() {
                   </label>
                   <a
                     href="#forgotpassword"
-                    data-toggle="modal"
-                    data-dismiss="modal"
+                    data-testid="switch-to-forgot-link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      openModal('forgot');
+                    }}
                     className="text-brand-red hover:underline font-semibold"
                   >
                     Forgot Password ?
@@ -204,8 +206,11 @@ export default function LoginModal() {
               Don't have an account?{' '}
               <a
                 href="#signupform"
-                data-toggle="modal"
-                data-dismiss="modal"
+                data-testid="switch-to-signup-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  openModal('signup');
+                }}
                 className="text-brand-red hover:underline font-bold"
               >
                 Signup Here
