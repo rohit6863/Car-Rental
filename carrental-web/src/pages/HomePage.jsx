@@ -58,7 +58,7 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-radial from-brand-red/10 via-transparent to-transparent opacity-50"></div>
           </div>
 
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               
               {/* Left Column: Heading & CTA */}
@@ -130,22 +130,22 @@ export default function HomePage() {
             </div>
 
             {/* QUICK SEARCH BAR */}
-            <div className="surface-card bg-white/95 backdrop-blur-md rounded-2xl p-4 sm:p-6 shadow-2xl border border-slate-200 text-slate-900 transition-colors">
+            <div className="surface-card bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl p-4 sm:p-6 shadow-2xl border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 transition-colors">
               <form onSubmit={handleQuickSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
                 
                 {/* Brand Selector */}
                 <div className="lg:col-span-5">
-                  <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600 mb-1.5">
+                  <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                     <i className="fa-solid fa-car text-brand-red mr-1"></i> Select Brand
                   </label>
                   <select
-                    className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-red"
+                    className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-red"
                     value={selectedBrand}
                     onChange={(e) => setSelectedBrand(e.target.value)}
                   >
-                    <option value="">All Brands</option>
+                    <option value="" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">All Brands</option>
                     {brands.map((b) => (
-                      <option key={b.id} value={b.id}>
+                      <option key={b.id} value={b.id} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
                         {b.BrandName}
                       </option>
                     ))}
@@ -154,20 +154,20 @@ export default function HomePage() {
 
                 {/* Fuel Type Selector */}
                 <div className="lg:col-span-4">
-                  <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600 mb-1.5">
+                  <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                     <i className="fa-solid fa-gas-pump text-amber-500 mr-1"></i> Fuel Type
                   </label>
                   <select
-                    className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-red"
+                    className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-red"
                     value={selectedFuel}
                     onChange={(e) => setSelectedFuel(e.target.value)}
                   >
-                    <option value="">All Fuel Types</option>
-                    <option value="Petrol">Petrol</option>
-                    <option value="Diesel">Diesel</option>
-                    <option value="Electric">Electric</option>
-                    <option value="CNG">CNG</option>
-                    <option value="Hybrid">Hybrid</option>
+                    <option value="" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">All Fuel Types</option>
+                    <option value="Petrol" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Petrol</option>
+                    <option value="Diesel" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Diesel</option>
+                    <option value="Electric" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Electric</option>
+                    <option value="CNG" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">CNG</option>
+                    <option value="Hybrid" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Hybrid</option>
                   </select>
                 </div>
 
@@ -189,30 +189,30 @@ export default function HomePage() {
         </section>
 
         {/* ==================== FEATURED FLEET SECTION ==================== */}
-        <section className="py-16 sm:py-20 bg-brand-light transition-colors">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        <section className="py-16 sm:py-20 bg-brand-light dark:bg-brand-darker transition-colors">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
             
             {/* Header & Description */}
             <div className="text-center max-w-3xl mx-auto space-y-4">
               <span className="px-3.5 py-1 rounded-full bg-brand-red/10 text-brand-red text-xs font-extrabold uppercase tracking-widest border border-brand-red/20 inline-block">
                 Our Showcase Fleet
               </span>
-              <h2 className="text-adaptive-main font-display font-extrabold text-3xl sm:text-4xl tracking-tight text-slate-900">
+              <h2 className="text-adaptive-main font-display font-extrabold text-3xl sm:text-4xl tracking-tight text-slate-900 dark:text-white">
                 Find the Best <span className="text-brand-red">Car For You</span>
               </h2>
-              <p className="text-adaptive-sub text-sm sm:text-base text-slate-600 leading-relaxed">
+              <p className="text-adaptive-sub text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
                 At WanderWheels, we believe every adventure deserves the perfect ride. Whether you're exploring a new city, embarking on a road trip, or just need a reliable set of wheels, we've got you covered.
               </p>
             </div>
 
             {/* Vehicle Grid */}
             {loading ? (
-              <div className="text-center py-12 text-slate-500 font-semibold">
+              <div className="text-center py-12 text-slate-500 dark:text-slate-400 font-semibold">
                 <i className="fa-solid fa-spinner fa-spin text-brand-red text-2xl mb-2 block"></i>
                 <span>Loading available vehicles...</span>
               </div>
             ) : vehicles.length === 0 ? (
-              <div className="text-center py-12 text-slate-500">
+              <div className="text-center py-12 text-slate-500 dark:text-slate-400">
                 No vehicles available currently.
               </div>
             ) : (
@@ -220,7 +220,7 @@ export default function HomePage() {
                 {vehicles.map((v) => (
                   <div
                     key={v.id}
-                    className="surface-card group bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-card hover:shadow-2xl hover:border-slate-300 transition-all duration-300 flex flex-col"
+                    className="surface-card group bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-card hover:shadow-2xl hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-300 flex flex-col"
                   >
                     {/* Vehicle Image Container */}
                     <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
@@ -247,18 +247,18 @@ export default function HomePage() {
                     {/* Vehicle Details Content */}
                     <div className="p-5 flex flex-col flex-grow justify-between space-y-4">
                       <div>
-                        <h3 className="font-display font-extrabold text-lg text-slate-900 group-hover:text-brand-red transition-colors line-clamp-1">
-                          <Link to={`/vehical-details/${v.id}`}>
+                        <h3 className="font-display font-extrabold text-lg text-slate-900 dark:text-white group-hover:text-brand-red transition-colors line-clamp-1">
+                          <Link to={`/vehical-details/${v.id}`} className="text-slate-900 dark:text-white hover:text-brand-red transition-colors">
                             {v.VehiclesTitle}
                           </Link>
                         </h3>
-                        <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
                           {v.VehiclesOverview || 'Verified luxury performance vehicle with premium safety features.'}
                         </p>
                       </div>
 
                       {/* Specs Row */}
-                      <div className="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 text-slate-600 text-[11px] font-semibold text-center">
+                      <div className="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-semibold text-center">
                         <div className="flex flex-col items-center">
                           <i className="fa-solid fa-gas-pump text-amber-500 mb-1"></i>
                           <span>{v.FuelType}</span>
@@ -277,7 +277,7 @@ export default function HomePage() {
                       <div>
                         <Link
                           to={`/vehical-details/${v.id}`}
-                          className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-brand-red text-white font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+                          className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-brand-red dark:bg-slate-800 dark:hover:bg-brand-red text-white hover:text-white font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
                         >
                           <span>View Details</span>
                           <i className="fa-solid fa-arrow-right text-[10px]"></i>
@@ -293,7 +293,7 @@ export default function HomePage() {
             <div className="text-center pt-4">
               <Link
                 to="/car-listing"
-                className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition-all"
+                className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-brand-red text-white hover:text-white font-bold text-xs uppercase tracking-wider transition-all"
               >
                 <span>View All Fleet</span>
                 <i className="fa-solid fa-chevron-right text-[10px]"></i>

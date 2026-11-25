@@ -69,7 +69,7 @@ export default function MyBookingPage() {
         </section>
 
         {/* Dashboard Content */}
-        <section className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <section className="py-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
@@ -138,7 +138,7 @@ export default function MyBookingPage() {
                           <li
                             key={bookingId}
                             data-booking-id={bookingId}
-                            className="p-5 sm:p-6 rounded-2xl bg-slate-50/70 border border-slate-200 flex flex-col md:flex-row gap-5 items-start justify-between transition-all"
+                            className="p-5 sm:p-6 rounded-2xl bg-slate-50/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row gap-5 items-start justify-between transition-all"
                           >
                             {/* Left: Vehicle Image & Basic Info */}
                             <div className="flex flex-col sm:flex-row gap-4 flex-grow">
@@ -153,30 +153,30 @@ export default function MyBookingPage() {
                               </div>
 
                               <div className="vehicle_title space-y-2">
-                                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">
+                                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">
                                   Booking #{bookingId}
                                 </span>
-                                <h3 className="font-display font-extrabold text-base text-slate-900 hover:text-brand-red transition-colors">
-                                  <Link to={`/vehical-details/${booking.vid}`}>
+                                <h3 className="font-display font-extrabold text-base text-slate-900 dark:text-white hover:text-brand-red transition-colors">
+                                  <Link to={`/vehical-details/${booking.vid}`} className="text-slate-900 dark:text-white hover:text-brand-red">
                                     {booking.BrandName ? `${booking.BrandName}, ` : ''}{booking.VehiclesTitle}
                                   </Link>
                                 </h3>
                                 
-                                <div className="text-xs text-slate-600 space-y-1">
+                                <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
                                   <p>
-                                    <span className="font-semibold text-slate-500">From Date:</span>{' '}
-                                    <span className="font-bold text-slate-800">{booking.FromDate}</span>
+                                    <span className="font-semibold text-slate-500 dark:text-slate-400">From Date:</span>{' '}
+                                    <span className="font-bold text-slate-800 dark:text-slate-200">{booking.FromDate}</span>
                                   </p>
                                   <p>
-                                    <span className="font-semibold text-slate-500">To Date:</span>{' '}
-                                    <span className="font-bold text-slate-800">{booking.ToDate}</span>
+                                    <span className="font-semibold text-slate-500 dark:text-slate-400">To Date:</span>{' '}
+                                    <span className="font-bold text-slate-800 dark:text-slate-200">{booking.ToDate}</span>
                                   </p>
                                   <p>
-                                    <span className="font-semibold text-slate-500">Total Amount:</span>{' '}
+                                    <span className="font-semibold text-slate-500 dark:text-slate-400">Total Amount:</span>{' '}
                                     <span className="font-black text-brand-red">Rs. {booking.totalAmount}</span>
                                   </p>
                                   {booking.message && (
-                                    <p className="pt-1 text-[11px] text-slate-500">
+                                    <p className="pt-1 text-[11px] text-slate-500 dark:text-slate-400">
                                       <b>Message:</b> {booking.message}
                                     </p>
                                   )}

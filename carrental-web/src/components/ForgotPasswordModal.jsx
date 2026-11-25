@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../api/client';
+import { hideModal } from '../utils/modal';
 
 const COMMON_PASSWORDS = new Set([
   'password',
@@ -28,6 +29,20 @@ export default function ForgotPasswordModal() {
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Close on Escape key
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        const el = document.getElementById('forgotpassword');
+        if (el && (el.classList.contains('in') || el.classList.contains('show'))) {
+          hideModal('#forgotpassword');
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   const handleRequestReset = async (e) => {
     e.preventDefault();
@@ -111,9 +126,7 @@ export default function ForgotPasswordModal() {
   };
 
   const handleClose = () => {
-    if (window.$) {
-      window.$('#forgotpassword').modal('hide');
-    }
+    hideModal('#forgotpassword');
   };
 
   const switchToLogin = (e) => {
@@ -125,9 +138,18 @@ export default function ForgotPasswordModal() {
   };
 
   return (
-    <div className="modal fade" id="forgotpassword" tabIndex="-1" role="dialog" aria-hidden="true">
+    <div
+      className="modal fade"
+      id="forgotpassword"
+      tabIndex="-1"
+      role="dialog"
+      aria-hidden="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleClose();
+      }}
+    >
       <div className="modal-dialog max-w-md w-full mx-auto p-4" role="document">
-        <div className="modal-content surface-card bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden transition-colors">
+        <div className="modal-content surface-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden transition-colors">
           
           {/* Header */}
           <div className="modal-header bg-brand-dark text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
@@ -139,9 +161,9 @@ export default function ForgotPasswordModal() {
             </div>
             <button
               type="button"
-              className="close w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none"
-              data-dismiss="modal"
+              className="close w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
               aria-label="Close"
+              onClick={handleClose}
             >
               <span aria-hidden="true" className="text-xl leading-none">&times;</span>
             </button>

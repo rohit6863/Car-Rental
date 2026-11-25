@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark-atmosphere, .dark-atmosphere *));
+
 @theme {
   --font-sans: "Plus Jakarta Sans", sans-serif;
   --font-display: "Outfit", sans-serif;
@@ -19,24 +21,31 @@
   --shadow-amber-glow: 0 10px 25px -5px rgba(245, 158, 11, 0.35);
 }
 
-/* Base Styles */
-html {
-  scroll-behavior: smooth;
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
 
-body {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-}
+  body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  #root {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
 
-a:hover {
-  color: inherit;
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 /* Custom Scrollbar */
@@ -171,6 +180,7 @@ body.dark-atmosphere .modal-content {
 }
 
 /* Payment Modal Overlay */
+.modal.payment-modal-overlay,
 .payment-modal-overlay {
   position: fixed;
   inset: 0;
@@ -183,4 +193,15 @@ body.dark-atmosphere .modal-content {
   -webkit-backdrop-filter: blur(8px);
   padding: 1rem;
   overflow-y: auto;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body,
+  body.dark-atmosphere {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+  }
 }

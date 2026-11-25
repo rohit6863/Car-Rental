@@ -42,7 +42,7 @@ export default function CmsPage() {
       {/* Subbanner */}
       <section className="page-header aboutus_page relative subbanner-overlay py-12 md:py-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-brand-darker via-brand-dark to-brand-slate opacity-95"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="page-header_wrap">
             <div className="page-heading">
               <h1 className="font-display text-3xl md:text-4xl font-extrabold text-white tracking-tight">

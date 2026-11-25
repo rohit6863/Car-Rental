@@ -87,7 +87,7 @@ export default function ProfilePage() {
       {/* Subbanner */}
       <section className="page-header profile_page relative subbanner-overlay py-12 md:py-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-brand-darker via-brand-dark to-brand-slate opacity-95"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="page-header_wrap">
             <div className="page-heading">
               <h1 className="font-display text-3xl md:text-4xl font-extrabold text-white tracking-tight">Your Profile</h1>
@@ -106,7 +106,7 @@ export default function ProfilePage() {
 
       {/* Profile Content */}
       <section className="user_profile inner_pages flex-1 py-10 md:py-14">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           {/* User Header Summary Card */}
           <div className="user_profile_info gray-bg mb-8 bg-white dark:bg-brand-slate border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-6 transition-colors">
             <div className="upload_user_logo w-20 h-20 rounded-2xl bg-brand-red/10 border-2 border-brand-red/20 flex items-center justify-center p-2 flex-shrink-0">

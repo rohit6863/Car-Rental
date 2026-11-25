@@ -574,7 +574,7 @@ export default function VehicleDetailsPage() {
         </section>
 
         {/* Vehicle Showcase Section */}
-        <section className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        <section className="py-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           
           {/* Main Showcase Card */}
           <div className="surface-card bg-white rounded-3xl border border-slate-200/90 shadow-card p-6 sm:p-8 transition-colors">
@@ -625,38 +625,38 @@ export default function VehicleDetailsPage() {
               {/* Right Column: Title, 3 Specs Cards, Pricing */}
               <div className="lg:col-span-5 space-y-6">
                 <div>
-                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">
+                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                     Premium Self-Drive
                   </span>
-                  <h2 className="text-adaptive-main font-display font-extrabold text-2xl sm:text-3xl text-slate-900 mt-1">
+                  <h2 className="text-adaptive-main font-display font-extrabold text-2xl sm:text-3xl text-slate-900 dark:text-white mt-1">
                     {vehicle.BrandName} , {vehicle.VehiclesTitle}
                   </h2>
-                  <div className="mt-3 inline-flex items-baseline gap-1.5 px-4 py-2 rounded-2xl bg-rose-50 border border-rose-200 text-brand-red">
+                  <div className="mt-3 inline-flex items-baseline gap-1.5 px-4 py-2 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 text-brand-red">
                     <span className="text-2xl font-black">Rs. {vehicle.PricePerDay}</span>
-                    <span className="text-xs font-bold uppercase tracking-wider text-rose-700">/ Day</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400">/ Day</span>
                   </div>
                 </div>
 
                 {/* 3 Core Specs Cards */}
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="surface-muted bg-slate-50 border border-slate-200 rounded-2xl p-3 text-center">
+                  <div className="surface-muted bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 text-center">
                     <i className="fa-solid fa-calendar text-brand-red text-base mb-1 block"></i>
-                    <p className="text-xs font-extrabold text-slate-900">{vehicle.ModelYear}</p>
-                    <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Model Year</p>
+                    <p className="text-xs font-extrabold text-slate-900 dark:text-white">{vehicle.ModelYear}</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Model Year</p>
                   </div>
-                  <div className="surface-muted bg-slate-50 border border-slate-200 rounded-2xl p-3 text-center">
+                  <div className="surface-muted bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 text-center">
                     <i className="fa-solid fa-gas-pump text-amber-500 text-base mb-1 block"></i>
-                    <p className="text-xs font-extrabold text-slate-900">{vehicle.FuelType}</p>
-                    <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Fuel Type</p>
+                    <p className="text-xs font-extrabold text-slate-900 dark:text-white">{vehicle.FuelType}</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Fuel Type</p>
                   </div>
-                  <div className="surface-muted bg-slate-50 border border-slate-200 rounded-2xl p-3 text-center">
+                  <div className="surface-muted bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 text-center">
                     <i className="fa-solid fa-user-group text-blue-500 text-base mb-1 block"></i>
-                    <p className="text-xs font-extrabold text-slate-900">{vehicle.SeatingCapacity}</p>
-                    <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Seats</p>
+                    <p className="text-xs font-extrabold text-slate-900 dark:text-white">{vehicle.SeatingCapacity}</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Seats</p>
                   </div>
                 </div>
 
-                <div className="text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-4">
+                <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
                   <p>
                     {vehicle.VehiclesOverview || 'Verified luxury performance vehicle with premium safety features and 24/7 roadside assistance.'}
                   </p>
@@ -665,7 +665,7 @@ export default function VehicleDetailsPage() {
                 {/* Jump to Booking CTA */}
                 <a
                   href="#bookingForm"
-                  className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-brand-red text-white font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-brand-red dark:bg-slate-800 dark:hover:bg-brand-red text-white hover:text-white font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
                 >
                   <i className="fa-solid fa-calendar-check text-xs"></i>
                   <span>Configure Dates Below</span>
@@ -917,11 +917,11 @@ export default function VehicleDetailsPage() {
 
                   {/* Success Banner */}
                   {bookingSuccess && (
-                    <div className="alert alert-success p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs space-y-2">
+                    <div className="alert alert-success p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs space-y-2">
                       <p className="font-bold">{bookingSuccess}</p>
                       <Link
                         to="/my-booking"
-                        className="inline-block px-3 py-1.5 rounded-lg bg-emerald-700 text-white font-bold text-[11px] hover:bg-emerald-800 transition-colors"
+                        className="inline-block px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white hover:text-white font-bold text-[11px] transition-colors"
                       >
                         View My Bookings &rarr;
                       </Link>

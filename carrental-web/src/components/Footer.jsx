@@ -40,7 +40,7 @@ export default function Footer() {
 
   return (
     <footer id="portalFooter" className="bg-brand-darker text-slate-400 pt-14 pb-10 border-t border-slate-800 mt-auto transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Top 4-Column Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-slate-800">

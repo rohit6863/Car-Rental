@@ -95,7 +95,7 @@ export default function CarListingPage() {
         </section>
 
         {/* Listing Page Body */}
-        <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-12 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
             {/* LEFT SIDEBAR */}
@@ -112,18 +112,18 @@ export default function CarListingPage() {
 
                 <form onSubmit={handleSearchSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
                       Select Brand
                     </label>
                     <select
-                      className="w-full bg-slate-50 text-slate-800 font-semibold text-xs rounded-xl px-3.5 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-red transition-all cursor-pointer"
+                      className="w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-semibold text-xs rounded-xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-red transition-all cursor-pointer"
                       name="brand"
                       value={selectedBrand}
                       onChange={(e) => setSelectedBrand(e.target.value)}
                     >
-                      <option value="">Select Brand</option>
+                      <option value="" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Select Brand</option>
                       {brands.map((b) => (
-                        <option key={b.id} value={b.id}>
+                        <option key={b.id} value={b.id} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
                           {b.BrandName}
                         </option>
                       ))}
@@ -131,21 +131,21 @@ export default function CarListingPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
                       Select Fuel Type
                     </label>
                     <select
-                      className="w-full bg-slate-50 text-slate-800 font-semibold text-xs rounded-xl px-3.5 py-2.5 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-red transition-all cursor-pointer"
+                      className="w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-semibold text-xs rounded-xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-red transition-all cursor-pointer"
                       name="fueltype"
                       value={selectedFuel}
                       onChange={(e) => setSelectedFuel(e.target.value)}
                     >
-                      <option value="">Select Fuel Type</option>
-                      <option value="Petrol">Petrol</option>
-                      <option value="Diesel">Diesel</option>
-                      <option value="CNG">CNG</option>
-                      <option value="Electric">Electric</option>
-                      <option value="Hybrid">Hybrid</option>
+                      <option value="" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Select Fuel Type</option>
+                      <option value="Petrol" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Petrol</option>
+                      <option value="Diesel" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Diesel</option>
+                      <option value="CNG" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">CNG</option>
+                      <option value="Electric" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Electric</option>
+                      <option value="Hybrid" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">Hybrid</option>
                     </select>
                   </div>
 
@@ -179,8 +179,8 @@ export default function CarListingPage() {
                         />
                       </Link>
                       <div className="overflow-hidden">
-                        <h4 className="font-display font-bold text-xs text-slate-900 group-hover:text-brand-red transition-colors truncate">
-                          <Link to={`/vehical-details/${rc.id}`}>
+                        <h4 className="font-display font-bold text-xs text-slate-900 dark:text-white group-hover:text-brand-red transition-colors truncate">
+                          <Link to={`/vehical-details/${rc.id}`} className="text-slate-900 dark:text-white hover:text-brand-red">
                             {rc.BrandName ? `${rc.BrandName}, ` : ''}{rc.VehiclesTitle}
                           </Link>
                         </h4>
@@ -245,32 +245,32 @@ export default function CarListingPage() {
                       <div className="p-5 flex flex-col justify-between flex-grow space-y-4">
                         <div>
                           <div className="flex flex-wrap items-center justify-between gap-2">
-                            <h3 className="font-display font-extrabold text-lg text-slate-900 group-hover:text-brand-red transition-colors">
-                              <Link to={`/vehical-details/${v.id}`}>
+                            <h3 className="font-display font-extrabold text-lg text-slate-900 dark:text-white group-hover:text-brand-red transition-colors">
+                              <Link to={`/vehical-details/${v.id}`} className="text-slate-900 dark:text-white hover:text-brand-red">
                                 {v.BrandName} , {v.VehiclesTitle}
                               </Link>
                             </h3>
                             <span className="text-brand-red font-black text-base">
-                              Rs. {v.PricePerDay} <span className="text-xs font-bold text-slate-500">/ Day</span>
+                              Rs. {v.PricePerDay} <span className="text-xs font-bold text-slate-500 dark:text-slate-400">/ Day</span>
                             </span>
                           </div>
                           
-                          <p className="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">
                             {v.VehiclesOverview || 'Verified luxury performance vehicle with premium safety features.'}
                           </p>
                         </div>
 
                         {/* Specs Pills */}
-                        <div className="flex flex-wrap items-center gap-3 pt-2 text-xs font-semibold text-slate-600">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">
+                        <div className="flex flex-wrap items-center gap-3 pt-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
                             <i className="fa-solid fa-gas-pump text-amber-500"></i>
                             {v.FuelType}
                           </span>
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
                             <i className="fa-solid fa-calendar text-brand-red"></i>
                             {v.ModelYear} model
                           </span>
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
                             <i className="fa-solid fa-user text-blue-500"></i>
                             {v.SeatingCapacity} seats
                           </span>
@@ -280,7 +280,7 @@ export default function CarListingPage() {
                         <div className="pt-1 flex items-center justify-end">
                           <Link
                             to={`/vehical-details/${v.id}`}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-brand-red text-white font-bold text-xs uppercase tracking-wider transition-colors min-h-[44px]"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-brand-red dark:bg-slate-800 dark:hover:bg-brand-red text-white hover:text-white font-bold text-xs uppercase tracking-wider transition-colors min-h-[44px]"
                           >
                             <span>View Details</span>
                             <i className="fa-solid fa-arrow-right text-[10px]"></i>

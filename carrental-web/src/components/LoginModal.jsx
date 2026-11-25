@@ -1,13 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import googleLogo from '../assets/google-logo.svg';
+import { hideModal, showModal } from '../utils/modal';
 
 export default function LoginModal() {
-  const { login, providers } = useAuth();
+  const { login, providers, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Auto-close login modal whenever user becomes authenticated
+  useEffect(() => {
+    if (user) {
+      hideModal('#loginform');
+    }
+  }, [user]);
+
+  // Close on Escape key
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        const el = document.getElementById('loginform');
+        if (el && (el.classList.contains('in') || el.classList.contains('show'))) {
+          hideModal('#loginform');
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -21,9 +43,7 @@ export default function LoginModal() {
         } else {
           setError('Google sign-in failed. Please try again.');
         }
-        if (window.$) {
-          window.$('#loginform').modal('show');
-        }
+        showModal('#loginform');
         window.history.replaceState({}, '', window.location.pathname);
       }
     }
@@ -35,9 +55,7 @@ export default function LoginModal() {
     setLoading(true);
     try {
       await login(email, password);
-      if (window.$) {
-        window.$('#loginform').modal('hide');
-      }
+      hideModal('#loginform');
       setEmail('');
       setPassword('');
     } catch (err) {
@@ -58,22 +76,22 @@ export default function LoginModal() {
   };
 
   const handleClose = () => {
-    if (window.$) {
-      window.$('#loginform').modal('hide');
-    }
-  };
-
-  const switchToModal = (targetModalId) => {
-    if (window.$) {
-      window.$('#loginform').modal('hide');
-      window.$(targetModalId).modal('show');
-    }
+    hideModal('#loginform');
   };
 
   return (
-    <div className="modal fade" id="loginform" tabIndex="-1" role="dialog" aria-hidden="true">
+    <div
+      className="modal fade"
+      id="loginform"
+      tabIndex="-1"
+      role="dialog"
+      aria-hidden="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleClose();
+      }}
+    >
       <div className="modal-dialog max-w-md w-full mx-auto p-4" role="document">
-        <div className="modal-content surface-card bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden transition-colors">
+        <div className="modal-content surface-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden transition-colors">
           
           {/* Header */}
           <div className="modal-header bg-brand-dark text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
@@ -83,8 +101,7 @@ export default function LoginModal() {
             </div>
             <button
               type="button"
-              className="close w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none"
-              data-dismiss="modal"
+              className="close w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
               aria-label="Close"
               onClick={handleClose}
             >

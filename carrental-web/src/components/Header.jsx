@@ -33,7 +33,8 @@ export default function Header() {
   // Theme toggle initialization
   useEffect(() => {
     const savedTheme = localStorage.getItem('wanderwheels_theme');
-    if (savedTheme === 'dark' || (!savedTheme && document.body.classList.contains('dark-atmosphere'))) {
+    if (savedTheme === 'dark' || (!savedTheme && (document.documentElement.classList.contains('dark-atmosphere') || document.body.classList.contains('dark-atmosphere')))) {
+      document.documentElement.classList.add('dark-atmosphere');
       document.body.classList.add('dark-atmosphere');
       setIsDarkMode(true);
     }
@@ -62,9 +63,11 @@ export default function Header() {
     const nextMode = !isDarkMode;
     setIsDarkMode(nextMode);
     if (nextMode) {
+      document.documentElement.classList.add('dark-atmosphere');
       document.body.classList.add('dark-atmosphere');
       localStorage.setItem('wanderwheels_theme', 'dark');
     } else {
+      document.documentElement.classList.remove('dark-atmosphere');
       document.body.classList.remove('dark-atmosphere');
       localStorage.setItem('wanderwheels_theme', 'light');
     }
@@ -95,8 +98,8 @@ export default function Header() {
   return (
     <header className="w-full flex flex-col transition-colors">
       {/* 1. Top Support & Brand Bar */}
-      <div className="surface-card bg-white text-slate-700 border-b border-slate-200 text-xs py-2.5 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4">
+      <div className="surface-card bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-800 text-xs py-2.5 transition-colors">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4">
           
           {/* Brand Logo & Tagline */}
           <Link to="/" className="flex items-center gap-3 group focus:outline-none">
@@ -130,28 +133,28 @@ export default function Header() {
           {/* Support Contacts */}
           <div className="hidden lg:flex items-center space-x-6">
             <a href={`mailto:${contactInfo.EmailId}`} className="flex items-center gap-3 group">
-              <span className="w-9 h-9 rounded-full border border-slate-300 flex items-center justify-center text-slate-700 group-hover:border-brand-red group-hover:bg-brand-red group-hover:text-white transition-all">
+              <span className="w-9 h-9 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 group-hover:border-brand-red group-hover:bg-brand-red group-hover:text-white transition-all">
                 <i className="fa-solid fa-envelope text-xs"></i>
               </span>
               <div>
-                <span className="text-adaptive-main block text-[10px] font-extrabold uppercase tracking-wider text-slate-900">
+                <span className="text-adaptive-main block text-[10px] font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
                   FOR SUPPORT MAIL US :
                 </span>
-                <span className="text-xs text-slate-500 font-medium group-hover:text-brand-red transition-colors">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium group-hover:text-brand-red transition-colors">
                   {contactInfo.EmailId}
                 </span>
               </div>
             </a>
 
             <a href={`tel:${contactInfo.ContactNo}`} className="flex items-center gap-3 group">
-              <span className="w-9 h-9 rounded-full border border-slate-300 flex items-center justify-center text-slate-700 group-hover:border-brand-red group-hover:bg-brand-red group-hover:text-white transition-all">
+              <span className="w-9 h-9 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 group-hover:border-brand-red group-hover:bg-brand-red group-hover:text-white transition-all">
                 <i className="fa-solid fa-phone text-xs"></i>
               </span>
               <div>
-                <span className="text-adaptive-main block text-[10px] font-extrabold uppercase tracking-wider text-slate-900">
+                <span className="text-adaptive-main block text-[10px] font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
                   SERVICE HELPLINE CALL US:
                 </span>
-                <span className="text-xs text-slate-500 font-medium group-hover:text-brand-red transition-colors">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium group-hover:text-brand-red transition-colors">
                   {contactInfo.ContactNo}
                 </span>
               </div>
@@ -165,7 +168,7 @@ export default function Header() {
                 href="https://x.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-brand-dark hover:text-white text-slate-700 flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 hover:bg-brand-dark hover:text-white dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-brand-red dark:hover:text-white flex items-center justify-center transition-colors"
                 aria-label="X (Twitter)"
               >
                 <i className="fa-brands fa-x-twitter text-xs"></i>
@@ -174,7 +177,7 @@ export default function Header() {
                 href="https://www.linkedin.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-brand-dark hover:text-white text-slate-700 flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 hover:bg-brand-dark hover:text-white dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-brand-red dark:hover:text-white flex items-center justify-center transition-colors"
                 aria-label="LinkedIn"
               >
                 <i className="fa-brands fa-linkedin-in text-xs"></i>
@@ -183,7 +186,7 @@ export default function Header() {
                 href="https://www.instagram.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-brand-dark hover:text-white text-slate-700 flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 hover:bg-brand-dark hover:text-white dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-brand-red dark:hover:text-white flex items-center justify-center transition-colors"
                 aria-label="Instagram"
               >
                 <i className="fa-brands fa-instagram text-xs"></i>
@@ -195,7 +198,7 @@ export default function Header() {
               onClick={toggleTheme}
               id="themeToggleBtn"
               type="button"
-              className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center border border-slate-200 transition-all focus:outline-none"
+              className="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 flex items-center justify-center border border-slate-200 dark:border-slate-700 transition-all focus:outline-none"
               title="Toggle Dark Showroom Mode"
               aria-label="Toggle Dark Mode"
             >
@@ -204,8 +207,8 @@ export default function Header() {
 
             {/* Authenticated Welcome or Single Login Button */}
             {user ? (
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200">
-                <i className="fa-solid fa-circle-check text-emerald-600"></i>
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/60 px-3 py-1.5 rounded-full border border-amber-200 dark:border-amber-800">
+                <i className="fa-solid fa-circle-check text-emerald-600 dark:text-emerald-400"></i>
                 <span>Welcome To WanderWheels</span>
               </span>
             ) : (
@@ -235,7 +238,7 @@ export default function Header() {
           style={{ width: `${scrollProgress}%` }}
         ></div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             
             {/* Desktop Navigation Links */}

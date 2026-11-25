@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import googleLogo from '../assets/google-logo.svg';
+import { hideModal } from '../utils/modal';
 
 const COMMON_PASSWORDS = new Set([
   'password',
@@ -21,7 +22,7 @@ const COMMON_PASSWORDS = new Set([
 ]);
 
 export default function SignupModal() {
-  const { register, providers } = useAuth();
+  const { register, providers, user } = useAuth();
   const [formData, setFormData] = useState({
     fullname: '',
     mobileno: '',
@@ -33,6 +34,27 @@ export default function SignupModal() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Auto-close signup modal whenever user becomes authenticated
+  useEffect(() => {
+    if (user) {
+      hideModal('#signupform');
+    }
+  }, [user]);
+
+  // Close on Escape key
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        const el = document.getElementById('signupform');
+        if (el && (el.classList.contains('in') || el.classList.contains('show'))) {
+          hideModal('#signupform');
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   const checkEmailAvailability = async () => {
     if (!formData.emailid || !formData.emailid.includes('@')) return;
@@ -81,13 +103,8 @@ export default function SignupModal() {
     setLoading(true);
     try {
       await register(formData);
-      setSuccess('Registration successful. Now you are logged in.');
-      setTimeout(() => {
-        if (window.$) {
-          window.$('#signupform').modal('hide');
-        }
-        setSuccess('');
-      }, 1500);
+      hideModal('#signupform');
+      setSuccess('');
     } catch (err) {
       if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
         setError(err.response.data.details.map((d) => d.message).join('. '));
@@ -101,9 +118,7 @@ export default function SignupModal() {
   };
 
   const handleClose = () => {
-    if (window.$) {
-      window.$('#signupform').modal('hide');
-    }
+    hideModal('#signupform');
   };
 
   const switchToLogin = (e) => {
@@ -115,9 +130,18 @@ export default function SignupModal() {
   };
 
   return (
-    <div className="modal fade" id="signupform" tabIndex="-1" role="dialog" aria-hidden="true">
+    <div
+      className="modal fade"
+      id="signupform"
+      tabIndex="-1"
+      role="dialog"
+      aria-hidden="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleClose();
+      }}
+    >
       <div className="modal-dialog max-w-md w-full mx-auto p-4" role="document">
-        <div className="modal-content surface-card bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden transition-colors">
+        <div className="modal-content surface-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden transition-colors">
           
           {/* Header */}
           <div className="modal-header bg-brand-dark text-white px-6 py-4 flex items-center justify-between border-b border-slate-800">
@@ -127,9 +151,9 @@ export default function SignupModal() {
             </div>
             <button
               type="button"
-              className="close w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none"
-              data-dismiss="modal"
+              className="close w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
               aria-label="Close"
+              onClick={handleClose}
             >
               <span aria-hidden="true" className="text-xl leading-none">&times;</span>
             </button>

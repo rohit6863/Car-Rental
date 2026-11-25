@@ -20,18 +20,18 @@ export default function Sidebar({ active }) {
 
   return (
     <aside className="profile_nav w-full">
-      <div className="surface-card bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm transition-colors">
+      <div className="surface-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm transition-colors">
         
         {/* User Card Header */}
-        <div className="pb-4 mb-4 border-b border-slate-200 flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-base shadow-sm">
+        <div className="pb-4 mb-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-xl bg-slate-900 dark:bg-slate-800 text-white flex items-center justify-center font-bold text-base shadow-sm">
             <i className="fa-solid fa-user text-brand-red"></i>
           </div>
           <div className="overflow-hidden">
-            <p className="text-adaptive-main font-display font-bold text-sm text-slate-900 truncate">
+            <p className="text-adaptive-main font-display font-bold text-sm text-slate-900 dark:text-white truncate">
               {user?.fullname || user?.FullName || 'Account Settings'}
             </p>
-            <p className="text-adaptive-sub text-xs text-slate-500 truncate">
+            <p className="text-adaptive-sub text-xs text-slate-500 dark:text-slate-400 truncate">
               {user?.email || 'Manage your account'}
             </p>
           </div>
@@ -48,23 +48,23 @@ export default function Sidebar({ active }) {
                   className={`flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all ${
                     isActive
                       ? 'bg-brand-red text-white shadow-sm'
-                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-200 dark:hover:text-white dark:hover:bg-slate-800'
                   }`}
                 >
-                  <i className={`fa-solid ${item.icon} text-sm ${isActive ? 'text-white' : 'text-slate-400'}`}></i>
+                  <i className={`fa-solid ${item.icon} text-sm ${isActive ? 'text-white' : 'text-slate-400 dark:text-slate-400'}`}></i>
                   <span>{item.label}</span>
                 </Link>
               </li>
             );
           })}
           
-          <li className="pt-2 mt-2 border-t border-slate-200">
+          <li className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800">
             <a
               href="#logout"
               onClick={handleLogout}
-              className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-rose-600 hover:bg-rose-50 transition-all font-bold"
+              className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/50 transition-all font-bold"
             >
-              <i className="fa-solid fa-right-from-bracket text-sm text-rose-500"></i>
+              <i className="fa-solid fa-right-from-bracket text-sm text-rose-500 dark:text-rose-400"></i>
               <span>Sign Out</span>
             </a>
           </li>
