@@ -260,10 +260,10 @@ class FleetOpsService {
     `);
 
     const [pendingKyc] = await query(`
-      SELECT id, FullName, EmailId
+      SELECT id, FullName, EmailId, KycSubmittedAt
       FROM tblusers
-      WHERE KycStatus = 'Pending'
-      ORDER BY id DESC
+      WHERE KycSubmittedAt IS NOT NULL AND KycStatus = 'Pending'
+      ORDER BY KycSubmittedAt DESC
       LIMIT 5
     `);
 
@@ -287,11 +287,14 @@ class FleetOpsService {
       });
     });
     pendingKyc.forEach((u) => {
+      const submittedLabel = u.KycSubmittedAt
+        ? new Date(u.KycSubmittedAt).toLocaleString()
+        : 'recently';
       alerts.push({
         id: `kyc-${u.id}`,
         type: 'kyc',
-        title: `Driver KYC Pending`,
-        subtitle: `${u.FullName || u.EmailId} awaiting license verification`,
+        title: 'Driver KYC Pending',
+        subtitle: `${u.FullName || u.EmailId} submitted KYC (${submittedLabel})`,
         route: '/reg-users',
       });
     });

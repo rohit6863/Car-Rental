@@ -29,6 +29,28 @@ class UsersController {
       next(err);
     }
   }
+
+  async submitKyc(req, res, next) {
+    try {
+      const result = await usersService.submitKyc(req.user.email, {
+        drivingLicenseNo: req.body.drivingLicenseNo,
+        documentFilename: req.file ? req.file.filename : null,
+      });
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getKycDocument(req, res, next) {
+    try {
+      const filePath = await usersService.getCustomerKycDocumentPath(req.user.email);
+      res.setHeader('Cache-Control', 'private, no-store');
+      res.sendFile(filePath);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new UsersController();

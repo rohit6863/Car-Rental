@@ -10,6 +10,11 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+const kycUploadDir = path.join(__dirname, '..', '..', 'uploads', 'kyc');
+if (!fs.existsSync(kycUploadDir)) {
+  fs.mkdirSync(kycUploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
     cb(null, uploadDir);
@@ -17,6 +22,17 @@ const storage = multer.diskStorage({
   filename: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     const randomName = `${Date.now()}_${crypto.randomBytes(8).toString('hex')}${ext}`;
+    cb(null, randomName);
+  },
+});
+
+const kycStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => {
+    cb(null, kycUploadDir);
+  },
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const randomName = `kyc_${Date.now()}_${crypto.randomBytes(8).toString('hex')}${ext}`;
     cb(null, randomName);
   },
 });
@@ -31,6 +47,7 @@ const FIELD_LABELS = {
   img4: 'Image 4',
   img5: 'Image 5',
   img: 'Image',
+  kycDocument: 'Driving License Photo',
 };
 
 function getFieldLabel(fieldname) {
@@ -74,6 +91,14 @@ const fileFilter = (_req, file, cb) => {
 
 const upload = multer({
   storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max
+  },
+  fileFilter,
+});
+
+const kycUpload = multer({
+  storage: kycStorage,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB max
   },
@@ -145,6 +170,8 @@ function verifyUploadMagicBytes(req, _res, next) {
 
 module.exports = {
   upload,
+  kycUpload,
+  kycUploadDir,
   isAllowedImageMagicBytes,
   verifyUploadMagicBytes,
   cleanupUploadedFiles,

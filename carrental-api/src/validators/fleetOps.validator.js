@@ -41,10 +41,16 @@ const noteUpdateSchema = z.object({
   isDone: z.boolean(),
 });
 
-const kycUpdateSchema = z.object({
-  kycStatus: z.enum(['Pending', 'Verified', 'Rejected']),
-  drivingLicenseNo: z.string().trim().max(50).optional().nullable(),
-});
+const kycUpdateSchema = z
+  .object({
+    status: z.enum(['Pending', 'Verified', 'Rejected']).optional(),
+    kycStatus: z.enum(['Pending', 'Verified', 'Rejected']).optional(),
+    drivingLicenseNo: z.string().trim().max(50).optional().nullable(),
+    rejectionReason: z.string().trim().max(255).optional().nullable(),
+  })
+  .refine((data) => Boolean(data.status || data.kycStatus), {
+    message: 'KYC status is required',
+  });
 
 module.exports = {
   idParamSchema,

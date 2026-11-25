@@ -19,6 +19,16 @@ class AdminUsersController {
       next(err);
     }
   }
+
+  async getKycDocument(req, res, next) {
+    try {
+      const filePath = await usersService.adminGetKycDocumentPath(req.params.id);
+      res.setHeader('Cache-Control', 'private, no-store');
+      res.sendFile(filePath);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new AdminUsersController();

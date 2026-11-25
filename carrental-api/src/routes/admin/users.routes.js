@@ -10,5 +10,6 @@ const router = express.Router();
 router.use(requireAdmin);
 router.get('/', adminUsersController.getAll);
 router.patch('/:id/kyc', validate({ params: idParamSchema, body: kycUpdateSchema }), adminUsersController.updateKyc);
+router.get('/:id/kyc-document', validate({ params: idParamSchema }), adminUsersController.getKycDocument);
 
 module.exports = router;
