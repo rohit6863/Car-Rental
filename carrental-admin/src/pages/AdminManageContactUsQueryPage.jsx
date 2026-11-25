@@ -11,7 +11,7 @@ export default function AdminManageContactUsQueryPage() {
     try {
       const res = await client.get('/api/admin/queries');
       setQueries(res.data);
-    } catch (err) {
+    } catch {
       setError('Failed to load queries');
     } finally {
       setLoading(false);
@@ -28,7 +28,7 @@ export default function AdminManageContactUsQueryPage() {
     setMsg('');
     try {
       await client.patch(`/api/admin/queries/${id}/read`);
-      setMsg('Testimonial Successfully Inacrive'); // legacy copy phrasing
+      setMsg('Query marked as read');
     } catch (err) {
       const errorMsg =
         err.response?.data?.error ||
@@ -44,98 +44,79 @@ export default function AdminManageContactUsQueryPage() {
   };
 
   return (
-    <div className="row">
-      <div className="col-md-12">
-        <h2 className="page-title">Manage Contact Us Queries</h2>
+    <div className="space-y-5">
+      <div>
+        <h2 className="page-title text-xl font-bold text-slate-900 tracking-tight">Manage Contact Us Queries</h2>
+        <p className="text-xs text-slate-500 mt-0.5">Review and mark customer support inquiries as read</p>
+      </div>
 
-        <div className="panel panel-default">
-          <div className="panel-heading">User queries</div>
-          <div className="panel-body">
-            {error && (
-              <div className="errorWrap" style={{
-                padding: '10px',
-                margin: '0 0 20px 0',
-                background: '#fff',
-                borderLeft: '4px solid #dd3d36',
-                boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-              }}>
-                <strong>ERROR</strong>: {error}
-              </div>
-            )}
-            {msg && (
-              <div className="succWrap" style={{
-                padding: '10px',
-                margin: '0 0 20px 0',
-                background: '#fff',
-                borderLeft: '4px solid #5cb85c',
-                boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-              }}>
-                <strong>SUCCESS</strong>: {msg}
-              </div>
-            )}
+      {error && <div className="errorWrap"><strong>ERROR</strong>: {error}</div>}
+      {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
 
-            {loading ? (
-              <p>Loading queries...</p>
-            ) : (
-              <table id="zctb" className="display table table-striped table-bordered table-hover" cellSpacing="0" width="100%">
-                <thead>
+      <div className="bento-card overflow-hidden">
+        <div className="px-5 py-4 border-b border-hairline flex items-center justify-between">
+          <span className="text-sm font-bold text-slate-900">User queries</span>
+          <span className="text-xs text-slate-400 tabular-nums">{queries.length} total</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          {loading ? (
+            <p className="p-6 text-sm text-slate-500">Loading queries...</p>
+          ) : (
+            <table id="zctb" className="w-full text-left text-xs">
+              <thead className="bg-slate-50/80 text-slate-500 uppercase tracking-wider border-b border-hairline">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">#</th>
+                  <th className="px-4 py-3 font-semibold">Name</th>
+                  <th className="px-4 py-3 font-semibold">Email</th>
+                  <th className="px-4 py-3 font-semibold">Contact No</th>
+                  <th className="px-4 py-3 font-semibold">Message</th>
+                  <th className="px-4 py-3 font-semibold">Posting date</th>
+                  <th className="px-4 py-3 font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-hairline">
+                {queries.length === 0 ? (
                   <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Contact No</th>
-                    <th>Message</th>
-                    <th>Posting date</th>
-                    <th>Action</th>
+                    <td colSpan={7} className="px-4 py-8 text-center text-slate-400">
+                      No queries found
+                    </td>
                   </tr>
-                </thead>
-                <tfoot>
-                  <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Contact No</th>
-                    <th>Message</th>
-                    <th>Posting date</th>
-                    <th>Action</th>
-                  </tr>
-                </tfoot>
-                <tbody>
-                  {queries.length === 0 ? (
-                    <tr>
-                      <td colSpan="7" className="text-center">No queries found</td>
+                ) : (
+                  queries.map((q, idx) => (
+                    <tr key={q.id} className="hover:bg-slate-50/60">
+                      <td className="px-4 py-3 tabular-nums text-slate-500">{idx + 1}</td>
+                      <td className="px-4 py-3 font-semibold text-slate-900">{q.name}</td>
+                      <td className="px-4 py-3 text-slate-700">{q.EmailId}</td>
+                      <td className="px-4 py-3 tabular-nums text-slate-600">{q.ContactNumber}</td>
+                      <td className="px-4 py-3 text-slate-600 max-w-[260px]">{q.Message}</td>
+                      <td className="px-4 py-3 tabular-nums text-slate-500">
+                        {q.PostingDate ? new Date(q.PostingDate).toLocaleString() : ''}
+                      </td>
+                      <td className="px-4 py-3">
+                        {q.status === 1 ? (
+                          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            Read
+                          </span>
+                        ) : (
+                          <a
+                            href="#mark-read"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleMarkRead(q.id);
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 font-semibold no-underline"
+                          >
+                            Pending
+                          </a>
+                        )}
+                      </td>
                     </tr>
-                  ) : (
-                    queries.map((q, idx) => (
-                      <tr key={q.id}>
-                        <td>{idx + 1}</td>
-                        <td>{q.name}</td>
-                        <td>{q.EmailId}</td>
-                        <td>{q.ContactNumber}</td>
-                        <td>{q.Message}</td>
-                        <td>{q.PostingDate ? new Date(q.PostingDate).toLocaleString() : ''}</td>
-                        <td>
-                          {q.status === 1 ? (
-                            <span>Read</span>
-                          ) : (
-                            <a
-                              href="#mark-read"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleMarkRead(q.id);
-                              }}
-                            >
-                              Pending
-                            </a>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            )}
-          </div>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

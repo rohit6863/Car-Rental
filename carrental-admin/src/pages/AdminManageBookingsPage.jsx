@@ -13,7 +13,7 @@ export default function AdminManageBookingsPage() {
     try {
       const res = await client.get('/api/admin/bookings');
       setBookings(res.data);
-    } catch (err) {
+    } catch {
       setError('Failed to load bookings');
     } finally {
       setLoading(false);
@@ -71,121 +71,118 @@ export default function AdminManageBookingsPage() {
   };
 
   return (
-    <div className="row">
-      <div className="col-md-12">
-        <h2 className="page-title">Manage Bookings</h2>
+    <div className="space-y-5">
+      <div>
+        <h2 className="page-title text-xl font-bold text-slate-900 tracking-tight">Manage Bookings</h2>
+        <p className="text-xs text-slate-500 mt-0.5">Approve pending reservations, resolve date conflicts, or cancel bookings</p>
+      </div>
 
-        {error && (
-          <div className="errorWrap" style={{
-            padding: '10px',
-            margin: '0 0 20px 0',
-            background: '#fff',
-            borderLeft: '4px solid #dd3d36',
-            boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-          }}>
-            <strong>ERROR</strong>: {error}
-          </div>
-        )}
-        {msg && (
-          <div className="succWrap" style={{
-            padding: '10px',
-            margin: '0 0 20px 0',
-            background: '#fff',
-            borderLeft: '4px solid #5cb85c',
-            boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-          }}>
-            <strong>SUCCESS</strong>: {msg}
-          </div>
-        )}
+      {error && <div className="errorWrap"><strong>ERROR</strong>: {error}</div>}
+      {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
 
-        <div className="panel panel-default">
-          <div className="panel-heading">Booking Details</div>
-          <div className="panel-body">
-            {loading ? (
-              <p>Loading bookings...</p>
-            ) : (
-              <table id="zctb" className="display table table-striped table-bordered table-hover" cellSpacing="0" width="100%">
-                <thead>
+      <div className="bento-card overflow-hidden">
+        <div className="px-5 py-4 border-b border-hairline flex items-center justify-between">
+          <span className="text-sm font-bold text-slate-900">Booking Details</span>
+          <span className="text-xs text-slate-400 tabular-nums">{bookings.length} total</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          {loading ? (
+            <p className="p-6 text-sm text-slate-500">Loading bookings...</p>
+          ) : (
+            <table id="zctb" className="w-full text-left text-xs">
+              <thead className="bg-slate-50/80 text-slate-500 uppercase tracking-wider border-b border-hairline">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">#</th>
+                  <th className="px-4 py-3 font-semibold">Name</th>
+                  <th className="px-4 py-3 font-semibold">Vehicle</th>
+                  <th className="px-4 py-3 font-semibold">From Date</th>
+                  <th className="px-4 py-3 font-semibold">To Date</th>
+                  <th className="px-4 py-3 font-semibold">Message</th>
+                  <th className="px-4 py-3 font-semibold">Status</th>
+                  <th className="px-4 py-3 font-semibold">Posting Date</th>
+                  <th className="px-4 py-3 font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-hairline">
+                {bookings.length === 0 ? (
                   <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Vehicle</th>
-                    <th>From Date</th>
-                    <th>To Date</th>
-                    <th>Message</th>
-                    <th>Status</th>
-                    <th>Posting Date</th>
-                    <th>Action</th>
+                    <td colSpan={9} className="px-4 py-8 text-center text-slate-400">
+                      No bookings found
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {bookings.length === 0 ? (
-                    <tr>
-                      <td colSpan="9" className="text-center">No bookings found</td>
+                ) : (
+                  bookings.map((b, idx) => (
+                    <tr key={b.id} className="hover:bg-slate-50/60">
+                      <td className="px-4 py-3 tabular-nums text-slate-500">{idx + 1}</td>
+                      <td className="px-4 py-3 font-semibold text-slate-900">{b.FullName}</td>
+                      <td className="px-4 py-3">
+                        <Link to={`/edit-vehicle/${b.vid}`} className="text-lavender-600 hover:underline font-medium no-underline">
+                          {b.BrandName}, {b.VehiclesTitle}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3 tabular-nums text-slate-600">{b.FromDate}</td>
+                      <td className="px-4 py-3 tabular-nums text-slate-600">{b.ToDate}</td>
+                      <td className="px-4 py-3 text-slate-600 max-w-[200px] truncate">{b.message}</td>
+                      <td className="px-4 py-3">
+                        {b.Status === 0 && (
+                          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                            Not Confirmed
+                          </span>
+                        )}
+                        {b.Status === 1 && (
+                          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            Confirmed
+                          </span>
+                        )}
+                        {b.Status === 2 && (
+                          <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                            Cancelled
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 tabular-nums text-slate-500">
+                        {b.PostingDate ? new Date(b.PostingDate).toLocaleString() : ''}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {actionInProgress === b.id ? (
+                          <span className="text-slate-400">Processing...</span>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            {b.Status === 0 && (
+                              <a
+                                href="#confirm"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleConfirm(b.id);
+                                }}
+                                className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold no-underline"
+                              >
+                                Confirm
+                              </a>
+                            )}
+                            {b.Status !== 2 && (
+                              <a
+                                href="#cancel"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleCancel(b.id);
+                                }}
+                                className="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 font-semibold no-underline"
+                              >
+                                Cancel
+                              </a>
+                            )}
+                            {b.Status === 2 && <span className="text-slate-400">Cancelled</span>}
+                          </div>
+                        )}
+                      </td>
                     </tr>
-                  ) : (
-                    bookings.map((b, idx) => (
-                      <tr key={b.id}>
-                        <td>{idx + 1}</td>
-                        <td>{b.FullName}</td>
-                        <td>
-                          <Link to={`/edit-vehicle/${b.vid}`}>
-                            {b.BrandName}, {b.VehiclesTitle}
-                          </Link>
-                        </td>
-                        <td>{b.FromDate}</td>
-                        <td>{b.ToDate}</td>
-                        <td>{b.message}</td>
-                        <td>
-                          {b.Status === 0 && 'Not Confirmed'}
-                          {b.Status === 1 && 'Confirmed'}
-                          {b.Status === 2 && 'Cancelled'}
-                        </td>
-                        <td>{b.PostingDate ? new Date(b.PostingDate).toLocaleString() : ''}</td>
-                        <td>
-                          {actionInProgress === b.id ? (
-                            <span>Processing...</span>
-                          ) : (
-                            <>
-                              {b.Status === 0 && (
-                                <>
-                                  <a
-                                    href="#confirm"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      handleConfirm(b.id);
-                                    }}
-                                  >
-                                    Confirm
-                                  </a>
-                                  {' / '}
-                                </>
-                              )}
-                              {b.Status !== 2 && (
-                                <a
-                                  href="#cancel"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    handleCancel(b.id);
-                                  }}
-                                  style={{ color: '#dd3d36' }}
-                                >
-                                  Cancel
-                                </a>
-                              )}
-                              {b.Status === 2 && (
-                                <span style={{ color: '#888' }}>Cancelled</span>
-                              )}
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            )}
-          </div>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

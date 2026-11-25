@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import DOMPurify from 'dompurify';
+import { FileText, Check } from 'lucide-react';
 import client from '../api/client';
 
 const PAGE_NAMES = {
@@ -21,7 +22,6 @@ export default function AdminManagePagesPage() {
   const editorContainerRef = useRef(null);
   const quillInstanceRef = useRef(null);
 
-  // Initialize Quill once
   useEffect(() => {
     if (editorContainerRef.current && !quillInstanceRef.current) {
       quillInstanceRef.current = new Quill(editorContainerRef.current, {
@@ -38,7 +38,6 @@ export default function AdminManagePagesPage() {
     }
   }, []);
 
-  // Fetch page detail whenever selectedType changes
   useEffect(() => {
     async function fetchPage() {
       if (!selectedType) return;
@@ -50,7 +49,7 @@ export default function AdminManagePagesPage() {
         if (quillInstanceRef.current) {
           quillInstanceRef.current.root.innerHTML = DOMPurify.sanitize(found?.detail || '');
         }
-      } catch (err) {
+      } catch {
         setError('Failed to load page content');
       } finally {
         setLoading(false);
@@ -75,7 +74,7 @@ export default function AdminManagePagesPage() {
     setSubmitting(true);
     try {
       await client.put(`/api/admin/pages/${selectedType}`, { detail });
-      setMsg('Page data updated  successfully'); // legacy phrasing
+      setMsg('Page data updated successfully');
     } catch (err) {
       if (err.response?.data?.details && Array.isArray(err.response.data.details) && err.response.data.details.length > 0) {
         setError(err.response.data.details.map((d) => d.message).join('. '));
@@ -91,98 +90,71 @@ export default function AdminManagePagesPage() {
   };
 
   return (
-    <div className="row">
-      <div className="col-md-12">
-        <h2 className="page-title">Manage Pages</h2>
+    <div className="space-y-5 max-w-4xl">
+      <div>
+        <h2 className="page-title text-xl font-bold text-slate-900 tracking-tight">Manage Pages</h2>
+        <p className="text-xs text-slate-500 mt-0.5">Edit Terms, Privacy Policy, About Us, and FAQs content</p>
+      </div>
 
-        <div className="row">
-          <div className="col-md-10">
-            <div className="panel panel-default">
-              <div className="panel-heading">Form fields</div>
-              <div className="panel-body">
-                {error && (
-                  <div className="errorWrap" style={{
-                    padding: '10px',
-                    margin: '0 0 20px 0',
-                    background: '#fff',
-                    borderLeft: '4px solid #dd3d36',
-                    boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-                  }}>
-                    <strong>ERROR</strong>: {error}
-                  </div>
-                )}
-                {msg && (
-                  <div className="succWrap" style={{
-                    padding: '10px',
-                    margin: '0 0 20px 0',
-                    background: '#fff',
-                    borderLeft: '4px solid #5cb85c',
-                    boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-                  }}>
-                    <strong>SUCCESS</strong>: {msg}
-                  </div>
-                )}
+      {error && <div className="errorWrap"><strong>ERROR</strong>: {error}</div>}
+      {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
 
-                <form className="form-horizontal" onSubmit={handleSubmit}>
-                  <div className="form-group">
-                    <label className="col-sm-4 control-label" htmlFor="menu1">select Page</label>
-                    <div className="col-sm-8">
-                      <select
-                        id="menu1"
-                        name="menu1"
-                        className="form-control"
-                        value={selectedType}
-                        onChange={(e) => setSelectedType(e.target.value)}
-                      >
-                        <option value="">***Select One***</option>
-                        <option value="terms">terms and condition</option>
-                        <option value="privacy">privacy and policy</option>
-                        <option value="aboutus">aboutus</option>
-                        <option value="faqs">FAQs</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="hr-dashed" style={{ borderTop: '1px dashed #e4e4e4', margin: '20px 0' }}></div>
+      <div className="bento-card p-6">
+        <div className="flex items-center gap-2 pb-3 mb-4 border-b border-hairline">
+          <FileText className="w-4 h-4 text-lavender-600" />
+          <h3 className="text-sm font-bold text-slate-900">CMS Page Editor</h3>
+        </div>
 
-                  <div className="form-group">
-                    <label className="col-sm-4 control-label">selected Page</label>
-                    <div className="col-sm-8" style={{ paddingTop: '7px', fontWeight: 'bold' }}>
-                      {PAGE_NAMES[selectedType] || ''}
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="col-sm-4 control-label">Page Details</label>
-                    <div className="col-sm-8">
-                      {loading ? (
-                        <p>Loading editor...</p>
-                      ) : null}
-                      <div
-                        ref={editorContainerRef}
-                        style={{ minHeight: '220px', background: '#fff' }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <div className="col-sm-8 col-sm-offset-4">
-                      <button
-                        type="submit"
-                        name="submit"
-                        value="Update"
-                        id="submit"
-                        className="btn-primary btn"
-                        disabled={submitting}
-                      >
-                        {submitting ? 'Updating...' : 'Update'}
-                      </button>
-                    </div>
-                  </div>
-                </form>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+            <div>
+              <label htmlFor="menu1" className="block text-xs font-semibold text-slate-600 mb-1.5">
+                Select Page
+              </label>
+              <select
+                id="menu1"
+                name="menu1"
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
+              >
+                <option value="">***Select One***</option>
+                <option value="terms">terms and condition</option>
+                <option value="privacy">privacy and policy</option>
+                <option value="aboutus">aboutus</option>
+                <option value="faqs">FAQs</option>
+              </select>
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-slate-500 mb-1">Selected Page</div>
+              <div className="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-hairline text-sm font-bold text-slate-900">
+                {PAGE_NAMES[selectedType] || 'None'}
               </div>
             </div>
           </div>
-        </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Page Details</label>
+            {loading && <p className="text-xs text-slate-400 mb-2">Loading editor...</p>}
+            <div className="rounded-xl overflow-hidden border border-slate-200 bg-white">
+              <div ref={editorContainerRef} style={{ minHeight: '240px', background: '#fff' }} />
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              name="submit"
+              value="Update"
+              id="submit"
+              disabled={submitting}
+              className="px-5 py-2.5 rounded-xl bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-semibold inline-flex items-center gap-2 cursor-pointer disabled:opacity-60"
+            >
+              <Check className="w-4 h-4" />
+              <span>{submitting ? 'Updating...' : 'Update'}</span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

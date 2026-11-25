@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 import client from '../api/client';
 
 export default function AdminManageVehiclesPage() {
@@ -12,7 +13,7 @@ export default function AdminManageVehiclesPage() {
     try {
       const res = await client.get('/api/admin/vehicles');
       setVehicles(res.data);
-    } catch (err) {
+    } catch {
       setError('Failed to load vehicles');
     } finally {
       setLoading(false);
@@ -45,111 +46,113 @@ export default function AdminManageVehiclesPage() {
   };
 
   return (
-    <div className="row">
-      <div className="col-md-12">
-        <h2 className="page-title">Manage Vehicles</h2>
+    <div className="space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 className="page-title text-xl font-bold text-slate-900 tracking-tight">Manage Vehicles</h2>
+          <p className="text-xs text-slate-500 mt-0.5">View, edit, or remove vehicles from the active rental fleet</p>
+        </div>
+        <Link
+          to="/post-vehicle"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-semibold transition no-underline self-start sm:self-auto"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add New Vehicle</span>
+        </Link>
+      </div>
 
-        {error && (
-          <div className="errorWrap" style={{
-            padding: '10px',
-            margin: '0 0 20px 0',
-            background: '#fff',
-            borderLeft: '4px solid #dd3d36',
-            boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-          }}>
-            <strong>ERROR</strong>: {error}
-          </div>
-        )}
-        {msg && (
-          <div className="succWrap" style={{
-            padding: '10px',
-            margin: '0 0 20px 0',
-            background: '#fff',
-            borderLeft: '4px solid #5cb85c',
-            boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-          }}>
-            <strong>SUCCESS</strong>: {msg}
-          </div>
-        )}
+      {error && <div className="errorWrap"><strong>ERROR</strong>: {error}</div>}
+      {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
 
-        <div className="panel panel-default">
-          <div className="panel-heading clearfix">
-            <span>All Vehicles</span>
-            <Link to="/post-vehicle" className="btn btn-primary btn-xs pull-right">
-              <i className="fa fa-plus"></i> Add New Vehicle
-            </Link>
-          </div>
-          <div className="panel-body">
-            {loading ? (
-              <p>Loading vehicles...</p>
-            ) : (
-              <table id="vehicleTable" className="table table-striped table-bordered table-hover" width="100%">
-                <thead>
+      <div className="bento-card overflow-hidden">
+        <div className="px-5 py-4 border-b border-hairline flex items-center justify-between">
+          <span className="text-sm font-bold text-slate-900">All Vehicles</span>
+          <span className="text-xs text-slate-400 tabular-nums">{vehicles.length} total</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          {loading ? (
+            <p className="p-6 text-sm text-slate-500">Loading vehicles...</p>
+          ) : (
+            <table id="vehicleTable" className="w-full text-left text-xs">
+              <thead className="bg-slate-50/80 text-slate-500 uppercase tracking-wider border-b border-hairline">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">#</th>
+                  <th className="px-4 py-3 font-semibold">Vehicle</th>
+                  <th className="px-4 py-3 font-semibold">Brand</th>
+                  <th className="px-4 py-3 font-semibold">Price/Day</th>
+                  <th className="px-4 py-3 font-semibold">Fuel Type</th>
+                  <th className="px-4 py-3 font-semibold">Transmission</th>
+                  <th className="px-4 py-3 font-semibold">Year</th>
+                  <th className="px-4 py-3 font-semibold">Status</th>
+                  <th className="px-4 py-3 font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-hairline">
+                {vehicles.length === 0 ? (
                   <tr>
-                    <th>#</th>
-                    <th>Vehicle</th>
-                    <th>Brand</th>
-                    <th>Price/Day</th>
-                    <th>Fuel Type</th>
-                    <th>Year</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <td colSpan={9} className="px-4 py-8 text-center text-slate-400">
+                      No vehicles found
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {vehicles.length === 0 ? (
-                    <tr>
-                      <td colSpan="8" className="text-center">No vehicles found</td>
-                    </tr>
-                  ) : (
-                    vehicles.map((v, idx) => (
-                      <tr key={v.id}>
-                        <td>{idx + 1}</td>
-                        <td>{v.VehiclesTitle}</td>
-                        <td>{v.BrandName}</td>
-                        <td>Rs. {v.PricePerDay}</td>
-                        <td>{v.FuelType}</td>
-                        <td>{v.ModelYear}</td>
-                        <td>
-                          <span
-                            className="status-label"
-                            style={{
-                              padding: '3px 8px',
-                              borderRadius: '4px',
-                              fontSize: '12px',
-                              fontWeight: 'bold',
-                              color: 'white',
-                              backgroundColor: v.vehicle_status === 'Available' ? '#5cb85c' : '#d9534f',
-                            }}
+                ) : (
+                  vehicles.map((v, idx) => (
+                    <tr key={v.id} className="hover:bg-slate-50/60">
+                      <td className="px-4 py-3 tabular-nums text-slate-500">{idx + 1}</td>
+                      <td className="px-4 py-3 font-semibold text-slate-900">
+                        <div>{v.VehiclesTitle}</div>
+                        {v.Category && (
+                          <div className="text-[11px] font-normal text-slate-400">{v.Category}</div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-slate-700">{v.BrandName}</td>
+                      <td className="px-4 py-3 font-semibold text-slate-900 tabular-nums">Rs. {v.PricePerDay}</td>
+                      <td className="px-4 py-3">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium">
+                          {v.FuelType}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">{v.Transmission || 'Automatic'}</td>
+                      <td className="px-4 py-3 tabular-nums text-slate-600">{v.ModelYear}</td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`status-label inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+                            v.vehicle_status === 'Rented'
+                              ? 'bg-rose-50 text-rose-700 border-rose-200'
+                              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          }`}
+                        >
+                          {v.vehicle_status || 'Available'}
+                        </span>
+                      </td>
+                      <td className="action-links px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <Link
+                            to={`/edit-vehicle/${v.id}`}
+                            className="text-lavender-600 hover:text-lavender-700"
+                            title="Edit"
                           >
-                            {v.vehicle_status || 'Available'}
-                          </span>
-                        </td>
-                        <td className="action-links">
-                          <Link to={`/edit-vehicle/${v.id}`} className="text-primary" title="Edit">
-                            <i className="fa fa-edit"></i>
+                            <Pencil className="w-4 h-4" />
                           </Link>
-                          &nbsp;&nbsp;
                           <a
                             href="#delete"
-                            className="text-danger"
+                            className="text-rose-600 hover:text-rose-700"
                             title="Delete"
                             onClick={(e) => {
                               e.preventDefault();
                               handleDelete(v.id);
                             }}
-                            style={{ color: '#d9534f' }}
                           >
-                            <i className="fa fa-trash"></i>
+                            <Trash2 className="w-4 h-4" />
                           </a>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            )}
-          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

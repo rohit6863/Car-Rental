@@ -12,7 +12,7 @@ export default function AdminManagePaymentsPage() {
     try {
       const res = await client.get('/api/admin/payments');
       setPayments(res.data);
-    } catch (err) {
+    } catch {
       setError('Failed to load payments');
     } finally {
       setLoading(false);
@@ -92,183 +92,170 @@ export default function AdminManagePaymentsPage() {
   };
 
   return (
-    <div className="row">
-      <div className="col-md-12">
-        <h2 className="page-title">Manage Payments</h2>
+    <div className="space-y-5">
+      <div>
+        <h2 className="page-title text-xl font-bold text-slate-900 tracking-tight">Manage Payments</h2>
+        <p className="text-xs text-slate-500 mt-0.5">Monitor gateway settlements, reconcile pending transactions, and manage manual approvals</p>
+      </div>
 
-        {error && (
-          <div className="errorWrap" style={{
-            padding: '10px',
-            margin: '0 0 20px 0',
-            background: '#fff',
-            borderLeft: '4px solid #dd3d36',
-            boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-          }}>
-            <strong>ERROR</strong>: {error}
-          </div>
-        )}
-        {msg && (
-          <div className="succWrap" style={{
-            padding: '10px',
-            margin: '0 0 20px 0',
-            background: '#fff',
-            borderLeft: '4px solid #5cb85c',
-            boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-          }}>
-            <strong>SUCCESS</strong>: {msg}
-          </div>
-        )}
+      {error && <div className="errorWrap"><strong>ERROR</strong>: {error}</div>}
+      {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
 
-        <div className="panel panel-default">
-          <div className="panel-heading">Payment Details</div>
-          <div className="panel-body" style={{ overflowX: 'auto' }}>
-            {loading ? (
-              <p>Loading payments...</p>
-            ) : (
-              <table id="zctb" className="display table table-striped table-bordered table-hover" cellSpacing="0" width="100%">
-                <thead>
+      <div className="bento-card overflow-hidden">
+        <div className="px-5 py-4 border-b border-hairline flex items-center justify-between">
+          <span className="text-sm font-bold text-slate-900">Payment Details</span>
+          <span className="text-xs text-slate-400 tabular-nums">{payments.length} transactions</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          {loading ? (
+            <p className="p-6 text-sm text-slate-500">Loading payments...</p>
+          ) : (
+            <table id="zctb" className="w-full text-left text-xs">
+              <thead className="bg-slate-50/80 text-slate-500 uppercase tracking-wider border-b border-hairline">
+                <tr>
+                  <th className="px-3.5 py-3 font-semibold">#</th>
+                  <th className="px-3.5 py-3 font-semibold">Booking ID</th>
+                  <th className="px-3.5 py-3 font-semibold">User</th>
+                  <th className="px-3.5 py-3 font-semibold">Vehicle</th>
+                  <th className="px-3.5 py-3 font-semibold">Amount</th>
+                  <th className="px-3.5 py-3 font-semibold">Gateway</th>
+                  <th className="px-3.5 py-3 font-semibold">Order ID</th>
+                  <th className="px-3.5 py-3 font-semibold">Payment ID</th>
+                  <th className="px-3.5 py-3 font-semibold">Method</th>
+                  <th className="px-3.5 py-3 font-semibold">Payment Date</th>
+                  <th className="px-3.5 py-3 font-semibold">Status</th>
+                  <th className="px-3.5 py-3 font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-hairline">
+                {payments.length === 0 ? (
                   <tr>
-                    <th>#</th>
-                    <th>Booking ID</th>
-                    <th>User</th>
-                    <th>Vehicle</th>
-                    <th>Amount</th>
-                    <th>Gateway</th>
-                    <th>Order ID</th>
-                    <th>Payment ID</th>
-                    <th>Method</th>
-                    <th>Payment Date</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <td colSpan={12} className="px-4 py-8 text-center text-slate-400">
+                      No payments found
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {payments.length === 0 ? (
-                    <tr>
-                      <td colSpan="12" className="text-center">No payments found</td>
-                    </tr>
-                  ) : (
-                    payments.map((p, idx) => {
-                      const isAutomated = p.gateway && p.gateway !== 'manual';
-                      const gatewayName = p.gateway
-                        ? (p.gateway.charAt(0).toUpperCase() + p.gateway.slice(1))
-                        : 'Manual';
+                ) : (
+                  payments.map((p, idx) => {
+                    const isAutomated = p.gateway && p.gateway !== 'manual';
+                    const gatewayName = p.gateway
+                      ? p.gateway.charAt(0).toUpperCase() + p.gateway.slice(1)
+                      : 'Manual';
 
-                      return (
-                        <tr key={p.id}>
-                          <td>{idx + 1}</td>
-                          <td>{p.booking_id}</td>
-                          <td>{p.FullName}</td>
-                          <td>{p.VehiclesTitle}</td>
-                          <td>Rs. {p.amount}</td>
-                          <td>
-                            <span className={`label ${isAutomated ? 'label-info' : 'label-default'}`}>
-                              {gatewayName}
+                    return (
+                      <tr key={p.id} className="hover:bg-slate-50/60">
+                        <td className="px-3.5 py-3 tabular-nums text-slate-500">{idx + 1}</td>
+                        <td className="px-3.5 py-3 tabular-nums font-semibold text-slate-900">{p.booking_id}</td>
+                        <td className="px-3.5 py-3 text-slate-800">{p.FullName}</td>
+                        <td className="px-3.5 py-3 text-slate-700">{p.VehiclesTitle}</td>
+                        <td className="px-3.5 py-3 font-semibold text-slate-900 tabular-nums">Rs. {p.amount}</td>
+                        <td className="px-3.5 py-3">
+                          <span
+                            className={`label px-2 py-0.5 rounded-md text-[11px] font-semibold ${
+                              isAutomated
+                                ? 'label-info bg-indigo-50 text-indigo-700 border border-indigo-200'
+                                : 'label-default bg-slate-100 text-slate-700'
+                            }`}
+                          >
+                            {gatewayName}
+                          </span>
+                        </td>
+                        <td className="px-3.5 py-3 font-mono text-[11px] text-slate-500">
+                          {p.gateway_order_id || '-'}
+                        </td>
+                        <td className="px-3.5 py-3 font-mono text-[11px] text-slate-500">
+                          {p.gateway_payment_id || p.transaction_id || '-'}
+                        </td>
+                        <td className="px-3.5 py-3 text-slate-600">{p.payment_method || '-'}</td>
+                        <td className="px-3.5 py-3 tabular-nums text-slate-500">
+                          {p.payment_date ? new Date(p.payment_date).toLocaleString() : ''}
+                        </td>
+                        <td className="px-3.5 py-3">
+                          {p.payment_status === 'needs_refund' ? (
+                            <div>
+                              <span className="label label-danger inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                                Needs Refund
+                              </span>
+                              {p.failure_reason && (
+                                <div className="text-[11px] text-rose-600 mt-1">{p.failure_reason}</div>
+                              )}
+                            </div>
+                          ) : p.payment_status === 'confirmed' ? (
+                            <span className="label label-success inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              Confirmed
                             </span>
-                          </td>
-                          <td style={{ fontSize: '11px', fontFamily: 'monospace' }}>
-                            {p.gateway_order_id || '-'}
-                          </td>
-                          <td style={{ fontSize: '11px', fontFamily: 'monospace' }}>
-                            {p.gateway_payment_id || p.transaction_id || '-'}
-                          </td>
-                          <td>{p.payment_method || '-'}</td>
-                          <td>{p.payment_date ? new Date(p.payment_date).toLocaleString() : ''}</td>
-                          <td>
-                            {p.payment_status === 'needs_refund' ? (
-                              <div>
-                                <span className="label label-danger" style={{ backgroundColor: '#d9534f', fontSize: '11px', padding: '4px 8px', display: 'inline-block' }}>
-                                  Needs Refund
-                                </span>
-                                {p.failure_reason && (
-                                  <div style={{ fontSize: '11px', color: '#c9302c', marginTop: '3px' }}>
-                                    {p.failure_reason}
-                                  </div>
-                                )}
-                              </div>
-                            ) : p.payment_status === 'confirmed' ? (
-                              <span className="label label-success" style={{ backgroundColor: '#5cb85c', fontSize: '11px', padding: '4px 8px' }}>
-                                Confirmed
+                          ) : p.payment_status === 'failed' ? (
+                            <div>
+                              <span className="label label-default inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                Failed
                               </span>
-                            ) : p.payment_status === 'failed' ? (
-                              <div>
-                                <span className="label label-default" style={{ backgroundColor: '#777', fontSize: '11px', padding: '4px 8px' }}>
-                                  Failed
-                                </span>
-                                {p.failure_reason && (
-                                  <div style={{ fontSize: '11px', color: '#777', marginTop: '3px' }}>
-                                    {p.failure_reason}
-                                  </div>
-                                )}
-                              </div>
+                              {p.failure_reason && (
+                                <div className="text-[11px] text-slate-500 mt-1">{p.failure_reason}</div>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="capitalize font-semibold text-amber-700">{p.payment_status}</span>
+                          )}
+                          {p.booking_status === 2 && p.payment_status !== 'needs_refund' && (
+                            <div className="mt-1">
+                              <span className="label label-warning inline-block px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                Booking Cancelled
+                              </span>
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-3.5 py-3 whitespace-nowrap">
+                          {actionInProgress === p.id ? (
+                            <span className="text-slate-400">Processing...</span>
+                          ) : isAutomated ? (
+                            p.payment_status === 'pending' ? (
+                              <a
+                                href="#reconcile"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleReconcile(p.id);
+                                }}
+                                className="px-2.5 py-1 rounded-lg bg-lavender-50 text-lavender-600 hover:bg-lavender-100 font-semibold no-underline"
+                              >
+                                Reconcile
+                              </a>
                             ) : (
-                              <span style={{ textTransform: 'capitalize', fontWeight: 'bold' }}>
-                                {p.payment_status}
-                              </span>
-                            )}
-                            {p.booking_status === 2 && p.payment_status !== 'needs_refund' && (
-                              <div style={{ marginTop: '3px' }}>
-                                <span className="label label-warning" style={{ fontSize: '10px' }}>Booking Cancelled</span>
-                              </div>
-                            )}
-                          </td>
-                          <td>
-                            {actionInProgress === p.id ? (
-                              <span>Processing...</span>
-                            ) : isAutomated ? (
-                              p.payment_status === 'pending' ? (
-                                <a
-                                  href="#reconcile"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    handleReconcile(p.id);
-                                  }}
-                                  className="btn btn-xs btn-primary"
-                                >
-                                  Reconcile
-                                </a>
-                              ) : (
-                                <span className="text-muted" style={{ fontSize: '12px' }}>
-                                  Automated
-                                </span>
-                              )
-                            ) : p.payment_status === 'pending' ? (
-                              <>
-                                <a
-                                  href="#confirm"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    handleConfirm(p.id);
-                                  }}
-                                >
-                                  Confirm
-                                </a>
-                                {' / '}
-                                <a
-                                  href="#reject"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    handleReject(p.id);
-                                  }}
-                                  style={{ color: '#dd3d36' }}
-                                >
-                                  Reject
-                                </a>
-                              </>
-                            ) : (
-                              <span style={{ textTransform: 'capitalize' }}>
-                                {p.payment_status}
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            )}
-          </div>
+                              <span className="text-slate-400">Automated</span>
+                            )
+                          ) : p.payment_status === 'pending' ? (
+                            <div className="flex items-center gap-2">
+                              <a
+                                href="#confirm"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleConfirm(p.id);
+                                }}
+                                className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold no-underline"
+                              >
+                                Confirm
+                              </a>
+                              <a
+                                href="#reject"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleReject(p.id);
+                                }}
+                                className="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 font-semibold no-underline"
+                              >
+                                Reject
+                              </a>
+                            </div>
+                          ) : (
+                            <span className="capitalize text-slate-500">{p.payment_status}</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

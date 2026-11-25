@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Lock, User, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function AdminLoginPage() {
@@ -40,76 +41,83 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div
-      className="login-page bk-img"
-      style={{
-        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
-        minHeight: '100vh',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        paddingTop: '60px',
-      }}
-    >
-      <div className="form-content">
-        <div className="container">
-          <div className="row">
-            <div className="col-md-6 col-md-offset-3">
-              <h1 className="text-center text-bold text-light mt-4x" style={{ color: '#fff', marginBottom: '30px' }}>
-                Sign in
-              </h1>
-              <div className="well row pt-2x pb-3x bk-light">
-                <div className="col-md-8 col-md-offset-2">
-                  {error && (
-                    <div className="alert alert-danger" style={{ marginBottom: '15px' }}>
-                      {error}
-                    </div>
-                  )}
+    <div className="min-h-screen bg-canvas flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md bento-card p-7 sm:p-8 shadow-sm">
+        <div className="flex flex-col items-center text-center mb-6">
+          <img
+            src="/img/logo.JPG"
+            alt="WanderWheels"
+            className="w-14 h-14 rounded-2xl object-cover border border-hairline shadow-xs mb-3"
+          />
+          <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
+            Wander<span className="text-rose-600">Wheels</span> Admin
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">
+            Sign in to Fleet Operations & Analytics
+          </p>
+        </div>
 
-                  <form onSubmit={handleSubmit}>
-                    <label htmlFor="username" className="text-uppercase text-sm">
-                      Your Username
-                    </label>
-                    <input
-                      id="username"
-                      type="text"
-                      placeholder="Username"
-                      name="username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="form-control mb"
-                      style={{ marginBottom: '15px' }}
-                      required
-                    />
+        {error && (
+          <div className="alert alert-danger mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
+            <span>{error}</span>
+          </div>
+        )}
 
-                    <label htmlFor="password" className="text-uppercase text-sm">
-                      Password
-                    </label>
-                    <input
-                      id="password"
-                      type="password"
-                      placeholder="Password"
-                      name="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="form-control mb"
-                      style={{ marginBottom: '20px' }}
-                      required
-                    />
-
-                    <button
-                      className="btn btn-primary btn-block"
-                      name="login"
-                      type="submit"
-                      disabled={loading}
-                    >
-                      {loading ? 'LOGGING IN...' : 'LOGIN'}
-                    </button>
-                  </form>
-                </div>
-              </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label
+              htmlFor="username"
+              className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5"
+            >
+              Your Username
+            </label>
+            <div className="relative">
+              <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                id="username"
+                type="text"
+                placeholder="Username"
+                name="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-slate-900 outline-none transition"
+                required
+              />
             </div>
           </div>
-        </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5"
+            >
+              Password
+            </label>
+            <div className="relative">
+              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                id="password"
+                type="password"
+                placeholder="Password"
+                name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-slate-900 outline-none transition"
+                required
+              />
+            </div>
+          </div>
+
+          <button
+            className="w-full py-3 px-4 rounded-xl bg-lavender-600 hover:bg-lavender-700 text-white font-bold text-xs uppercase tracking-wider transition cursor-pointer disabled:opacity-60"
+            name="login"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? 'LOGGING IN...' : 'LOGIN'}
+          </button>
+        </form>
       </div>
     </div>
   );

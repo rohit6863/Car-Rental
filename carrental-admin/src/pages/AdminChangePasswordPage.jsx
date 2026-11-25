@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { KeyRound, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const COMMON_PASSWORDS = new Set([
@@ -80,105 +81,85 @@ export default function AdminChangePasswordPage() {
   };
 
   return (
-    <div className="row">
-      <div className="col-md-12">
-        <h2 className="page-title">Change Password</h2>
+    <div className="space-y-5 max-w-2xl">
+      <div>
+        <h2 className="page-title text-xl font-bold text-slate-900 tracking-tight">Change Password</h2>
+        <p className="text-xs text-slate-500 mt-0.5">Update administrator credentials (minimum 12 characters)</p>
+      </div>
 
-        {mustChangePassword && (
-          <div className="alert alert-warning">
-            <strong>Security Notice:</strong> You must change the default password before proceeding.
-          </div>
-        )}
-
-        <div className="row">
-          <div className="col-md-10">
-            <div className="panel panel-default">
-              <div className="panel-heading">Form fields</div>
-              <div className="panel-body">
-                {error && (
-                  <div className="errorWrap" style={{
-                    padding: '10px',
-                    margin: '0 0 20px 0',
-                    background: '#fff',
-                    borderLeft: '4px solid #dd3d36',
-                    boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-                  }}>
-                    <strong>ERROR</strong>: {error}
-                  </div>
-                )}
-                {msg && (
-                  <div className="succWrap" style={{
-                    padding: '10px',
-                    margin: '0 0 20px 0',
-                    background: '#fff',
-                    borderLeft: '4px solid #5cb85c',
-                    boxShadow: '0 1px 1px 0 rgba(0,0,0,.1)'
-                  }}>
-                    <strong>SUCCESS</strong>: {msg}
-                  </div>
-                )}
-
-                <form className="form-horizontal" onSubmit={handleSubmit}>
-                  <div className="form-group">
-                    <label className="col-sm-4 control-label" htmlFor="password">Current Password</label>
-                    <div className="col-sm-8">
-                      <input
-                        type="password"
-                        className="form-control"
-                        name="password"
-                        id="password"
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="hr-dashed" style={{ borderTop: '1px dashed #e4e4e4', margin: '20px 0' }}></div>
-
-                  <div className="form-group">
-                    <label className="col-sm-4 control-label" htmlFor="newpassword">New Password</label>
-                    <div className="col-sm-8">
-                      <input
-                        type="password"
-                        className="form-control"
-                        name="newpassword"
-                        id="newpassword"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="hr-dashed" style={{ borderTop: '1px dashed #e4e4e4', margin: '20px 0' }}></div>
-
-                  <div className="form-group">
-                    <label className="col-sm-4 control-label" htmlFor="confirmpassword">Confirm Password</label>
-                    <div className="col-sm-8">
-                      <input
-                        type="password"
-                        className="form-control"
-                        name="confirmpassword"
-                        id="confirmpassword"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="hr-dashed" style={{ borderTop: '1px dashed #e4e4e4', margin: '20px 0' }}></div>
-
-                  <div className="form-group">
-                    <div className="col-sm-8 col-sm-offset-4">
-                      <button className="btn btn-primary" name="submit" type="submit" disabled={submitting}>
-                        {submitting ? 'Saving...' : 'Save changes'}
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
+      {mustChangePassword && (
+        <div className="alert alert-warning">
+          <strong>Security Notice:</strong> You must change the default password before proceeding.
         </div>
+      )}
+
+      {error && <div className="errorWrap"><strong>ERROR</strong>: {error}</div>}
+      {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
+
+      <div className="bento-card p-6">
+        <div className="flex items-center gap-2 pb-3 mb-4 border-b border-hairline">
+          <KeyRound className="w-4 h-4 text-lavender-600" />
+          <h3 className="text-sm font-bold text-slate-900">Password Settings</h3>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="password" className="block text-xs font-semibold text-slate-600 mb-1.5">
+              Current Password
+            </label>
+            <input
+              type="password"
+              className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
+              name="password"
+              id="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="newpassword" className="block text-xs font-semibold text-slate-600 mb-1.5">
+              New Password
+            </label>
+            <input
+              type="password"
+              className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
+              name="newpassword"
+              id="newpassword"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="confirmpassword" className="block text-xs font-semibold text-slate-600 mb-1.5">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
+              name="confirmpassword"
+              id="confirmpassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="pt-2 flex justify-end">
+            <button
+              className="px-5 py-2.5 rounded-xl bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-semibold inline-flex items-center gap-2 cursor-pointer disabled:opacity-60"
+              name="submit"
+              type="submit"
+              disabled={submitting}
+            >
+              <Check className="w-4 h-4" />
+              <span>{submitting ? 'Saving...' : 'Save changes'}</span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
