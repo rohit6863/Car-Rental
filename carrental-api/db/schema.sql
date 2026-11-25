@@ -8,7 +8,7 @@
 CREATE TABLE IF NOT EXISTS `admin` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `UserName` varchar(100) NOT NULL,
-  `Password` varchar(255) NOT NULL,
+  `Password` varchar(255) DEFAULT NULL,
   `updationDate` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_admin_username` (`UserName`)
@@ -117,11 +117,11 @@ CREATE TABLE IF NOT EXISTS `tblpages` (
 CREATE TABLE IF NOT EXISTS `tblpayments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `booking_id` int(11) NOT NULL,
-  `user_email` varchar(100) NOT NULL,
+  `user_email` varchar(100) DEFAULT NULL,
   `amount` decimal(10,2) NOT NULL,
   `currency` varchar(10) NOT NULL DEFAULT 'INR',
-  `payment_method` varchar(50) NOT NULL,
-  `transaction_id` varchar(255) NOT NULL,
+  `payment_method` varchar(50) DEFAULT NULL,
+  `transaction_id` varchar(255) DEFAULT NULL,
   `payment_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `confirmation_date` timestamp NULL DEFAULT NULL,
   `payment_status` varchar(50) NOT NULL DEFAULT 'pending',
