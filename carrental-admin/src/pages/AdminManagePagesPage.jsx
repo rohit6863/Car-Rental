@@ -92,23 +92,23 @@ export default function AdminManagePagesPage() {
   return (
     <div className="space-y-5 max-w-4xl">
       <div>
-        <h2 className="page-title text-xl font-bold text-slate-900 tracking-tight">Manage Pages</h2>
-        <p className="text-xs text-slate-500 mt-0.5">Edit Terms, Privacy Policy, About Us, and FAQs content</p>
+        <h2 className="page-title text-xl font-bold text-slate-900 dark:text-white tracking-tight">Manage Pages</h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Edit Terms, Privacy Policy, About Us, and FAQs content</p>
       </div>
 
       {error && <div className="errorWrap"><strong>ERROR</strong>: {error}</div>}
       {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
 
       <div className="bento-card p-6">
-        <div className="flex items-center gap-2 pb-3 mb-4 border-b border-hairline">
-          <FileText className="w-4 h-4 text-lavender-600" />
-          <h3 className="text-sm font-bold text-slate-900">CMS Page Editor</h3>
+        <div className="flex items-center gap-2 pb-3 mb-4 border-b border-hairline dark:border-slate-800">
+          <FileText className="w-4 h-4 text-lavender-600 dark:text-indigo-400" />
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white">CMS Page Editor</h3>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
             <div>
-              <label htmlFor="menu1" className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label htmlFor="menu1" className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
                 Select Page
               </label>
               <select
@@ -116,7 +116,7 @@ export default function AdminManagePagesPage() {
                 name="menu1"
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white outline-none"
               >
                 <option value="">***Select One***</option>
                 <option value="terms">terms and condition</option>
@@ -126,18 +126,18 @@ export default function AdminManagePagesPage() {
               </select>
             </div>
             <div>
-              <div className="text-xs font-semibold text-slate-500 mb-1">Selected Page</div>
-              <div className="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-hairline text-sm font-bold text-slate-900">
+              <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Selected Page</div>
+              <div className="px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-hairline dark:border-slate-700 text-sm font-bold text-slate-900 dark:text-white">
                 {PAGE_NAMES[selectedType] || 'None'}
               </div>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Page Details</label>
+            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Page Details</label>
             {loading && <p className="text-xs text-slate-400 mb-2">Loading editor...</p>}
-            <div className="rounded-xl overflow-hidden border border-slate-200 bg-white">
-              <div ref={editorContainerRef} style={{ minHeight: '240px', background: '#fff' }} />
+            <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+              <div ref={editorContainerRef} style={{ minHeight: '240px' }} />
             </div>
           </div>
 

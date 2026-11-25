@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
@@ -15,6 +16,12 @@
     background-color: #F4F7FE;
     color: #0F172A;
     font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .dark body {
+    background-color: #020617;
+    color: #F1F5F9;
   }
 
   ::-webkit-scrollbar {
@@ -24,9 +31,15 @@
   ::-webkit-scrollbar-track {
     background: #F4F7FE;
   }
+  .dark ::-webkit-scrollbar-track {
+    background: #0F172A;
+  }
   ::-webkit-scrollbar-thumb {
     background: #CBD5E1;
     border-radius: 9999px;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: #334155;
   }
   ::-webkit-scrollbar-thumb:hover {
     background: #94A3B8;
@@ -38,6 +51,13 @@
   border: 1px solid #E5E9F2;
   border-radius: 14px;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.dark .bento-card {
+  background: #0F172A;
+  border-color: #1E293B;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 .tabular-nums {
@@ -56,6 +76,12 @@
   font-weight: 600;
 }
 
+.dark .succWrap {
+  background-color: rgba(6, 78, 59, 0.45);
+  border-color: #065F46;
+  color: #6EE7B7;
+}
+
 .errorWrap {
   padding: 0.875rem 1rem;
   margin-bottom: 1.25rem;
@@ -68,6 +94,12 @@
   font-weight: 600;
 }
 
+.dark .errorWrap {
+  background-color: rgba(136, 19, 55, 0.45);
+  border-color: #9F1239;
+  color: #FDA4AF;
+}
+
 .alert-warning {
   padding: 0.875rem 1rem;
   margin-bottom: 1.25rem;
@@ -78,4 +110,58 @@
   color: #92400E;
   font-size: 0.8125rem;
   font-weight: 600;
+}
+
+.dark .alert-warning {
+  background-color: rgba(120, 53, 15, 0.45);
+  border-color: #92400E;
+  color: #FCD34D;
+}
+
+/* Dark mode support for Quill Rich Text Editor */
+.dark .ql-toolbar.ql-snow {
+  background-color: #1E293B;
+  border-color: #334155;
+}
+.dark .ql-toolbar.ql-snow .ql-stroke {
+  stroke: #CBD5E1;
+}
+.dark .ql-toolbar.ql-snow .ql-fill {
+  fill: #CBD5E1;
+}
+.dark .ql-toolbar.ql-snow .ql-picker-label {
+  color: #CBD5E1;
+}
+.dark .ql-toolbar.ql-snow .ql-picker-options {
+  background-color: #1E293B;
+  border-color: #334155;
+  color: #F1F5F9;
+}
+.dark .ql-container.ql-snow {
+  background-color: #0F172A;
+  border-color: #334155;
+  color: #F1F5F9;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .gst-invoice-printable,
+  .gst-invoice-printable * {
+    visibility: visible;
+  }
+  .gst-invoice-printable {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #FFFFFF !important;
+    color: #0F172A !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .no-print {
+    display: none !important;
+  }
 }

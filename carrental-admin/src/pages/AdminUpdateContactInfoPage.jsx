@@ -59,29 +59,29 @@ export default function AdminUpdateContactInfoPage() {
   return (
     <div className="space-y-5 max-w-2xl">
       <div>
-        <h2 className="page-title text-xl font-bold text-slate-900 tracking-tight">Update Contact Info</h2>
-        <p className="text-xs text-slate-500 mt-0.5">Configure public support email, helpline number, and office address</p>
+        <h2 className="page-title text-xl font-bold text-slate-900 dark:text-white tracking-tight">Update Contact Info</h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Configure public support email, helpline number, and office address</p>
       </div>
 
       {error && <div className="errorWrap"><strong>ERROR</strong>: {error}</div>}
       {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
 
       <div className="bento-card p-6">
-        <div className="flex items-center gap-2 pb-3 mb-4 border-b border-hairline">
-          <Headphones className="w-4 h-4 text-lavender-600" />
-          <h3 className="text-sm font-bold text-slate-900">Contact & Helpline Details</h3>
+        <div className="flex items-center gap-2 pb-3 mb-4 border-b border-hairline dark:border-slate-800">
+          <Headphones className="w-4 h-4 text-lavender-600 dark:text-indigo-400" />
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white">Contact & Helpline Details</h3>
         </div>
 
         {loading ? (
-          <p className="text-sm text-slate-500">Loading contact information...</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Loading contact information...</p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="address" className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label htmlFor="address" className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
                 Address
               </label>
               <textarea
-                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white outline-none"
                 name="address"
                 id="address"
                 rows={3}
@@ -92,12 +92,12 @@ export default function AdminUpdateContactInfoPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label htmlFor="email" className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
                 Email id
               </label>
               <input
                 type="email"
-                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white outline-none"
                 name="email"
                 id="email"
                 value={formData.email}
@@ -107,12 +107,12 @@ export default function AdminUpdateContactInfoPage() {
             </div>
 
             <div>
-              <label htmlFor="contactno" className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label htmlFor="contactno" className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
                 Contact Number
               </label>
               <input
                 type="text"
-                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white outline-none"
                 name="contactno"
                 id="contactno"
                 value={formData.contactno}

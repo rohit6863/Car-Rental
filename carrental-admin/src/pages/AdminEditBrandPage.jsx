@@ -59,10 +59,10 @@ export default function AdminEditBrandPage() {
     <div className="space-y-5 max-w-2xl">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h2 className="page-title text-xl font-bold text-slate-900 tracking-tight">Edit Brand</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Update manufacturer name</p>
+          <h2 className="page-title text-xl font-bold text-slate-900 dark:text-white tracking-tight">Edit Brand</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Update manufacturer name</p>
         </div>
-        <Link to="/manage-brands" className="text-xs font-semibold text-slate-600 hover:text-lavender-600 no-underline">
+        <Link to="/manage-brands" className="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-lavender-600 dark:hover:text-indigo-400 no-underline">
           &larr; Manage Brands
         </Link>
       </div>
@@ -71,22 +71,22 @@ export default function AdminEditBrandPage() {
       {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
 
       <div className="bento-card p-6">
-        <div className="flex items-center gap-2 pb-3 mb-4 border-b border-hairline">
-          <Award className="w-4 h-4 text-lavender-600" />
-          <h3 className="text-sm font-bold text-slate-900">Brand Details</h3>
+        <div className="flex items-center gap-2 pb-3 mb-4 border-b border-hairline dark:border-slate-800">
+          <Award className="w-4 h-4 text-lavender-600 dark:text-indigo-400" />
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white">Brand Details</h3>
         </div>
 
         {loading ? (
-          <p className="text-sm text-slate-500">Loading brand data...</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Loading brand data...</p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="brand" className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label htmlFor="brand" className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
                 Brand Name <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
-                className="w-full bg-white border border-slate-200 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 outline-none"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-lavender-600 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white outline-none"
                 name="brand"
                 id="brand"
                 value={brand}

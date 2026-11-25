@@ -12,14 +12,23 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import './index.css';
 
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { ToastProvider } from './context/ToastContext';
+import { SearchProvider } from './context/SearchContext';
 import App from './App';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+      <ThemeProvider>
+        <ToastProvider>
+          <SearchProvider>
+            <AuthProvider>
+              <App />
+            </AuthProvider>
+          </SearchProvider>
+        </ToastProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

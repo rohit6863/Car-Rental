@@ -49,8 +49,8 @@ export default function AdminManageBrandsPage() {
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="page-title text-xl font-bold text-slate-900 tracking-tight">Manage Brands</h2>
-          <p className="text-xs text-slate-500 mt-0.5">All vehicle manufacturers available in the portal</p>
+          <h2 className="page-title text-xl font-bold text-slate-900 dark:text-white tracking-tight">Manage Brands</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">All vehicle manufacturers available in the portal</p>
         </div>
         <Link
           to="/create-brand"
@@ -65,17 +65,17 @@ export default function AdminManageBrandsPage() {
       {msg && <div className="succWrap"><strong>SUCCESS</strong>: {msg}</div>}
 
       <div className="bento-card overflow-hidden">
-        <div className="px-5 py-4 border-b border-hairline flex items-center justify-between">
-          <span className="text-sm font-bold text-slate-900">Listed Brands</span>
+        <div className="px-5 py-4 border-b border-hairline dark:border-slate-800 flex items-center justify-between">
+          <span className="text-sm font-bold text-slate-900 dark:text-white">Listed Brands</span>
           <span className="text-xs text-slate-400 tabular-nums">{brands.length} total</span>
         </div>
 
         <div className="overflow-x-auto">
           {loading ? (
-            <p className="p-6 text-sm text-slate-500">Loading brands...</p>
+            <p className="p-6 text-sm text-slate-500 dark:text-slate-400">Loading brands...</p>
           ) : (
             <table id="zctb" className="w-full text-left text-xs">
-              <thead className="bg-slate-50/80 text-slate-500 uppercase tracking-wider border-b border-hairline">
+              <thead className="bg-slate-50/80 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-hairline dark:border-slate-800">
                 <tr>
                   <th className="px-4 py-3 font-semibold">#</th>
                   <th className="px-4 py-3 font-semibold">Brand Name</th>
@@ -84,7 +84,7 @@ export default function AdminManageBrandsPage() {
                   <th className="px-4 py-3 font-semibold">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-hairline">
+              <tbody className="divide-y divide-hairline dark:divide-slate-800">
                 {brands.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
@@ -93,18 +93,18 @@ export default function AdminManageBrandsPage() {
                   </tr>
                 ) : (
                   brands.map((b, idx) => (
-                    <tr key={b.id} className="hover:bg-slate-50/60">
-                      <td className="px-4 py-3 tabular-nums text-slate-500">{idx + 1}</td>
-                      <td className="px-4 py-3 font-semibold text-slate-900">{b.BrandName}</td>
-                      <td className="px-4 py-3 text-slate-600 tabular-nums">
+                    <tr key={b.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                      <td className="px-4 py-3 tabular-nums text-slate-500 dark:text-slate-400">{idx + 1}</td>
+                      <td className="px-4 py-3 font-semibold text-slate-900 dark:text-white">{b.BrandName}</td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 tabular-nums">
                         {b.CreationDate ? new Date(b.CreationDate).toLocaleString() : ''}
                       </td>
-                      <td className="px-4 py-3 text-slate-600 tabular-nums">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 tabular-nums">
                         {b.UpdationDate ? new Date(b.UpdationDate).toLocaleString() : ''}
                       </td>
                       <td className="action-links px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <Link to={`/edit-brand/${b.id}`} title="Edit" className="text-lavender-600 hover:text-lavender-700">
+                          <Link to={`/edit-brand/${b.id}`} title="Edit" className="text-lavender-600 dark:text-indigo-400 hover:text-lavender-700">
                             <Pencil className="w-4 h-4" />
                           </Link>
                           <a
@@ -114,7 +114,7 @@ export default function AdminManageBrandsPage() {
                               e.preventDefault();
                               handleDelete(b.id);
                             }}
-                            className="text-rose-600 hover:text-rose-700"
+                            className="text-rose-600 dark:text-rose-400 hover:text-rose-700"
                           >
                             <Trash2 className="w-4 h-4" />
                           </a>
