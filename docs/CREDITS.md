@@ -39,14 +39,11 @@ All retained third-party software, fonts, and stylesheets have been verified aga
 
 | Asset / Package | Category | Version | Author / Organization | Verified License |
 | :--- | :--- | :--- | :--- | :--- |
-| Font Awesome (`@fortawesome/fontawesome-free` in `carrental-web`; v4.7.0 in `carrental-admin`) | Web Fonts & Icons | 6.x / 4.7.0 | Fonticons, Inc. / Dave Gandy | SIL OFL 1.1 (Fonts) / MIT (CSS) |
-| Bootstrap (`carrental-admin` only; removed from `carrental-web`) | UI Framework & Glyphicons | 3.3.7 | Twitter, Inc. / Thomas Park | MIT License |
-| Bootstrap Select (`carrental-admin`) | Select Dropdowns | 1.7.2 | Silvio Moreto | MIT License |
-| Bootstrap Social (`carrental-admin`) | Social Button Styles | 4.9.0 | Panayiotis Lipiridis | MIT License |
-| Awesome Bootstrap Checkbox (`carrental-admin`) | Form Controls | 0.3.7 | Flatlogic | MIT License |
-| DataTables Bootstrap (`carrental-admin`) | Data Table Styling | 1.10.x | SpryMedia Ltd | MIT License |
-| `@fontsource/outfit` & `@fontsource/plus-jakarta-sans` (`carrental-web`) | Web Fonts | 5.x | Google Fonts / Fontsource | SIL OFL 1.1 |
-| `tailwindcss` (`carrental-web`) | Utility CSS Framework | 4.x | Tailwind Labs | MIT License |
+| Font Awesome (`@fortawesome/fontawesome-free`) | Web Fonts & Icons | 6.x / 7.x | Fonticons, Inc. | SIL OFL 1.1 (Fonts) / MIT (CSS) |
+| `lucide-react` (`carrental-admin`) | Vector Icons | 0.x | Lucide Contributors | ISC License |
+| `chart.js` & `react-chartjs-2` (`carrental-admin`) | Analytics Charts | 4.x / 5.x | Chart.js Contributors | MIT License |
+| `@fontsource/outfit` & `@fontsource/plus-jakarta-sans` | Web Fonts | 5.x | Google Fonts / Fontsource | SIL OFL 1.1 |
+| `tailwindcss` (`carrental-web` & `carrental-admin`) | Utility CSS Framework | 4.x | Tailwind Labs | MIT License |
 | `react` & `react-dom` | Frontend Framework | 18.3.1 | Meta Platforms, Inc. | MIT License |
 | `react-router-dom` | Client Routing | 6.x | Remix Software | MIT License |
 | `axios` | HTTP Client | 1.21.0 | Matt Zabriskie | MIT License |
@@ -74,17 +71,9 @@ All retained third-party software, fonts, and stylesheets have been verified aga
 
 All legacy Class-C template stylesheets (`style.css`, `bootstrap.min.css`, `owl.carousel.css`, `owl.transitions.css`, `slick.css`, `bootstrap-slider.min.css`, `font-awesome.min.css`) and Bootstrap/jQuery JS packages have been removed from `carrental-web` and replaced with Tailwind CSS v4, self-hosted `@fontsource` fonts, and pure React components.
 
-### Retained CSS Sections in `carrental-admin/public/css/style.css`
+### `carrental-admin/public/css/style.css` (Removed)
 
-The admin portal stylesheet (`747 lines`) originates from a legacy Bootstrap admin dashboard template:
-- Global typography and body resets (lines 1–48)
-- Admin action buttons and color variants (lines 49–98)
-- Form inputs, switches, and validation states (lines 99–129)
-- Layout containers and full-height page wrapper (`.bk-img`, `.login-page`, lines 130–150)
-- Brand header and navigation bar (`.brand`, `.ts-profile-nav`, `.ts-avatar`, lines 151–280)
-- Admin left sidebar navigation menu (`.ts-sidebar`, `.ts-sidebar-menu`, lines 281–480)
-- Dashboard statistics panels, count cards, and summary widgets (`.stat-panel`, lines 481–610)
-- Responsive layout toggles for mobile viewports (lines 611–747)
+All legacy Bootstrap 3, jQuery, Font Awesome 4.7, DataTables, and template stylesheets in `carrental-admin/public/css/` and `carrental-admin/public/fonts/` have been removed and replaced with Tailwind CSS v4, self-hosted `@fontsource/plus-jakarta-sans`, `@fortawesome/fontawesome-free`, `lucide-react`, and `chart.js`.
 
 ---
 
